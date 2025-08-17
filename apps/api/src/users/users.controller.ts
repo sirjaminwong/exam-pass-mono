@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { User, Prisma } from '../../generated/prisma';
+import { User, Prisma } from '@prisma/client';
 
 @ApiTags('users')
 @Controller('users')
