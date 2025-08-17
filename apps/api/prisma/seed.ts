@@ -73,8 +73,8 @@ async function main(): Promise<void> {
   console.log('已清理现有数据');
 
   // 创建管理员用户
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const hashedAdminPassword = (await bcrypt.hash('admin123', 10)) as string;
+
+  const hashedAdminPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.create({
     data: {
       email: 'admin@example.com',
@@ -85,8 +85,8 @@ async function main(): Promise<void> {
   });
 
   // 创建老师用户
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const hashedTeacherPassword = (await bcrypt.hash('teacher123', 10)) as string;
+
+  const hashedTeacherPassword = await bcrypt.hash('teacher123', 10);
   const teacher = await prisma.user.create({
     data: {
       email: 'teacher@example.com',
@@ -106,8 +106,8 @@ async function main(): Promise<void> {
   });
 
   // 创建学生用户
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const hashedStudentPassword = (await bcrypt.hash('student123', 10)) as string;
+
+  const hashedStudentPassword = await bcrypt.hash('student123', 10);
   await prisma.user.create({
     data: {
       email: 'student@example.com',
