@@ -14,12 +14,191 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 用户模型
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String?
+  role      UserRole @default(STUDENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // 关联关系
+  examAttempts ExamAttempt[]
+  wrongQuestions WrongQuestion[]
+  favoriteQuestions FavoriteQuestion[]
+  classMembers ClassMember[]
+
   @@map("users")
+}
+
+// 用户角色枚举
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+// 班级模型
+model Class {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  teacherId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联关系
+  members   ClassMember[]
+  exams     Exam[]
+
+  @@map("classes")
+}
+
+// 班级成员关系
+model ClassMember {
+  id      String @id @default(cuid())
+  userId  String
+  classId String
+  joinedAt DateTime @default(now())
+
+  // 关联关系
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId])
+  @@map("class_members")
+}
+
+// 试卷模型
+model Exam {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  classId     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关联关系
+  class     Class?        @relation(fields: [classId], references: [id])
+  questions ExamQuestion[]
+  attempts  ExamAttempt[]
+
+  @@map("exams")
+}
+
+// 题目模型
+model Question {
+  id          String      @id @default(cuid())
+  type        QuestionType
+  content     String      // 题目内容
+  options     Json?       // 选项（JSON格式存储）
+  correctAnswer Json      // 正确答案（JSON格式存储）
+  explanation String?     // 解析
+  score       Float       // 分值
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // 关联关系
+  examQuestions    ExamQuestion[]
+  answers          Answer[]
+  wrongQuestions   WrongQuestion[]
+  favoriteQuestions FavoriteQuestion[]
+
+  @@map("questions")
+}
+
+// 题目类型枚举
+enum QuestionType {
+  SINGLE_CHOICE     // 单选题 0.5分
+  MULTIPLE_CHOICE   // 多选题 1分
+  TRUE_FALSE        // 判断题 1分
+  INDEFINITE_CHOICE // 不定向选择题 1分
+}
+
+// 试卷题目关联
+model ExamQuestion {
+  id         String @id @default(cuid())
+  examId     String
+  questionId String
+  order      Int    // 题目顺序
+
+  // 关联关系
+  exam     Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, questionId])
+  @@map("exam_questions")
+}
+
+// 考试记录
+model ExamAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  examId      String
+  totalScore  Float    @default(0)
+  maxScore    Float    @default(0)
+  accuracy    Float    @default(0) // 正确率
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  isCompleted Boolean  @default(false)
+
+  // 关联关系
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exam    Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@map("exam_attempts")
+}
+
+// 答题记录
+model Answer {
+  id            String  @id @default(cuid())
+  attemptId     String
+  questionId    String
+  userAnswer    Json    // 用户答案（JSON格式）
+  isCorrect     Boolean @default(false)
+  score         Float   @default(0)
+  answeredAt    DateTime @default(now())
+
+  // 关联关系
+  attempt  ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@map("answers")
+}
+
+// 错题本
+model WrongQuestion {
+  id         String   @id @default(cuid())
+  userId     String
+  questionId String
+  addedAt    DateTime @default(now())
+  isResolved Boolean  @default(false) // 是否已解决（重新答对）
+  resolvedAt DateTime?
+
+  // 关联关系
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@map("wrong_questions")
+}
+
+// 收藏题目
+model FavoriteQuestion {
+  id         String   @id @default(cuid())
+  userId     String
+  questionId String
+  addedAt    DateTime @default(now())
+  note       String?  // 收藏备注
+
+  // 关联关系
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@map("favorite_questions")
 }
