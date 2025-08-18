@@ -11,8 +11,8 @@ export default defineConfig({
       override: {
         header: false,
         mutator: {
-          path: "./src/utils/request.ts",
-          name: "request",
+          path: './src/utils/orval-mutator.ts',
+          name: 'customInstance',
         },
       },
     },
