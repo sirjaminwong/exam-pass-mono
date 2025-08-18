@@ -34,20 +34,55 @@ export default function Home() {
           </ul>
         </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Link
+            href="/login"
+            className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
+          >
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              用户登录
+            </h2>
+            <p className="text-gray-600">
+              登录到考试系统
+            </p>
+          </Link>
+
+          <Link
+            href="/dashboard"
+            className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
+          >
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              用户主页
+            </h2>
+            <p className="text-gray-600">
+              查看考试记录和统计信息
+            </p>
+          </Link>
+
           <Link
             href="/users"
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-blue-600 text-white gap-2 hover:bg-blue-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+            className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
           >
-            用户管理
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              用户管理
+            </h2>
+            <p className="text-gray-600">
+              查看和管理系统用户
+            </p>
           </Link>
+
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
             href="http://localhost:3001/api"
             target="_blank"
             rel="noopener noreferrer"
+            className="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
           >
-            API 文档
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              API 文档
+            </h2>
+            <p className="text-gray-600">
+              查看 Swagger API 文档
+            </p>
           </a>
         </div>
       </main>
