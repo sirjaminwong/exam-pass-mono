@@ -1,16 +1,20 @@
-import { defineConfig } from 'orval';
+import { defineConfig } from "orval";
 
 export default defineConfig({
-  api: {
-    input: {
-      target: 'http://localhost:3001/api-json',
-    },
+  glimmer: {
+    input: "http://localhost:4001/api-yaml",
     output: {
-      mode: 'split',
-      target: 'src/lib/api.ts',
-      schemas: 'src/lib/model',
-      client: 'axios',
-      mock: true,
+      mode: "tags-split",
+      target: "./src/services",
+      schemas: "./src/models",
+      client: "react-query",
+      override: {
+        header: false,
+        mutator: {
+          path: "./src/utils/request.ts",
+          name: "request",
+        },
+      },
     },
   },
 });
