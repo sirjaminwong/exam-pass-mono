@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { WrongQuestionsService } from './wrong-questions.service';
 import { WrongQuestion, Prisma } from '@prisma/client';
@@ -25,6 +26,30 @@ export class WrongQuestionsController {
 
   @Post()
   @ApiOperation({ summary: '创建新的错题记录' })
+  @ApiBody({
+    description: '创建错题记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        isResolved: {
+          type: 'boolean',
+          description: '是否已解决',
+          example: false,
+        },
+      },
+      required: ['userId', 'questionId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '错题记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
@@ -35,6 +60,25 @@ export class WrongQuestionsController {
 
   @Post('add')
   @ApiOperation({ summary: '添加错题' })
+  @ApiBody({
+    description: '添加错题的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+      },
+      required: ['userId', 'questionId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '错题添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   addWrongQuestion(
@@ -48,6 +92,23 @@ export class WrongQuestionsController {
 
   @Post('bulk-resolve')
   @ApiOperation({ summary: '批量标记为已解决' })
+  @ApiBody({
+    description: '批量标记为已解决的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: '错题记录ID列表',
+          example: ['id-1', 'id-2', 'id-3'],
+        },
+      },
+      required: ['ids'],
+    },
+  })
   @ApiResponse({ status: 200, description: '批量标记成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkMarkAsResolved(@Body() body: { ids: string[] }): Promise<number> {
@@ -56,6 +117,23 @@ export class WrongQuestionsController {
 
   @Post('bulk-remove')
   @ApiOperation({ summary: '批量删除错题记录' })
+  @ApiBody({
+    description: '批量删除错题记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: '错题记录ID列表',
+          example: ['id-1', 'id-2', 'id-3'],
+        },
+      },
+      required: ['ids'],
+    },
+  })
   @ApiResponse({ status: 200, description: '批量删除成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkRemove(@Body() body: { ids: string[] }): Promise<number> {
@@ -173,6 +251,19 @@ export class WrongQuestionsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新错题记录' })
   @ApiParam({ name: 'id', description: '错题记录ID' })
+  @ApiBody({
+    description: '更新错题记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        isResolved: {
+          type: 'boolean',
+          description: '是否已解决',
+          example: true,
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '错题记录更新成功' })
   @ApiResponse({ status: 404, description: '错题记录不存在' })
   update(

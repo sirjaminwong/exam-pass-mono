@@ -7,7 +7,13 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { ClassesService } from './classes.service';
 import { Class, Prisma } from '@prisma/client';
 
@@ -18,6 +24,30 @@ export class ClassesController {
 
   @Post()
   @ApiOperation({ summary: '创建新班级' })
+  @ApiBody({
+    description: '创建班级的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: '班级名称',
+          example: '高三一班',
+        },
+        code: {
+          type: 'string',
+          description: '班级代码',
+          example: 'CLASS001',
+        },
+        description: {
+          type: 'string',
+          description: '班级描述',
+          example: '这是一个优秀的班级',
+        },
+      },
+      required: ['name', 'code'],
+    },
+  })
   @ApiResponse({ status: 201, description: '班级创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(@Body() createClassDto: Prisma.ClassCreateInput): Promise<Class> {
@@ -52,6 +82,29 @@ export class ClassesController {
   @Patch(':id')
   @ApiOperation({ summary: '更新班级信息' })
   @ApiParam({ name: 'id', description: '班级ID' })
+  @ApiBody({
+    description: '更新班级的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: '班级名称',
+          example: '高三一班',
+        },
+        code: {
+          type: 'string',
+          description: '班级代码',
+          example: 'CLASS001',
+        },
+        description: {
+          type: 'string',
+          description: '班级描述',
+          example: '这是一个优秀的班级',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '班级更新成功' })
   @ApiResponse({ status: 404, description: '班级不存在' })
   update(
@@ -73,6 +126,20 @@ export class ClassesController {
   @Post(':id/members')
   @ApiOperation({ summary: '添加班级成员' })
   @ApiParam({ name: 'id', description: '班级ID' })
+  @ApiBody({
+    description: '添加成员的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user123',
+        },
+      },
+      required: ['userId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '成员添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   addMember(@Param('id') classId: string, @Body() body: { userId: string }) {

@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ClassMembersService } from './class-members.service';
 import { ClassMember, Prisma } from '@prisma/client';
@@ -25,6 +26,31 @@ export class ClassMembersController {
 
   @Post()
   @ApiOperation({ summary: '创建新的班级成员记录' })
+  @ApiBody({
+    description: '创建班级成员记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        classId: {
+          type: 'string',
+          description: '班级ID',
+          example: 'class-456',
+        },
+        role: {
+          type: 'string',
+          enum: ['STUDENT', 'TEACHER', 'ASSISTANT'],
+          description: '角色',
+          example: 'STUDENT',
+        },
+      },
+      required: ['userId', 'classId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '班级成员记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
@@ -35,6 +61,25 @@ export class ClassMembersController {
 
   @Post('add')
   @ApiOperation({ summary: '添加班级成员' })
+  @ApiBody({
+    description: '添加班级成员的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        classId: {
+          type: 'string',
+          description: '班级ID',
+          example: 'class-456',
+        },
+      },
+      required: ['userId', 'classId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '班级成员添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   addMember(
@@ -45,6 +90,35 @@ export class ClassMembersController {
 
   @Post('bulk-add')
   @ApiOperation({ summary: '批量添加班级成员' })
+  @ApiBody({
+    description: '批量添加班级成员的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        members: {
+          type: 'array',
+          description: '成员列表',
+          items: {
+            type: 'object',
+            properties: {
+              userId: {
+                type: 'string',
+                description: '用户ID',
+                example: 'user-123',
+              },
+              classId: {
+                type: 'string',
+                description: '班级ID',
+                example: 'class-456',
+              },
+            },
+            required: ['userId', 'classId'],
+          },
+        },
+      },
+      required: ['members'],
+    },
+  })
   @ApiResponse({ status: 201, description: '批量添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkAdd(
@@ -55,6 +129,23 @@ export class ClassMembersController {
 
   @Post('bulk-remove')
   @ApiOperation({ summary: '批量删除班级成员记录' })
+  @ApiBody({
+    description: '批量删除班级成员记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          description: '班级成员记录ID列表',
+          items: {
+            type: 'string',
+            example: 'member-123',
+          },
+        },
+      },
+      required: ['ids'],
+    },
+  })
   @ApiResponse({ status: 200, description: '批量删除成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkRemove(@Body() body: { ids: string[] }): Promise<number> {
@@ -169,6 +260,20 @@ export class ClassMembersController {
   @Patch(':id')
   @ApiOperation({ summary: '更新班级成员记录' })
   @ApiParam({ name: 'id', description: '班级成员记录ID' })
+  @ApiBody({
+    description: '更新班级成员记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        role: {
+          type: 'string',
+          enum: ['STUDENT', 'TEACHER', 'ASSISTANT'],
+          description: '角色',
+          example: 'TEACHER',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '班级成员记录更新成功' })
   @ApiResponse({ status: 404, description: '班级成员记录不存在' })
   update(

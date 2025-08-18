@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { AnswersService } from './answers.service';
 import { Answer, Prisma } from '@prisma/client';
@@ -25,6 +26,39 @@ export class AnswersController {
 
   @Post()
   @ApiOperation({ summary: '创建新的答题记录' })
+  @ApiBody({
+    description: '创建答题记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        attemptId: {
+          type: 'string',
+          description: '考试记录ID',
+          example: 'attempt-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        userAnswer: {
+          description: '用户答案',
+          example: 'A',
+        },
+        isCorrect: {
+          type: 'boolean',
+          description: '是否正确',
+          example: true,
+        },
+        score: {
+          type: 'number',
+          description: '得分',
+          example: 10,
+        },
+      },
+      required: ['attemptId', 'questionId', 'userAnswer'],
+    },
+  })
   @ApiResponse({ status: 201, description: '答题记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(@Body() createAnswerDto: Prisma.AnswerCreateInput): Promise<Answer> {
@@ -33,6 +67,29 @@ export class AnswersController {
 
   @Post('submit')
   @ApiOperation({ summary: '提交答案' })
+  @ApiBody({
+    description: '提交答案的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        attemptId: {
+          type: 'string',
+          description: '考试记录ID',
+          example: 'attempt-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        userAnswer: {
+          description: '用户答案',
+          example: 'A',
+        },
+      },
+      required: ['attemptId', 'questionId', 'userAnswer'],
+    },
+  })
   @ApiResponse({ status: 201, description: '答案提交成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   @ApiResponse({ status: 404, description: '题目不存在' })
@@ -53,6 +110,39 @@ export class AnswersController {
 
   @Post('batch-submit')
   @ApiOperation({ summary: '批量提交答案' })
+  @ApiBody({
+    description: '批量提交答案的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        attemptId: {
+          type: 'string',
+          description: '考试记录ID',
+          example: 'attempt-123',
+        },
+        answers: {
+          type: 'array',
+          description: '答案列表',
+          items: {
+            type: 'object',
+            properties: {
+              questionId: {
+                type: 'string',
+                description: '题目ID',
+                example: 'question-456',
+              },
+              userAnswer: {
+                description: '用户答案',
+                example: 'A',
+              },
+            },
+            required: ['questionId', 'userAnswer'],
+          },
+        },
+      },
+      required: ['attemptId', 'answers'],
+    },
+  })
   @ApiResponse({ status: 201, description: '答案批量提交成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   batchSubmitAnswers(
@@ -153,6 +243,28 @@ export class AnswersController {
   @Patch(':id')
   @ApiOperation({ summary: '更新答题记录' })
   @ApiParam({ name: 'id', description: '答题记录ID' })
+  @ApiBody({
+    description: '更新答题记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userAnswer: {
+          description: '用户答案',
+          example: 'B',
+        },
+        isCorrect: {
+          type: 'boolean',
+          description: '是否正确',
+          example: false,
+        },
+        score: {
+          type: 'number',
+          description: '得分',
+          example: 0,
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '答题记录更新成功' })
   @ApiResponse({ status: 404, description: '答题记录不存在' })
   update(

@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ExamAttemptsService } from './exam-attempts.service';
 import { ExamAttempt, Prisma } from '@prisma/client';
@@ -25,6 +26,47 @@ export class ExamAttemptsController {
 
   @Post()
   @ApiOperation({ summary: '创建新的考试记录' })
+  @ApiBody({
+    description: '创建考试记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        examId: {
+          type: 'string',
+          description: '试卷ID',
+          example: 'exam-456',
+        },
+        startTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '开始时间',
+          example: '2024-01-01T10:00:00Z',
+        },
+        endTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '结束时间',
+          example: '2024-01-01T12:00:00Z',
+        },
+        score: {
+          type: 'number',
+          description: '得分',
+          example: 85,
+        },
+        isCompleted: {
+          type: 'boolean',
+          description: '是否完成',
+          example: false,
+        },
+      },
+      required: ['userId', 'examId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '考试记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
@@ -35,6 +77,25 @@ export class ExamAttemptsController {
 
   @Post('start')
   @ApiOperation({ summary: '开始考试' })
+  @ApiBody({
+    description: '开始考试的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        examId: {
+          type: 'string',
+          description: '试卷ID',
+          example: 'exam-456',
+        },
+      },
+      required: ['userId', 'examId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '考试开始成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   startExam(
@@ -127,6 +188,30 @@ export class ExamAttemptsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新考试记录' })
   @ApiParam({ name: 'id', description: '考试记录ID' })
+  @ApiBody({
+    description: '更新考试记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        endTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '结束时间',
+          example: '2024-01-01T12:00:00Z',
+        },
+        score: {
+          type: 'number',
+          description: '得分',
+          example: 85,
+        },
+        isCompleted: {
+          type: 'boolean',
+          description: '是否完成',
+          example: true,
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '考试记录更新成功' })
   @ApiResponse({ status: 404, description: '考试记录不存在' })
   update(

@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ExamQuestionsService } from './exam-questions.service';
 import { ExamQuestion, Prisma } from '@prisma/client';
@@ -25,6 +26,35 @@ export class ExamQuestionsController {
 
   @Post()
   @ApiOperation({ summary: '创建新的试卷题目关联记录' })
+  @ApiBody({
+    description: '创建试卷题目关联记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        examId: {
+          type: 'string',
+          description: '试卷ID',
+          example: 'exam-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        order: {
+          type: 'number',
+          description: '题目在试卷中的顺序',
+          example: 1,
+        },
+        score: {
+          type: 'number',
+          description: '题目分值',
+          example: 10,
+        },
+      },
+      required: ['examId', 'questionId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '试卷题目关联记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
@@ -35,6 +65,30 @@ export class ExamQuestionsController {
 
   @Post('add')
   @ApiOperation({ summary: '添加题目到试卷' })
+  @ApiBody({
+    description: '添加题目到试卷的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        examId: {
+          type: 'string',
+          description: '试卷ID',
+          example: 'exam-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        order: {
+          type: 'number',
+          description: '题目在试卷中的顺序',
+          example: 1,
+        },
+      },
+      required: ['examId', 'questionId', 'order'],
+    },
+  })
   @ApiResponse({ status: 201, description: '题目添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   addQuestionToExam(
@@ -49,6 +103,28 @@ export class ExamQuestionsController {
 
   @Post('bulk-add')
   @ApiOperation({ summary: '批量添加题目到试卷' })
+  @ApiBody({
+    description: '批量添加题目到试卷的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        examId: {
+          type: 'string',
+          description: '试卷ID',
+          example: 'exam-123',
+        },
+        questionIds: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: '题目ID列表',
+          example: ['question-1', 'question-2', 'question-3'],
+        },
+      },
+      required: ['examId', 'questionIds'],
+    },
+  })
   @ApiResponse({ status: 201, description: '批量添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkAddQuestions(
@@ -62,6 +138,23 @@ export class ExamQuestionsController {
 
   @Post('bulk-remove')
   @ApiOperation({ summary: '批量删除试卷题目关联记录' })
+  @ApiBody({
+    description: '批量删除试卷题目关联记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: '试卷题目关联记录ID列表',
+          example: ['id-1', 'id-2', 'id-3'],
+        },
+      },
+      required: ['ids'],
+    },
+  })
   @ApiResponse({ status: 200, description: '批量删除成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkRemove(@Body() body: { ids: string[] }): Promise<number> {
@@ -166,6 +259,24 @@ export class ExamQuestionsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新试卷题目关联记录' })
   @ApiParam({ name: 'id', description: '试卷题目关联记录ID' })
+  @ApiBody({
+    description: '更新试卷题目关联记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        order: {
+          type: 'number',
+          description: '题目在试卷中的顺序',
+          example: 2,
+        },
+        score: {
+          type: 'number',
+          description: '题目分值',
+          example: 15,
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '试卷题目关联记录更新成功' })
   @ApiResponse({ status: 404, description: '试卷题目关联记录不存在' })
   update(

@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { FavoriteQuestionsService } from './favorite-questions.service';
 import { FavoriteQuestion, Prisma } from '@prisma/client';
@@ -27,6 +28,30 @@ export class FavoriteQuestionsController {
 
   @Post()
   @ApiOperation({ summary: '创建新的收藏题目记录' })
+  @ApiBody({
+    description: '创建收藏题目记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        note: {
+          type: 'string',
+          description: '收藏备注',
+          example: '这道题很重要，需要重点复习',
+        },
+      },
+      required: ['userId', 'questionId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '收藏题目记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
@@ -37,6 +62,30 @@ export class FavoriteQuestionsController {
 
   @Post('add')
   @ApiOperation({ summary: '添加收藏题目' })
+  @ApiBody({
+    description: '添加收藏题目的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'string',
+          description: '用户ID',
+          example: 'user-123',
+        },
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        note: {
+          type: 'string',
+          description: '收藏备注（可选）',
+          example: '重点题目',
+        },
+      },
+      required: ['userId', 'questionId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '收藏题目添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   addFavoriteQuestion(
@@ -51,6 +100,23 @@ export class FavoriteQuestionsController {
 
   @Post('bulk-remove')
   @ApiOperation({ summary: '批量删除收藏题目记录' })
+  @ApiBody({
+    description: '批量删除收藏题目记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+          description: '收藏题目记录ID列表',
+          example: ['id-1', 'id-2', 'id-3'],
+        },
+      },
+      required: ['ids'],
+    },
+  })
   @ApiResponse({ status: 200, description: '批量删除成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   bulkRemove(@Body() body: { ids: string[] }): Promise<number> {
@@ -166,6 +232,20 @@ export class FavoriteQuestionsController {
   @Patch(':id/note')
   @ApiOperation({ summary: '更新收藏题目备注' })
   @ApiParam({ name: 'id', description: '收藏题目记录ID' })
+  @ApiBody({
+    description: '更新收藏题目备注的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        note: {
+          type: 'string',
+          description: '新的备注内容',
+          example: '已掌握，需要定期复习',
+        },
+      },
+      required: ['note'],
+    },
+  })
   @ApiResponse({ status: 200, description: '收藏题目备注更新成功' })
   @ApiResponse({ status: 404, description: '收藏题目记录不存在' })
   updateNote(
@@ -178,6 +258,19 @@ export class FavoriteQuestionsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新收藏题目记录' })
   @ApiParam({ name: 'id', description: '收藏题目记录ID' })
+  @ApiBody({
+    description: '更新收藏题目记录的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        note: {
+          type: 'string',
+          description: '收藏备注',
+          example: '这道题很重要，需要重点复习',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '收藏题目记录更新成功' })
   @ApiResponse({ status: 404, description: '收藏题目记录不存在' })
   update(

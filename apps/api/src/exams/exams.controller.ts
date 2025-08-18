@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ExamsService } from './exams.service';
 import { Exam, Prisma } from '@prisma/client';
@@ -25,6 +26,57 @@ export class ExamsController {
 
   @Post()
   @ApiOperation({ summary: '创建新试卷' })
+  @ApiBody({
+    description: '创建试卷的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: '试卷标题',
+          example: '期末考试',
+        },
+        description: {
+          type: 'string',
+          description: '试卷描述',
+          example: '本学期期末考试试卷',
+        },
+        classId: {
+          type: 'string',
+          description: '班级ID',
+          example: 'class-123',
+        },
+        duration: {
+          type: 'number',
+          description: '考试时长（分钟）',
+          example: 120,
+        },
+        totalScore: {
+          type: 'number',
+          description: '总分',
+          example: 100,
+        },
+        isActive: {
+          type: 'boolean',
+          description: '是否激活',
+          example: true,
+        },
+        startTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '开始时间',
+          example: '2024-01-01T09:00:00Z',
+        },
+        endTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '结束时间',
+          example: '2024-01-01T11:00:00Z',
+        },
+      },
+      required: ['title', 'classId'],
+    },
+  })
   @ApiResponse({ status: 201, description: '试卷创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(@Body() createExamDto: Prisma.ExamCreateInput): Promise<Exam> {
@@ -95,6 +147,51 @@ export class ExamsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新试卷信息' })
   @ApiParam({ name: 'id', description: '试卷ID' })
+  @ApiBody({
+    description: '更新试卷的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: '试卷标题',
+          example: '期末考试（修订版）',
+        },
+        description: {
+          type: 'string',
+          description: '试卷描述',
+          example: '本学期期末考试试卷（已修订）',
+        },
+        duration: {
+          type: 'number',
+          description: '考试时长（分钟）',
+          example: 150,
+        },
+        totalScore: {
+          type: 'number',
+          description: '总分',
+          example: 120,
+        },
+        isActive: {
+          type: 'boolean',
+          description: '是否激活',
+          example: false,
+        },
+        startTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '开始时间',
+          example: '2024-01-01T09:00:00Z',
+        },
+        endTime: {
+          type: 'string',
+          format: 'date-time',
+          description: '结束时间',
+          example: '2024-01-01T11:30:00Z',
+        },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: '试卷更新成功' })
   @ApiResponse({ status: 404, description: '试卷不存在' })
   update(
@@ -124,6 +221,25 @@ export class ExamsController {
   @Post(':id/questions')
   @ApiOperation({ summary: '为试卷添加题目' })
   @ApiParam({ name: 'id', description: '试卷ID' })
+  @ApiBody({
+    description: '添加题目到试卷的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        questionId: {
+          type: 'string',
+          description: '题目ID',
+          example: 'question-456',
+        },
+        order: {
+          type: 'number',
+          description: '题目在试卷中的顺序',
+          example: 1,
+        },
+      },
+      required: ['questionId', 'order'],
+    },
+  })
   @ApiResponse({ status: 201, description: '题目添加成功' })
   addQuestion(
     @Param('id') examId: string,
@@ -148,6 +264,20 @@ export class ExamsController {
   @ApiOperation({ summary: '更新试卷中题目的顺序' })
   @ApiParam({ name: 'id', description: '试卷ID' })
   @ApiParam({ name: 'questionId', description: '题目ID' })
+  @ApiBody({
+    description: '更新题目顺序的数据',
+    schema: {
+      type: 'object',
+      properties: {
+        order: {
+          type: 'number',
+          description: '新的题目顺序',
+          example: 3,
+        },
+      },
+      required: ['order'],
+    },
+  })
   @ApiResponse({ status: 200, description: '顺序更新成功' })
   updateQuestionOrder(
     @Param('id') examId: string,
