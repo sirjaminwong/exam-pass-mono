@@ -18,14 +18,19 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  FavoriteQuestionsControllerAddFavoriteQuestionBody,
+  FavoriteQuestionsControllerBulkRemoveBody,
+  FavoriteQuestionsControllerCreateBody,
   FavoriteQuestionsControllerFindAllParams,
   FavoriteQuestionsControllerGetFavoriteQuestionStatsParams,
   FavoriteQuestionsControllerGetRecentFavoritesParams,
-  FavoriteQuestionsControllerSearchFavoriteQuestionsParams
+  FavoriteQuestionsControllerSearchFavoriteQuestionsParams,
+  FavoriteQuestionsControllerUpdateBody,
+  FavoriteQuestionsControllerUpdateNoteBody
 } from '../../models';
 
 import { customInstance } from '../../utils/orval-mutator';
-import type { ErrorType } from '../../utils/orval-mutator';
+import type { ErrorType , BodyType } from '../../utils/orval-mutator';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -36,13 +41,15 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新的收藏题目记录
  */
 export const favoriteQuestionsControllerCreate = (
-    
+    favoriteQuestionsControllerCreateBody: BodyType<FavoriteQuestionsControllerCreateBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/favorite-questions`, method: 'POST', signal
+      {url: `/favorite-questions`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: favoriteQuestionsControllerCreateBody, signal
     },
       options);
     }
@@ -50,8 +57,8 @@ export const favoriteQuestionsControllerCreate = (
 
 
 export const getFavoriteQuestionsControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<FavoriteQuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<FavoriteQuestionsControllerCreateBody>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -63,10 +70,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, {data: BodyType<FavoriteQuestionsControllerCreateBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  favoriteQuestionsControllerCreate(requestOptions)
+          return  favoriteQuestionsControllerCreate(data,requestOptions)
         }
 
         
@@ -75,18 +82,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>>
-    
+    export type FavoriteQuestionsControllerCreateMutationBody = BodyType<FavoriteQuestionsControllerCreateBody>
     export type FavoriteQuestionsControllerCreateMutationError = ErrorType<null>
 
     /**
  * @summary 创建新的收藏题目记录
  */
 export const useFavoriteQuestionsControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<FavoriteQuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>,
         TError,
-        void,
+        {data: BodyType<FavoriteQuestionsControllerCreateBody>},
         TContext
       > => {
 
@@ -186,13 +193,15 @@ export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType
  * @summary 添加收藏题目
  */
 export const favoriteQuestionsControllerAddFavoriteQuestion = (
-    
+    favoriteQuestionsControllerAddFavoriteQuestionBody: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/favorite-questions/add`, method: 'POST', signal
+      {url: `/favorite-questions/add`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: favoriteQuestionsControllerAddFavoriteQuestionBody, signal
     },
       options);
     }
@@ -200,8 +209,8 @@ export const favoriteQuestionsControllerAddFavoriteQuestion = (
 
 
 export const getFavoriteQuestionsControllerAddFavoriteQuestionMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerAddFavoriteQuestion'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -213,10 +222,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, {data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  favoriteQuestionsControllerAddFavoriteQuestion(requestOptions)
+          return  favoriteQuestionsControllerAddFavoriteQuestion(data,requestOptions)
         }
 
         
@@ -225,18 +234,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerAddFavoriteQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>>
-    
+    export type FavoriteQuestionsControllerAddFavoriteQuestionMutationBody = BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>
     export type FavoriteQuestionsControllerAddFavoriteQuestionMutationError = ErrorType<null>
 
     /**
  * @summary 添加收藏题目
  */
 export const useFavoriteQuestionsControllerAddFavoriteQuestion = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>,
         TError,
-        void,
+        {data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>},
         TContext
       > => {
 
@@ -248,13 +257,15 @@ export const useFavoriteQuestionsControllerAddFavoriteQuestion = <TError = Error
  * @summary 批量删除收藏题目记录
  */
 export const favoriteQuestionsControllerBulkRemove = (
-    
+    favoriteQuestionsControllerBulkRemoveBody: BodyType<FavoriteQuestionsControllerBulkRemoveBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/favorite-questions/bulk-remove`, method: 'POST', signal
+      {url: `/favorite-questions/bulk-remove`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: favoriteQuestionsControllerBulkRemoveBody, signal
     },
       options);
     }
@@ -262,8 +273,8 @@ export const favoriteQuestionsControllerBulkRemove = (
 
 
 export const getFavoriteQuestionsControllerBulkRemoveMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerBulkRemove'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -275,10 +286,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, {data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  favoriteQuestionsControllerBulkRemove(requestOptions)
+          return  favoriteQuestionsControllerBulkRemove(data,requestOptions)
         }
 
         
@@ -287,18 +298,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerBulkRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>>
-    
+    export type FavoriteQuestionsControllerBulkRemoveMutationBody = BodyType<FavoriteQuestionsControllerBulkRemoveBody>
     export type FavoriteQuestionsControllerBulkRemoveMutationError = ErrorType<null>
 
     /**
  * @summary 批量删除收藏题目记录
  */
 export const useFavoriteQuestionsControllerBulkRemove = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>,
         TError,
-        void,
+        {data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>},
         TContext
       > => {
 
@@ -937,11 +948,14 @@ export function useFavoriteQuestionsControllerFindOne<TData = Awaited<ReturnType
  */
 export const favoriteQuestionsControllerUpdate = (
     id: string,
+    favoriteQuestionsControllerUpdateBody: BodyType<FavoriteQuestionsControllerUpdateBody>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
       return customInstance<null>(
-      {url: `/favorite-questions/${id}`, method: 'PATCH'
+      {url: `/favorite-questions/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: favoriteQuestionsControllerUpdateBody
     },
       options);
     }
@@ -949,8 +963,8 @@ export const favoriteQuestionsControllerUpdate = (
 
 
 export const getFavoriteQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -962,10 +976,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, {id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}> = (props) => {
+          const {id,data} = props ?? {};
 
-          return  favoriteQuestionsControllerUpdate(id,requestOptions)
+          return  favoriteQuestionsControllerUpdate(id,data,requestOptions)
         }
 
         
@@ -974,18 +988,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>>
-    
+    export type FavoriteQuestionsControllerUpdateMutationBody = BodyType<FavoriteQuestionsControllerUpdateBody>
     export type FavoriteQuestionsControllerUpdateMutationError = ErrorType<null>
 
     /**
  * @summary 更新收藏题目记录
  */
 export const useFavoriteQuestionsControllerUpdate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>,
         TError,
-        {id: string},
+        {id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>},
         TContext
       > => {
 
@@ -1059,11 +1073,14 @@ export const useFavoriteQuestionsControllerRemove = <TError = ErrorType<null>,
  */
 export const favoriteQuestionsControllerUpdateNote = (
     id: string,
+    favoriteQuestionsControllerUpdateNoteBody: BodyType<FavoriteQuestionsControllerUpdateNoteBody>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
       return customInstance<null>(
-      {url: `/favorite-questions/${id}/note`, method: 'PATCH'
+      {url: `/favorite-questions/${id}/note`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: favoriteQuestionsControllerUpdateNoteBody
     },
       options);
     }
@@ -1071,8 +1088,8 @@ export const favoriteQuestionsControllerUpdateNote = (
 
 
 export const getFavoriteQuestionsControllerUpdateNoteMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, TError,{id: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateNoteBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateNoteBody>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerUpdateNote'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1084,10 +1101,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, {id: string;data: BodyType<FavoriteQuestionsControllerUpdateNoteBody>}> = (props) => {
+          const {id,data} = props ?? {};
 
-          return  favoriteQuestionsControllerUpdateNote(id,requestOptions)
+          return  favoriteQuestionsControllerUpdateNote(id,data,requestOptions)
         }
 
         
@@ -1096,18 +1113,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerUpdateNoteMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>>
-    
+    export type FavoriteQuestionsControllerUpdateNoteMutationBody = BodyType<FavoriteQuestionsControllerUpdateNoteBody>
     export type FavoriteQuestionsControllerUpdateNoteMutationError = ErrorType<null>
 
     /**
  * @summary 更新收藏题目备注
  */
 export const useFavoriteQuestionsControllerUpdateNote = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateNoteBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerUpdateNote>>,
         TError,
-        {id: string},
+        {id: string;data: BodyType<FavoriteQuestionsControllerUpdateNoteBody>},
         TContext
       > => {
 

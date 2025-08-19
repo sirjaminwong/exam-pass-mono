@@ -18,13 +18,18 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ClassMembersControllerAddMemberBody,
+  ClassMembersControllerBulkAddBody,
+  ClassMembersControllerBulkRemoveBody,
+  ClassMembersControllerCreateBody,
   ClassMembersControllerFindAllParams,
   ClassMembersControllerGetClassMemberStatsParams,
-  ClassMembersControllerGetRecentMembersParams
+  ClassMembersControllerGetRecentMembersParams,
+  ClassMembersControllerUpdateBody
 } from '../../models';
 
 import { customInstance } from '../../utils/orval-mutator';
-import type { ErrorType } from '../../utils/orval-mutator';
+import type { ErrorType , BodyType } from '../../utils/orval-mutator';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -35,13 +40,15 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新的班级成员记录
  */
 export const classMembersControllerCreate = (
-    
+    classMembersControllerCreateBody: BodyType<ClassMembersControllerCreateBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/class-members`, method: 'POST', signal
+      {url: `/class-members`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: classMembersControllerCreateBody, signal
     },
       options);
     }
@@ -49,8 +56,8 @@ export const classMembersControllerCreate = (
 
 
 export const getClassMembersControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerCreate>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerCreate>>, TError,{data: BodyType<ClassMembersControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerCreate>>, TError,{data: BodyType<ClassMembersControllerCreateBody>}, TContext> => {
 
 const mutationKey = ['classMembersControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -62,10 +69,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerCreate>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerCreate>>, {data: BodyType<ClassMembersControllerCreateBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  classMembersControllerCreate(requestOptions)
+          return  classMembersControllerCreate(data,requestOptions)
         }
 
         
@@ -74,18 +81,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassMembersControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof classMembersControllerCreate>>>
-    
+    export type ClassMembersControllerCreateMutationBody = BodyType<ClassMembersControllerCreateBody>
     export type ClassMembersControllerCreateMutationError = ErrorType<null>
 
     /**
  * @summary 创建新的班级成员记录
  */
 export const useClassMembersControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerCreate>>, TError,{data: BodyType<ClassMembersControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classMembersControllerCreate>>,
         TError,
-        void,
+        {data: BodyType<ClassMembersControllerCreateBody>},
         TContext
       > => {
 
@@ -185,13 +192,15 @@ export function useClassMembersControllerFindAll<TData = Awaited<ReturnType<type
  * @summary 添加班级成员
  */
 export const classMembersControllerAddMember = (
-    
+    classMembersControllerAddMemberBody: BodyType<ClassMembersControllerAddMemberBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/class-members/add`, method: 'POST', signal
+      {url: `/class-members/add`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: classMembersControllerAddMemberBody, signal
     },
       options);
     }
@@ -199,8 +208,8 @@ export const classMembersControllerAddMember = (
 
 
 export const getClassMembersControllerAddMemberMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerAddMember>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerAddMember>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerAddMember>>, TError,{data: BodyType<ClassMembersControllerAddMemberBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerAddMember>>, TError,{data: BodyType<ClassMembersControllerAddMemberBody>}, TContext> => {
 
 const mutationKey = ['classMembersControllerAddMember'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -212,10 +221,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerAddMember>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerAddMember>>, {data: BodyType<ClassMembersControllerAddMemberBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  classMembersControllerAddMember(requestOptions)
+          return  classMembersControllerAddMember(data,requestOptions)
         }
 
         
@@ -224,18 +233,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassMembersControllerAddMemberMutationResult = NonNullable<Awaited<ReturnType<typeof classMembersControllerAddMember>>>
-    
+    export type ClassMembersControllerAddMemberMutationBody = BodyType<ClassMembersControllerAddMemberBody>
     export type ClassMembersControllerAddMemberMutationError = ErrorType<null>
 
     /**
  * @summary 添加班级成员
  */
 export const useClassMembersControllerAddMember = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerAddMember>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerAddMember>>, TError,{data: BodyType<ClassMembersControllerAddMemberBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classMembersControllerAddMember>>,
         TError,
-        void,
+        {data: BodyType<ClassMembersControllerAddMemberBody>},
         TContext
       > => {
 
@@ -247,13 +256,15 @@ export const useClassMembersControllerAddMember = <TError = ErrorType<null>,
  * @summary 批量添加班级成员
  */
 export const classMembersControllerBulkAdd = (
-    
+    classMembersControllerBulkAddBody: BodyType<ClassMembersControllerBulkAddBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/class-members/bulk-add`, method: 'POST', signal
+      {url: `/class-members/bulk-add`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: classMembersControllerBulkAddBody, signal
     },
       options);
     }
@@ -261,8 +272,8 @@ export const classMembersControllerBulkAdd = (
 
 
 export const getClassMembersControllerBulkAddMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, TError,{data: BodyType<ClassMembersControllerBulkAddBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, TError,{data: BodyType<ClassMembersControllerBulkAddBody>}, TContext> => {
 
 const mutationKey = ['classMembersControllerBulkAdd'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -274,10 +285,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, {data: BodyType<ClassMembersControllerBulkAddBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  classMembersControllerBulkAdd(requestOptions)
+          return  classMembersControllerBulkAdd(data,requestOptions)
         }
 
         
@@ -286,18 +297,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassMembersControllerBulkAddMutationResult = NonNullable<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>>
-    
+    export type ClassMembersControllerBulkAddMutationBody = BodyType<ClassMembersControllerBulkAddBody>
     export type ClassMembersControllerBulkAddMutationError = ErrorType<null>
 
     /**
  * @summary 批量添加班级成员
  */
 export const useClassMembersControllerBulkAdd = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkAdd>>, TError,{data: BodyType<ClassMembersControllerBulkAddBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classMembersControllerBulkAdd>>,
         TError,
-        void,
+        {data: BodyType<ClassMembersControllerBulkAddBody>},
         TContext
       > => {
 
@@ -309,13 +320,15 @@ export const useClassMembersControllerBulkAdd = <TError = ErrorType<null>,
  * @summary 批量删除班级成员记录
  */
 export const classMembersControllerBulkRemove = (
-    
+    classMembersControllerBulkRemoveBody: BodyType<ClassMembersControllerBulkRemoveBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/class-members/bulk-remove`, method: 'POST', signal
+      {url: `/class-members/bulk-remove`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: classMembersControllerBulkRemoveBody, signal
     },
       options);
     }
@@ -323,8 +336,8 @@ export const classMembersControllerBulkRemove = (
 
 
 export const getClassMembersControllerBulkRemoveMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, TError,{data: BodyType<ClassMembersControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, TError,{data: BodyType<ClassMembersControllerBulkRemoveBody>}, TContext> => {
 
 const mutationKey = ['classMembersControllerBulkRemove'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -336,10 +349,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, {data: BodyType<ClassMembersControllerBulkRemoveBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  classMembersControllerBulkRemove(requestOptions)
+          return  classMembersControllerBulkRemove(data,requestOptions)
         }
 
         
@@ -348,18 +361,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassMembersControllerBulkRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>>
-    
+    export type ClassMembersControllerBulkRemoveMutationBody = BodyType<ClassMembersControllerBulkRemoveBody>
     export type ClassMembersControllerBulkRemoveMutationError = ErrorType<null>
 
     /**
  * @summary 批量删除班级成员记录
  */
 export const useClassMembersControllerBulkRemove = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerBulkRemove>>, TError,{data: BodyType<ClassMembersControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classMembersControllerBulkRemove>>,
         TError,
-        void,
+        {data: BodyType<ClassMembersControllerBulkRemoveBody>},
         TContext
       > => {
 
@@ -1059,11 +1072,14 @@ export function useClassMembersControllerFindOne<TData = Awaited<ReturnType<type
  */
 export const classMembersControllerUpdate = (
     id: string,
+    classMembersControllerUpdateBody: BodyType<ClassMembersControllerUpdateBody>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
       return customInstance<null>(
-      {url: `/class-members/${id}`, method: 'PATCH'
+      {url: `/class-members/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: classMembersControllerUpdateBody
     },
       options);
     }
@@ -1071,8 +1087,8 @@ export const classMembersControllerUpdate = (
 
 
 export const getClassMembersControllerUpdateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerUpdate>>, TError,{id: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerUpdate>>, TError,{id: string;data: BodyType<ClassMembersControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerUpdate>>, TError,{id: string;data: BodyType<ClassMembersControllerUpdateBody>}, TContext> => {
 
 const mutationKey = ['classMembersControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1084,10 +1100,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerUpdate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classMembersControllerUpdate>>, {id: string;data: BodyType<ClassMembersControllerUpdateBody>}> = (props) => {
+          const {id,data} = props ?? {};
 
-          return  classMembersControllerUpdate(id,requestOptions)
+          return  classMembersControllerUpdate(id,data,requestOptions)
         }
 
         
@@ -1096,18 +1112,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassMembersControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof classMembersControllerUpdate>>>
-    
+    export type ClassMembersControllerUpdateMutationBody = BodyType<ClassMembersControllerUpdateBody>
     export type ClassMembersControllerUpdateMutationError = ErrorType<null>
 
     /**
  * @summary 更新班级成员记录
  */
 export const useClassMembersControllerUpdate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classMembersControllerUpdate>>, TError,{id: string;data: BodyType<ClassMembersControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classMembersControllerUpdate>>,
         TError,
-        {id: string},
+        {id: string;data: BodyType<ClassMembersControllerUpdateBody>},
         TContext
       > => {
 

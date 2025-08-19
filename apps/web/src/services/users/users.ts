@@ -17,8 +17,13 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import type {
+  UsersControllerCreateBody,
+  UsersControllerUpdateBody
+} from '../../models';
+
 import { customInstance } from '../../utils/orval-mutator';
-import type { ErrorType } from '../../utils/orval-mutator';
+import type { ErrorType , BodyType } from '../../utils/orval-mutator';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -29,22 +34,24 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary Create a new user
  */
 export const usersControllerCreate = (
-    
+    usersControllerCreateBody: BodyType<UsersControllerCreateBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/users`, method: 'POST', signal
+      {url: `/users`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: usersControllerCreateBody, signal
     },
       options);
     }
   
 
 
-export const getUsersControllerCreateMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof usersControllerCreate>>, TError,void, TContext> => {
+export const getUsersControllerCreateMutationOptions = <TError = ErrorType<null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerCreate>>, TError,{data: BodyType<UsersControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof usersControllerCreate>>, TError,{data: BodyType<UsersControllerCreateBody>}, TContext> => {
 
 const mutationKey = ['usersControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -56,10 +63,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersControllerCreate>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersControllerCreate>>, {data: BodyType<UsersControllerCreateBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  usersControllerCreate(requestOptions)
+          return  usersControllerCreate(data,requestOptions)
         }
 
         
@@ -68,18 +75,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UsersControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof usersControllerCreate>>>
-    
-    export type UsersControllerCreateMutationError = ErrorType<unknown>
+    export type UsersControllerCreateMutationBody = BodyType<UsersControllerCreateBody>
+    export type UsersControllerCreateMutationError = ErrorType<null>
 
     /**
  * @summary Create a new user
  */
-export const useUsersControllerCreate = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useUsersControllerCreate = <TError = ErrorType<null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerCreate>>, TError,{data: BodyType<UsersControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof usersControllerCreate>>,
         TError,
-        void,
+        {data: BodyType<UsersControllerCreateBody>},
         TContext
       > => {
 
@@ -266,20 +273,23 @@ export function useUsersControllerFindOne<TData = Awaited<ReturnType<typeof user
  */
 export const usersControllerUpdate = (
     id: string,
+    usersControllerUpdateBody: BodyType<UsersControllerUpdateBody>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
       return customInstance<null>(
-      {url: `/users/${id}`, method: 'PATCH'
+      {url: `/users/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: usersControllerUpdateBody
     },
       options);
     }
   
 
 
-export const getUsersControllerUpdateMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdate>>, TError,{id: string}, TContext> => {
+export const getUsersControllerUpdateMutationOptions = <TError = ErrorType<null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdate>>, TError,{id: string;data: BodyType<UsersControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdate>>, TError,{id: string;data: BodyType<UsersControllerUpdateBody>}, TContext> => {
 
 const mutationKey = ['usersControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -291,10 +301,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersControllerUpdate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersControllerUpdate>>, {id: string;data: BodyType<UsersControllerUpdateBody>}> = (props) => {
+          const {id,data} = props ?? {};
 
-          return  usersControllerUpdate(id,requestOptions)
+          return  usersControllerUpdate(id,data,requestOptions)
         }
 
         
@@ -303,18 +313,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UsersControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof usersControllerUpdate>>>
-    
-    export type UsersControllerUpdateMutationError = ErrorType<unknown>
+    export type UsersControllerUpdateMutationBody = BodyType<UsersControllerUpdateBody>
+    export type UsersControllerUpdateMutationError = ErrorType<null>
 
     /**
  * @summary Update a user
  */
-export const useUsersControllerUpdate = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useUsersControllerUpdate = <TError = ErrorType<null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerUpdate>>, TError,{id: string;data: BodyType<UsersControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof usersControllerUpdate>>,
         TError,
-        {id: string},
+        {id: string;data: BodyType<UsersControllerUpdateBody>},
         TContext
       > => {
 
@@ -338,7 +348,7 @@ export const usersControllerRemove = (
   
 
 
-export const getUsersControllerRemoveMutationOptions = <TError = ErrorType<unknown>,
+export const getUsersControllerRemoveMutationOptions = <TError = ErrorType<null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof usersControllerRemove>>, TError,{id: string}, TContext> => {
 
@@ -365,12 +375,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UsersControllerRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof usersControllerRemove>>>
     
-    export type UsersControllerRemoveMutationError = ErrorType<unknown>
+    export type UsersControllerRemoveMutationError = ErrorType<null>
 
     /**
  * @summary Delete a user
  */
-export const useUsersControllerRemove = <TError = ErrorType<unknown>,
+export const useUsersControllerRemove = <TError = ErrorType<null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersControllerRemove>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof usersControllerRemove>>,

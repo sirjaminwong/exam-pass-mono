@@ -18,12 +18,16 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AnswersControllerBatchSubmitAnswersBody,
+  AnswersControllerCreateBody,
   AnswersControllerFindAllParams,
-  AnswersControllerGetAnswerStatsParams
+  AnswersControllerGetAnswerStatsParams,
+  AnswersControllerSubmitAnswerBody,
+  AnswersControllerUpdateBody
 } from '../../models';
 
 import { customInstance } from '../../utils/orval-mutator';
-import type { ErrorType } from '../../utils/orval-mutator';
+import type { ErrorType , BodyType } from '../../utils/orval-mutator';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -34,13 +38,15 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新的答题记录
  */
 export const answersControllerCreate = (
-    
+    answersControllerCreateBody: BodyType<AnswersControllerCreateBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/answers`, method: 'POST', signal
+      {url: `/answers`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: answersControllerCreateBody, signal
     },
       options);
     }
@@ -48,8 +54,8 @@ export const answersControllerCreate = (
 
 
 export const getAnswersControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof answersControllerCreate>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerCreate>>, TError,{data: BodyType<AnswersControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof answersControllerCreate>>, TError,{data: BodyType<AnswersControllerCreateBody>}, TContext> => {
 
 const mutationKey = ['answersControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -61,10 +67,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerCreate>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerCreate>>, {data: BodyType<AnswersControllerCreateBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  answersControllerCreate(requestOptions)
+          return  answersControllerCreate(data,requestOptions)
         }
 
         
@@ -73,18 +79,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AnswersControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof answersControllerCreate>>>
-    
+    export type AnswersControllerCreateMutationBody = BodyType<AnswersControllerCreateBody>
     export type AnswersControllerCreateMutationError = ErrorType<null>
 
     /**
  * @summary 创建新的答题记录
  */
 export const useAnswersControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerCreate>>, TError,{data: BodyType<AnswersControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof answersControllerCreate>>,
         TError,
-        void,
+        {data: BodyType<AnswersControllerCreateBody>},
         TContext
       > => {
 
@@ -184,13 +190,15 @@ export function useAnswersControllerFindAll<TData = Awaited<ReturnType<typeof an
  * @summary 提交答案
  */
 export const answersControllerSubmitAnswer = (
-    
+    answersControllerSubmitAnswerBody: BodyType<AnswersControllerSubmitAnswerBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/answers/submit`, method: 'POST', signal
+      {url: `/answers/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: answersControllerSubmitAnswerBody, signal
     },
       options);
     }
@@ -198,8 +206,8 @@ export const answersControllerSubmitAnswer = (
 
 
 export const getAnswersControllerSubmitAnswerMutationOptions = <TError = ErrorType<null | null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, TError,{data: BodyType<AnswersControllerSubmitAnswerBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, TError,{data: BodyType<AnswersControllerSubmitAnswerBody>}, TContext> => {
 
 const mutationKey = ['answersControllerSubmitAnswer'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -211,10 +219,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, {data: BodyType<AnswersControllerSubmitAnswerBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  answersControllerSubmitAnswer(requestOptions)
+          return  answersControllerSubmitAnswer(data,requestOptions)
         }
 
         
@@ -223,18 +231,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AnswersControllerSubmitAnswerMutationResult = NonNullable<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>>
-    
+    export type AnswersControllerSubmitAnswerMutationBody = BodyType<AnswersControllerSubmitAnswerBody>
     export type AnswersControllerSubmitAnswerMutationError = ErrorType<null | null>
 
     /**
  * @summary 提交答案
  */
 export const useAnswersControllerSubmitAnswer = <TError = ErrorType<null | null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerSubmitAnswer>>, TError,{data: BodyType<AnswersControllerSubmitAnswerBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof answersControllerSubmitAnswer>>,
         TError,
-        void,
+        {data: BodyType<AnswersControllerSubmitAnswerBody>},
         TContext
       > => {
 
@@ -246,13 +254,15 @@ export const useAnswersControllerSubmitAnswer = <TError = ErrorType<null | null>
  * @summary 批量提交答案
  */
 export const answersControllerBatchSubmitAnswers = (
-    
+    answersControllerBatchSubmitAnswersBody: BodyType<AnswersControllerBatchSubmitAnswersBody>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<null>(
-      {url: `/answers/batch-submit`, method: 'POST', signal
+      {url: `/answers/batch-submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: answersControllerBatchSubmitAnswersBody, signal
     },
       options);
     }
@@ -260,8 +270,8 @@ export const answersControllerBatchSubmitAnswers = (
 
 
 export const getAnswersControllerBatchSubmitAnswersMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, TError,{data: BodyType<AnswersControllerBatchSubmitAnswersBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, TError,{data: BodyType<AnswersControllerBatchSubmitAnswersBody>}, TContext> => {
 
 const mutationKey = ['answersControllerBatchSubmitAnswers'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -273,10 +283,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, {data: BodyType<AnswersControllerBatchSubmitAnswersBody>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  answersControllerBatchSubmitAnswers(requestOptions)
+          return  answersControllerBatchSubmitAnswers(data,requestOptions)
         }
 
         
@@ -285,18 +295,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AnswersControllerBatchSubmitAnswersMutationResult = NonNullable<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>>
-    
+    export type AnswersControllerBatchSubmitAnswersMutationBody = BodyType<AnswersControllerBatchSubmitAnswersBody>
     export type AnswersControllerBatchSubmitAnswersMutationError = ErrorType<null>
 
     /**
  * @summary 批量提交答案
  */
 export const useAnswersControllerBatchSubmitAnswers = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>, TError,{data: BodyType<AnswersControllerBatchSubmitAnswersBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof answersControllerBatchSubmitAnswers>>,
         TError,
-        void,
+        {data: BodyType<AnswersControllerBatchSubmitAnswersBody>},
         TContext
       > => {
 
@@ -658,11 +668,14 @@ export function useAnswersControllerFindOne<TData = Awaited<ReturnType<typeof an
  */
 export const answersControllerUpdate = (
     id: string,
+    answersControllerUpdateBody: BodyType<AnswersControllerUpdateBody>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
       return customInstance<null>(
-      {url: `/answers/${id}`, method: 'PATCH'
+      {url: `/answers/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: answersControllerUpdateBody
     },
       options);
     }
@@ -670,8 +683,8 @@ export const answersControllerUpdate = (
 
 
 export const getAnswersControllerUpdateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof answersControllerUpdate>>, TError,{id: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerUpdate>>, TError,{id: string;data: BodyType<AnswersControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof answersControllerUpdate>>, TError,{id: string;data: BodyType<AnswersControllerUpdateBody>}, TContext> => {
 
 const mutationKey = ['answersControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -683,10 +696,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerUpdate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof answersControllerUpdate>>, {id: string;data: BodyType<AnswersControllerUpdateBody>}> = (props) => {
+          const {id,data} = props ?? {};
 
-          return  answersControllerUpdate(id,requestOptions)
+          return  answersControllerUpdate(id,data,requestOptions)
         }
 
         
@@ -695,18 +708,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type AnswersControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof answersControllerUpdate>>>
-    
+    export type AnswersControllerUpdateMutationBody = BodyType<AnswersControllerUpdateBody>
     export type AnswersControllerUpdateMutationError = ErrorType<null>
 
     /**
  * @summary 更新答题记录
  */
 export const useAnswersControllerUpdate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerUpdate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof answersControllerUpdate>>, TError,{id: string;data: BodyType<AnswersControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof answersControllerUpdate>>,
         TError,
-        {id: string},
+        {id: string;data: BodyType<AnswersControllerUpdateBody>},
         TContext
       > => {
 
