@@ -14,10 +14,17 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-  ApiBody,
 } from '@nestjs/swagger';
 import { ExamsService } from './exams.service';
-import { Exam, Prisma } from '@prisma/client';
+import {
+  CreateExamDto,
+  UpdateExamDto,
+  ExamDto,
+  QueryExamDto,
+  AddQuestionToExamDto,
+} from './dto/exam.dto';
+import { Exam } from '@prisma/client';
+import { ApiBody } from '@nestjs/swagger';
 
 @ApiTags('exams')
 @Controller('exams')
@@ -26,60 +33,9 @@ export class ExamsController {
 
   @Post()
   @ApiOperation({ summary: '创建新试卷' })
-  @ApiBody({
-    description: '创建试卷的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        title: {
-          type: 'string',
-          description: '试卷标题',
-          example: '期末考试',
-        },
-        description: {
-          type: 'string',
-          description: '试卷描述',
-          example: '本学期期末考试试卷',
-        },
-        classId: {
-          type: 'string',
-          description: '班级ID',
-          example: 'class-123',
-        },
-        duration: {
-          type: 'number',
-          description: '考试时长（分钟）',
-          example: 120,
-        },
-        totalScore: {
-          type: 'number',
-          description: '总分',
-          example: 100,
-        },
-        isActive: {
-          type: 'boolean',
-          description: '是否激活',
-          example: true,
-        },
-        startTime: {
-          type: 'string',
-          format: 'date-time',
-          description: '开始时间',
-          example: '2024-01-01T09:00:00Z',
-        },
-        endTime: {
-          type: 'string',
-          format: 'date-time',
-          description: '结束时间',
-          example: '2024-01-01T11:00:00Z',
-        },
-      },
-      required: ['title', 'classId'],
-    },
-  })
-  @ApiResponse({ status: 201, description: '试卷创建成功' })
+  @ApiResponse({ status: 201, description: '试卷创建成功', type: ExamDto })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  create(@Body() createExamDto: Prisma.ExamCreateInput): Promise<Exam> {
+  create(@Body() createExamDto: CreateExamDto) {
     return this.examsService.create(createExamDto);
   }
 
@@ -104,25 +60,32 @@ export class ExamsController {
     type: Number,
     description: '获取数量',
   })
-  @ApiResponse({ status: 200, description: '成功获取试卷列表' })
-  findAll(
-    @Query('classId') classId?: string,
-    @Query('isActive') isActive?: string,
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
-  ): Promise<Exam[]> {
+  @ApiResponse({
+    status: 200,
+    description: '成功获取试卷列表',
+    type: [ExamDto],
+  })
+  findAll(@Query() query: QueryExamDto): Promise<Exam[]> {
+    const skip = query.page
+      ? (query.page - 1) * (query.limit || 10)
+      : undefined;
+    const take = query.limit;
     return this.examsService.findAll({
-      classId,
-      isActive: isActive ? isActive === 'true' : undefined,
-      skip: skip ? parseInt(skip) : undefined,
-      take: take ? parseInt(take) : undefined,
+      classId: query.classId,
+      isActive: query.isActive,
+      skip,
+      take,
     });
   }
 
   @Get('class/:classId')
   @ApiOperation({ summary: '获取指定班级的试卷列表' })
   @ApiParam({ name: 'classId', description: '班级ID' })
-  @ApiResponse({ status: 200, description: '成功获取试卷列表' })
+  @ApiResponse({
+    status: 200,
+    description: '成功获取试卷列表',
+    type: [ExamDto],
+  })
   findByClass(@Param('classId') classId: string): Promise<Exam[]> {
     return this.examsService.findByClass(classId);
   }
@@ -130,7 +93,7 @@ export class ExamsController {
   @Get(':id')
   @ApiOperation({ summary: '通过ID获取试卷详情' })
   @ApiParam({ name: 'id', description: '试卷ID' })
-  @ApiResponse({ status: 200, description: '成功获取试卷详情' })
+  @ApiResponse({ status: 200, description: '成功获取试卷详情', type: ExamDto })
   @ApiResponse({ status: 404, description: '试卷不存在' })
   findOne(@Param('id') id: string): Promise<Exam | null> {
     return this.examsService.findOne(id);
@@ -147,56 +110,11 @@ export class ExamsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新试卷信息' })
   @ApiParam({ name: 'id', description: '试卷ID' })
-  @ApiBody({
-    description: '更新试卷的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        title: {
-          type: 'string',
-          description: '试卷标题',
-          example: '期末考试（修订版）',
-        },
-        description: {
-          type: 'string',
-          description: '试卷描述',
-          example: '本学期期末考试试卷（已修订）',
-        },
-        duration: {
-          type: 'number',
-          description: '考试时长（分钟）',
-          example: 150,
-        },
-        totalScore: {
-          type: 'number',
-          description: '总分',
-          example: 120,
-        },
-        isActive: {
-          type: 'boolean',
-          description: '是否激活',
-          example: false,
-        },
-        startTime: {
-          type: 'string',
-          format: 'date-time',
-          description: '开始时间',
-          example: '2024-01-01T09:00:00Z',
-        },
-        endTime: {
-          type: 'string',
-          format: 'date-time',
-          description: '结束时间',
-          example: '2024-01-01T11:30:00Z',
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 200, description: '试卷更新成功' })
+  @ApiResponse({ status: 200, description: '试卷更新成功', type: ExamDto })
   @ApiResponse({ status: 404, description: '试卷不存在' })
   update(
     @Param('id') id: string,
-    @Body() updateExamDto: Prisma.ExamUpdateInput,
+    @Body() updateExamDto: UpdateExamDto,
   ): Promise<Exam> {
     return this.examsService.update(id, updateExamDto);
   }
@@ -204,7 +122,7 @@ export class ExamsController {
   @Patch(':id/toggle-active')
   @ApiOperation({ summary: '切换试卷激活状态' })
   @ApiParam({ name: 'id', description: '试卷ID' })
-  @ApiResponse({ status: 200, description: '状态切换成功' })
+  @ApiResponse({ status: 200, description: '状态切换成功', type: ExamDto })
   toggleActive(@Param('id') id: string): Promise<Exam> {
     return this.examsService.toggleActive(id);
   }
@@ -212,7 +130,7 @@ export class ExamsController {
   @Delete(':id')
   @ApiOperation({ summary: '删除试卷' })
   @ApiParam({ name: 'id', description: '试卷ID' })
-  @ApiResponse({ status: 200, description: '试卷删除成功' })
+  @ApiResponse({ status: 200, description: '试卷删除成功', type: ExamDto })
   @ApiResponse({ status: 404, description: '试卷不存在' })
   remove(@Param('id') id: string): Promise<Exam> {
     return this.examsService.remove(id);
@@ -221,31 +139,16 @@ export class ExamsController {
   @Post(':id/questions')
   @ApiOperation({ summary: '为试卷添加题目' })
   @ApiParam({ name: 'id', description: '试卷ID' })
-  @ApiBody({
-    description: '添加题目到试卷的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        questionId: {
-          type: 'string',
-          description: '题目ID',
-          example: 'question-456',
-        },
-        order: {
-          type: 'number',
-          description: '题目在试卷中的顺序',
-          example: 1,
-        },
-      },
-      required: ['questionId', 'order'],
-    },
-  })
   @ApiResponse({ status: 201, description: '题目添加成功' })
   addQuestion(
     @Param('id') examId: string,
-    @Body() body: { questionId: string; order: number },
+    @Body() addQuestionDto: AddQuestionToExamDto,
   ) {
-    return this.examsService.addQuestion(examId, body.questionId, body.order);
+    return this.examsService.addQuestion(
+      examId,
+      addQuestionDto.questionId,
+      addQuestionDto.order,
+    );
   }
 
   @Delete(':id/questions/:questionId')
