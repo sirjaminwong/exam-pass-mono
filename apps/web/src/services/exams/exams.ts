@@ -18,11 +18,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ExamsControllerAddQuestionBody,
-  ExamsControllerCreateBody,
+  AddQuestionToExamDto,
+  CreateExamDto,
+  ExamDto,
   ExamsControllerFindAllParams,
-  ExamsControllerUpdateBody,
-  ExamsControllerUpdateQuestionOrderBody
+  ExamsControllerUpdateQuestionOrderBody,
+  UpdateExamDto
 } from '../../models';
 
 import { customInstance } from '../../utils/orval-mutator';
@@ -37,15 +38,15 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新试卷
  */
 export const examsControllerCreate = (
-    examsControllerCreateBody: BodyType<ExamsControllerCreateBody>,
+    createExamDto: BodyType<CreateExamDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto>(
       {url: `/exams`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: examsControllerCreateBody, signal
+      data: createExamDto, signal
     },
       options);
     }
@@ -53,8 +54,8 @@ export const examsControllerCreate = (
 
 
 export const getExamsControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerCreate>>, TError,{data: BodyType<ExamsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof examsControllerCreate>>, TError,{data: BodyType<ExamsControllerCreateBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerCreate>>, TError,{data: BodyType<CreateExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof examsControllerCreate>>, TError,{data: BodyType<CreateExamDto>}, TContext> => {
 
 const mutationKey = ['examsControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -66,7 +67,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examsControllerCreate>>, {data: BodyType<ExamsControllerCreateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examsControllerCreate>>, {data: BodyType<CreateExamDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  examsControllerCreate(data,requestOptions)
@@ -78,18 +79,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ExamsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof examsControllerCreate>>>
-    export type ExamsControllerCreateMutationBody = BodyType<ExamsControllerCreateBody>
+    export type ExamsControllerCreateMutationBody = BodyType<CreateExamDto>
     export type ExamsControllerCreateMutationError = ErrorType<null>
 
     /**
  * @summary 创建新试卷
  */
 export const useExamsControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerCreate>>, TError,{data: BodyType<ExamsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerCreate>>, TError,{data: BodyType<CreateExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examsControllerCreate>>,
         TError,
-        {data: BodyType<ExamsControllerCreateBody>},
+        {data: BodyType<CreateExamDto>},
         TContext
       > => {
 
@@ -106,7 +107,7 @@ export const examsControllerFindAll = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto[]>(
       {url: `/exams`, method: 'GET',
         params, signal
     },
@@ -194,7 +195,7 @@ export const examsControllerFindByClass = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto[]>(
       {url: `/exams/class/${classId}`, method: 'GET', signal
     },
       options);
@@ -281,7 +282,7 @@ export const examsControllerFindOne = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto>(
       {url: `/exams/${id}`, method: 'GET', signal
     },
       options);
@@ -364,14 +365,14 @@ export function useExamsControllerFindOne<TData = Awaited<ReturnType<typeof exam
  */
 export const examsControllerUpdate = (
     id: string,
-    examsControllerUpdateBody: BodyType<ExamsControllerUpdateBody>,
+    updateExamDto: BodyType<UpdateExamDto>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto>(
       {url: `/exams/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: examsControllerUpdateBody
+      data: updateExamDto
     },
       options);
     }
@@ -379,8 +380,8 @@ export const examsControllerUpdate = (
 
 
 export const getExamsControllerUpdateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerUpdate>>, TError,{id: string;data: BodyType<ExamsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof examsControllerUpdate>>, TError,{id: string;data: BodyType<ExamsControllerUpdateBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof examsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateExamDto>}, TContext> => {
 
 const mutationKey = ['examsControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -392,7 +393,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examsControllerUpdate>>, {id: string;data: BodyType<ExamsControllerUpdateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examsControllerUpdate>>, {id: string;data: BodyType<UpdateExamDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  examsControllerUpdate(id,data,requestOptions)
@@ -404,18 +405,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ExamsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof examsControllerUpdate>>>
-    export type ExamsControllerUpdateMutationBody = BodyType<ExamsControllerUpdateBody>
+    export type ExamsControllerUpdateMutationBody = BodyType<UpdateExamDto>
     export type ExamsControllerUpdateMutationError = ErrorType<null>
 
     /**
  * @summary 更新试卷信息
  */
 export const useExamsControllerUpdate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerUpdate>>, TError,{id: string;data: BodyType<ExamsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examsControllerUpdate>>,
         TError,
-        {id: string;data: BodyType<ExamsControllerUpdateBody>},
+        {id: string;data: BodyType<UpdateExamDto>},
         TContext
       > => {
 
@@ -431,7 +432,7 @@ export const examsControllerRemove = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto>(
       {url: `/exams/${id}`, method: 'DELETE'
     },
       options);
@@ -579,7 +580,7 @@ export const examsControllerToggleActive = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamDto>(
       {url: `/exams/${id}/toggle-active`, method: 'PATCH'
     },
       options);
@@ -637,7 +638,7 @@ export const useExamsControllerToggleActive = <TError = ErrorType<unknown>,
  */
 export const examsControllerAddQuestion = (
     id: string,
-    examsControllerAddQuestionBody: BodyType<ExamsControllerAddQuestionBody>,
+    addQuestionToExamDto: BodyType<AddQuestionToExamDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -645,7 +646,7 @@ export const examsControllerAddQuestion = (
       return customInstance<null>(
       {url: `/exams/${id}/questions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: examsControllerAddQuestionBody, signal
+      data: addQuestionToExamDto, signal
     },
       options);
     }
@@ -653,8 +654,8 @@ export const examsControllerAddQuestion = (
 
 
 export const getExamsControllerAddQuestionMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerAddQuestion>>, TError,{id: string;data: BodyType<ExamsControllerAddQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof examsControllerAddQuestion>>, TError,{id: string;data: BodyType<ExamsControllerAddQuestionBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerAddQuestion>>, TError,{id: string;data: BodyType<AddQuestionToExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof examsControllerAddQuestion>>, TError,{id: string;data: BodyType<AddQuestionToExamDto>}, TContext> => {
 
 const mutationKey = ['examsControllerAddQuestion'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -666,7 +667,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examsControllerAddQuestion>>, {id: string;data: BodyType<ExamsControllerAddQuestionBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examsControllerAddQuestion>>, {id: string;data: BodyType<AddQuestionToExamDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  examsControllerAddQuestion(id,data,requestOptions)
@@ -678,18 +679,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ExamsControllerAddQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof examsControllerAddQuestion>>>
-    export type ExamsControllerAddQuestionMutationBody = BodyType<ExamsControllerAddQuestionBody>
+    export type ExamsControllerAddQuestionMutationBody = BodyType<AddQuestionToExamDto>
     export type ExamsControllerAddQuestionMutationError = ErrorType<unknown>
 
     /**
  * @summary 为试卷添加题目
  */
 export const useExamsControllerAddQuestion = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerAddQuestion>>, TError,{id: string;data: BodyType<ExamsControllerAddQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examsControllerAddQuestion>>, TError,{id: string;data: BodyType<AddQuestionToExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examsControllerAddQuestion>>,
         TError,
-        {id: string;data: BodyType<ExamsControllerAddQuestionBody>},
+        {id: string;data: BodyType<AddQuestionToExamDto>},
         TContext
       > => {
 

@@ -18,11 +18,12 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  QuestionsControllerBulkCreateBodyItem,
-  QuestionsControllerCreateBody,
+  CreateQuestionDto,
+  CreateQuestionsDto,
+  QuestionDto,
   QuestionsControllerFindAllParams,
   QuestionsControllerSearchParams,
-  QuestionsControllerUpdateBody
+  UpdateQuestionDto
 } from '../../models';
 
 import { customInstance } from '../../utils/orval-mutator';
@@ -37,15 +38,15 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新题目
  */
 export const questionsControllerCreate = (
-    questionsControllerCreateBody: BodyType<QuestionsControllerCreateBody>,
+    createQuestionDto: BodyType<CreateQuestionDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto>(
       {url: `/questions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: questionsControllerCreateBody, signal
+      data: createQuestionDto, signal
     },
       options);
     }
@@ -53,8 +54,8 @@ export const questionsControllerCreate = (
 
 
 export const getQuestionsControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerCreate>>, TError,{data: BodyType<QuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof questionsControllerCreate>>, TError,{data: BodyType<QuestionsControllerCreateBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerCreate>>, TError,{data: BodyType<CreateQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof questionsControllerCreate>>, TError,{data: BodyType<CreateQuestionDto>}, TContext> => {
 
 const mutationKey = ['questionsControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -66,7 +67,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof questionsControllerCreate>>, {data: BodyType<QuestionsControllerCreateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof questionsControllerCreate>>, {data: BodyType<CreateQuestionDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  questionsControllerCreate(data,requestOptions)
@@ -78,18 +79,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type QuestionsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof questionsControllerCreate>>>
-    export type QuestionsControllerCreateMutationBody = BodyType<QuestionsControllerCreateBody>
+    export type QuestionsControllerCreateMutationBody = BodyType<CreateQuestionDto>
     export type QuestionsControllerCreateMutationError = ErrorType<null>
 
     /**
  * @summary 创建新题目
  */
 export const useQuestionsControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerCreate>>, TError,{data: BodyType<QuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerCreate>>, TError,{data: BodyType<CreateQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof questionsControllerCreate>>,
         TError,
-        {data: BodyType<QuestionsControllerCreateBody>},
+        {data: BodyType<CreateQuestionDto>},
         TContext
       > => {
 
@@ -101,12 +102,12 @@ export const useQuestionsControllerCreate = <TError = ErrorType<null>,
  * @summary 获取题目列表
  */
 export const questionsControllerFindAll = (
-    params?: QuestionsControllerFindAllParams,
+    params: QuestionsControllerFindAllParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto[]>(
       {url: `/questions`, method: 'GET',
         params, signal
     },
@@ -119,7 +120,7 @@ export const getQuestionsControllerFindAllQueryKey = (params?: QuestionsControll
     }
 
     
-export const getQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof questionsControllerFindAll>>, TError = ErrorType<unknown>>(params?: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof questionsControllerFindAll>>, TError = ErrorType<unknown>>(params: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -142,7 +143,7 @@ export type QuestionsControllerFindAllQueryError = ErrorType<unknown>
 
 
 export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof questionsControllerFindAll>>, TError = ErrorType<unknown>>(
- params: undefined |  QuestionsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>> & Pick<
+ params: QuestionsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof questionsControllerFindAll>>,
           TError,
@@ -152,7 +153,7 @@ export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof 
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof questionsControllerFindAll>>, TError = ErrorType<unknown>>(
- params?: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>> & Pick<
+ params: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof questionsControllerFindAll>>,
           TError,
@@ -162,7 +163,7 @@ export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof 
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof questionsControllerFindAll>>, TError = ErrorType<unknown>>(
- params?: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -170,7 +171,7 @@ export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof 
  */
 
 export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof questionsControllerFindAll>>, TError = ErrorType<unknown>>(
- params?: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params: QuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof questionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -189,7 +190,7 @@ export function useQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof 
  * @summary 批量创建题目
  */
 export const questionsControllerBulkCreate = (
-    questionsControllerBulkCreateBodyItem: BodyType<QuestionsControllerBulkCreateBodyItem[]>,
+    createQuestionsDto: BodyType<CreateQuestionsDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -197,7 +198,7 @@ export const questionsControllerBulkCreate = (
       return customInstance<null>(
       {url: `/questions/bulk`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: questionsControllerBulkCreateBodyItem, signal
+      data: createQuestionsDto, signal
     },
       options);
     }
@@ -205,8 +206,8 @@ export const questionsControllerBulkCreate = (
 
 
 export const getQuestionsControllerBulkCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, TError,{data: BodyType<QuestionsControllerBulkCreateBodyItem[]>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, TError,{data: BodyType<QuestionsControllerBulkCreateBodyItem[]>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, TError,{data: BodyType<CreateQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, TError,{data: BodyType<CreateQuestionsDto>}, TContext> => {
 
 const mutationKey = ['questionsControllerBulkCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -218,7 +219,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, {data: BodyType<QuestionsControllerBulkCreateBodyItem[]>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, {data: BodyType<CreateQuestionsDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  questionsControllerBulkCreate(data,requestOptions)
@@ -230,18 +231,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type QuestionsControllerBulkCreateMutationResult = NonNullable<Awaited<ReturnType<typeof questionsControllerBulkCreate>>>
-    export type QuestionsControllerBulkCreateMutationBody = BodyType<QuestionsControllerBulkCreateBodyItem[]>
+    export type QuestionsControllerBulkCreateMutationBody = BodyType<CreateQuestionsDto>
     export type QuestionsControllerBulkCreateMutationError = ErrorType<null>
 
     /**
  * @summary 批量创建题目
  */
 export const useQuestionsControllerBulkCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, TError,{data: BodyType<QuestionsControllerBulkCreateBodyItem[]>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerBulkCreate>>, TError,{data: BodyType<CreateQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof questionsControllerBulkCreate>>,
         TError,
-        {data: BodyType<QuestionsControllerBulkCreateBodyItem[]>},
+        {data: BodyType<CreateQuestionsDto>},
         TContext
       > => {
 
@@ -258,7 +259,7 @@ export const questionsControllerSearch = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto[]>(
       {url: `/questions/search`, method: 'GET',
         params, signal
     },
@@ -433,7 +434,7 @@ export const questionsControllerFindByType = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto[]>(
       {url: `/questions/type/${type}`, method: 'GET', signal
     },
       options);
@@ -520,7 +521,7 @@ export const questionsControllerFindOne = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto>(
       {url: `/questions/${id}`, method: 'GET', signal
     },
       options);
@@ -603,14 +604,14 @@ export function useQuestionsControllerFindOne<TData = Awaited<ReturnType<typeof 
  */
 export const questionsControllerUpdate = (
     id: string,
-    questionsControllerUpdateBody: BodyType<QuestionsControllerUpdateBody>,
+    updateQuestionDto: BodyType<UpdateQuestionDto>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto>(
       {url: `/questions/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: questionsControllerUpdateBody
+      data: updateQuestionDto
     },
       options);
     }
@@ -618,8 +619,8 @@ export const questionsControllerUpdate = (
 
 
 export const getQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerUpdate>>, TError,{id: string;data: BodyType<QuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof questionsControllerUpdate>>, TError,{id: string;data: BodyType<QuestionsControllerUpdateBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof questionsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateQuestionDto>}, TContext> => {
 
 const mutationKey = ['questionsControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -631,7 +632,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof questionsControllerUpdate>>, {id: string;data: BodyType<QuestionsControllerUpdateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof questionsControllerUpdate>>, {id: string;data: BodyType<UpdateQuestionDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  questionsControllerUpdate(id,data,requestOptions)
@@ -643,18 +644,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type QuestionsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof questionsControllerUpdate>>>
-    export type QuestionsControllerUpdateMutationBody = BodyType<QuestionsControllerUpdateBody>
+    export type QuestionsControllerUpdateMutationBody = BodyType<UpdateQuestionDto>
     export type QuestionsControllerUpdateMutationError = ErrorType<null>
 
     /**
  * @summary 更新题目信息
  */
 export const useQuestionsControllerUpdate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerUpdate>>, TError,{id: string;data: BodyType<QuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof questionsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof questionsControllerUpdate>>,
         TError,
-        {id: string;data: BodyType<QuestionsControllerUpdateBody>},
+        {id: string;data: BodyType<UpdateQuestionDto>},
         TContext
       > => {
 
@@ -670,7 +671,7 @@ export const questionsControllerRemove = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<QuestionDto>(
       {url: `/questions/${id}`, method: 'DELETE'
     },
       options);
