@@ -72,7 +72,12 @@ export default function ExamPage() {
     if (!currentUser || !exam) return;
 
     try {
-      const result = await startExamMutation.mutateAsync();
+      const result = await startExamMutation.mutateAsync({
+        data: {
+          userId: currentUser.id,
+          examId: examId
+        }
+      });
        
        if (result) {
           setAttemptId((result as any).id);
@@ -117,7 +122,13 @@ export default function ExamPage() {
     try {
       // 提交所有答案
       for (const answer of answers) {
-        await submitAnswerMutation.mutateAsync();
+        await submitAnswerMutation.mutateAsync({
+          data: {
+            attemptId: attemptId,
+            questionId: answer.questionId,
+            userAnswer: answer.selectedOption
+          }
+        });
       }
 
       // 完成考试
