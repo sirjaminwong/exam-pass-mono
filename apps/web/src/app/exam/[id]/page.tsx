@@ -276,9 +276,9 @@ export default function ExamPage() {
                 {currentQuestion?.question?.content}
               </h2>
               
-              {/* <div className="space-y-3">
-                {currentQuestion?.question?.options && typeof currentQuestion.question.options === 'object' ? Object.values(currentQuestion.question.options).map((option: any, index: number) => {
-                  const optionKey = String.fromCharCode(65 + index); // A, B, C, D
+              <div className="space-y-3">
+                {currentQuestion?.question?.options && Array.isArray(currentQuestion.question.options) ? currentQuestion.question.options.map((option: any, index: number) => {
+                  const optionKey = option.key;
                   const isSelected = currentAnswer?.selectedOption === optionKey;
                   
                   return (
@@ -299,11 +299,11 @@ export default function ExamPage() {
                         className="mr-3 text-blue-600"
                       />
                       <span className="font-medium text-gray-700 mr-2">{optionKey}.</span>
-                      <span className="text-gray-900">{option}</span>
+                      <span className="text-gray-900">{option.text}</span>
                     </label>
                   );
                 }) : null}
-              </div> */}
+              </div>
             </div>
 
             {/* 导航按钮 */}

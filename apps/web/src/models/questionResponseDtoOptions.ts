@@ -2,4 +2,7 @@
 /**
  * 选项（JSON格式）
  */
-export type QuestionResponseDtoOptions = { [key: string]: unknown };
+export type QuestionResponseDtoOptions = Array<{
+  key: string;
+  text: string;
+}>;
