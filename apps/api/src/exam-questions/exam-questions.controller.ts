@@ -17,7 +17,16 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { ExamQuestionsService } from './exam-questions.service';
-import { ExamQuestion, Prisma } from '@prisma/client';
+import { ExamQuestion } from '@prisma/client';
+import {
+  CreateExamQuestionDto,
+  AddQuestionToExamDto,
+  BulkAddQuestionsDto,
+  BulkRemoveDto,
+  UpdateExamQuestionDto,
+  FindAllQueryDto,
+  ExamQuestionResponseDto,
+} from './dto';
 
 @ApiTags('exam-questions')
 @Controller('exam-questions')
@@ -26,74 +35,21 @@ export class ExamQuestionsController {
 
   @Post()
   @ApiOperation({ summary: '创建新的试卷题目关联记录' })
-  @ApiBody({
-    description: '创建试卷题目关联记录的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        examId: {
-          type: 'string',
-          description: '试卷ID',
-          example: 'exam-123',
-        },
-        questionId: {
-          type: 'string',
-          description: '题目ID',
-          example: 'question-456',
-        },
-        order: {
-          type: 'number',
-          description: '题目在试卷中的顺序',
-          example: 1,
-        },
-        score: {
-          type: 'number',
-          description: '题目分值',
-          example: 10,
-        },
-      },
-      required: ['examId', 'questionId'],
-    },
-  })
+  @ApiBody({ type: CreateExamQuestionDto })
   @ApiResponse({ status: 201, description: '试卷题目关联记录创建成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
-    @Body() createExamQuestionDto: Prisma.ExamQuestionCreateInput,
+    @Body() createExamQuestionDto: CreateExamQuestionDto,
   ): Promise<ExamQuestion> {
     return this.examQuestionsService.create(createExamQuestionDto);
   }
 
   @Post('add')
   @ApiOperation({ summary: '添加题目到试卷' })
-  @ApiBody({
-    description: '添加题目到试卷的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        examId: {
-          type: 'string',
-          description: '试卷ID',
-          example: 'exam-123',
-        },
-        questionId: {
-          type: 'string',
-          description: '题目ID',
-          example: 'question-456',
-        },
-        order: {
-          type: 'number',
-          description: '题目在试卷中的顺序',
-          example: 1,
-        },
-      },
-      required: ['examId', 'questionId', 'order'],
-    },
-  })
+  @ApiBody({ type: AddQuestionToExamDto })
   @ApiResponse({ status: 201, description: '题目添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  addQuestionToExam(
-    @Body() body: { examId: string; questionId: string; order: number },
-  ): Promise<ExamQuestion> {
+  addQuestionToExam(@Body() body: AddQuestionToExamDto): Promise<ExamQuestion> {
     return this.examQuestionsService.addQuestionToExam(
       body.examId,
       body.questionId,
@@ -103,33 +59,10 @@ export class ExamQuestionsController {
 
   @Post('bulk-add')
   @ApiOperation({ summary: '批量添加题目到试卷' })
-  @ApiBody({
-    description: '批量添加题目到试卷的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        examId: {
-          type: 'string',
-          description: '试卷ID',
-          example: 'exam-123',
-        },
-        questionIds: {
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-          description: '题目ID列表',
-          example: ['question-1', 'question-2', 'question-3'],
-        },
-      },
-      required: ['examId', 'questionIds'],
-    },
-  })
+  @ApiBody({ type: BulkAddQuestionsDto })
   @ApiResponse({ status: 201, description: '批量添加成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  bulkAddQuestions(
-    @Body() body: { examId: string; questionIds: string[] },
-  ): Promise<number> {
+  bulkAddQuestions(@Body() body: BulkAddQuestionsDto): Promise<number> {
     return this.examQuestionsService.bulkAddQuestions(
       body.examId,
       body.questionIds,
@@ -138,64 +71,65 @@ export class ExamQuestionsController {
 
   @Post('bulk-remove')
   @ApiOperation({ summary: '批量删除试卷题目关联记录' })
-  @ApiBody({
-    description: '批量删除试卷题目关联记录的数据',
-    schema: {
-      type: 'object',
-      properties: {
-        ids: {
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-          description: '试卷题目关联记录ID列表',
-          example: ['id-1', 'id-2', 'id-3'],
-        },
-      },
-      required: ['ids'],
-    },
-  })
+  @ApiBody({ type: BulkRemoveDto })
   @ApiResponse({ status: 200, description: '批量删除成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  bulkRemove(@Body() body: { ids: string[] }): Promise<number> {
+  bulkRemove(@Body() body: BulkRemoveDto): Promise<number> {
     return this.examQuestionsService.bulkRemove(body.ids);
   }
 
   @Get()
   @ApiOperation({ summary: '获取试卷题目关联记录列表' })
-  @ApiQuery({ name: 'examId', required: false, description: '试卷ID' })
-  @ApiQuery({ name: 'questionId', required: false, description: '题目ID' })
-  @ApiQuery({
-    name: 'skip',
-    required: false,
-    type: Number,
-    description: '跳过数量',
+  @ApiResponse({
+    status: 200,
+    description: '成功获取试卷题目关联记录列表',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', description: '关联记录ID' },
+          examId: { type: 'string', description: '试卷ID' },
+          questionId: { type: 'string', description: '题目ID' },
+          order: { type: 'number', description: '题目顺序' },
+          exam: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', description: '试卷ID' },
+              title: { type: 'string', description: '试卷标题' },
+              description: { type: 'string', description: '试卷描述' },
+            },
+          },
+          question: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', description: '题目ID' },
+              type: { type: 'string', description: '题目类型' },
+              content: { type: 'string', description: '题目内容' },
+              score: { type: 'number', description: '题目分值' },
+            },
+          },
+        },
+      },
+    },
   })
-  @ApiQuery({
-    name: 'take',
-    required: false,
-    type: Number,
-    description: '获取数量',
-  })
-  @ApiResponse({ status: 200, description: '成功获取试卷题目关联记录列表' })
-  findAll(
-    @Query('examId') examId?: string,
-    @Query('questionId') questionId?: string,
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
-  ): Promise<ExamQuestion[]> {
+  findAll(@Query() query: FindAllQueryDto): Promise<ExamQuestion[]> {
     return this.examQuestionsService.findAll({
-      examId,
-      questionId,
-      skip: skip ? parseInt(skip) : undefined,
-      take: take ? parseInt(take) : undefined,
+      examId: query.examId,
+      questionId: query.questionId,
+      skip: query.skip ? parseInt(query.skip) : undefined,
+      take: query.take ? parseInt(query.take) : undefined,
     });
   }
 
   @Get('exam/:examId')
   @ApiOperation({ summary: '获取指定试卷的题目列表' })
   @ApiParam({ name: 'examId', description: '试卷ID' })
-  @ApiResponse({ status: 200, description: '成功获取题目列表' })
+  @ApiResponse({
+    status: 200,
+    description: '成功获取题目列表',
+    type: [ExamQuestionResponseDto],
+  })
   findByExam(@Param('examId') examId: string): Promise<ExamQuestion[]> {
     return this.examQuestionsService.findByExam(examId);
   }
@@ -259,29 +193,34 @@ export class ExamQuestionsController {
   @Patch(':id')
   @ApiOperation({ summary: '更新试卷题目关联记录' })
   @ApiParam({ name: 'id', description: '试卷题目关联记录ID' })
-  @ApiBody({
-    description: '更新试卷题目关联记录的数据',
+  @ApiBody({ type: UpdateExamQuestionDto })
+  @ApiResponse({
+    status: 200,
+    description: '试卷题目关联记录更新成功',
     schema: {
       type: 'object',
       properties: {
-        order: {
-          type: 'number',
-          description: '题目在试卷中的顺序',
-          example: 2,
+        id: { type: 'string', description: '关联记录ID' },
+        examId: { type: 'string', description: '试卷ID' },
+        questionId: { type: 'string', description: '题目ID' },
+        order: { type: 'number', description: '题目顺序' },
+        createdAt: {
+          type: 'string',
+          format: 'date-time',
+          description: '创建时间',
         },
-        score: {
-          type: 'number',
-          description: '题目分值',
-          example: 15,
+        updatedAt: {
+          type: 'string',
+          format: 'date-time',
+          description: '更新时间',
         },
       },
     },
   })
-  @ApiResponse({ status: 200, description: '试卷题目关联记录更新成功' })
   @ApiResponse({ status: 404, description: '试卷题目关联记录不存在' })
   update(
     @Param('id') id: string,
-    @Body() updateExamQuestionDto: Prisma.ExamQuestionUpdateInput,
+    @Body() updateExamQuestionDto: UpdateExamQuestionDto,
   ): Promise<ExamQuestion> {
     return this.examQuestionsService.update(id, updateExamQuestionDto);
   }

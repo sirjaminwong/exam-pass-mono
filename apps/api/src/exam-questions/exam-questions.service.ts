@@ -6,9 +6,17 @@ import { ExamQuestion, Prisma } from '@prisma/client';
 export class ExamQuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.ExamQuestionCreateInput): Promise<ExamQuestion> {
+  async create(data: {
+    examId: string;
+    questionId: string;
+    order: number;
+  }): Promise<ExamQuestion> {
     return this.prisma.examQuestion.create({
-      data,
+      data: {
+        examId: data.examId,
+        questionId: data.questionId,
+        order: data.order,
+      },
       include: {
         exam: {
           select: {

@@ -1,9 +1,9 @@
 
-export interface AddQuestionToExamDto {
+export interface CreateExamQuestionDto {
   /** Exam ID */
   examId: string;
   /** Question ID */
   questionId: string;
-  /** Order of the question in the exam */
+  /** 题目在试卷中的顺序 */
   order: number;
 }

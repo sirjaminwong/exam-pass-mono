@@ -4,41 +4,42 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useExamsControllerFindOne } from '../../../services/exams/exams';
+import { useExamQuestionsControllerFindByExam } from '../../../services/exam-questions/exam-questions';
 import { 
   useExamAttemptsControllerStartExam,
   useExamAttemptsControllerCompleteAttempt
 } from '../../../services/exam-attempts/exam-attempts';
 import { useAnswersControllerSubmitAnswer } from '../../../services/answers/answers';
-
-interface Answer {
-  questionId: string;
-  selectedOption: string;
-  isCorrect?: boolean;
-}
+import type { UserAnswer, User } from '../../../types/exam';
 
 export default function ExamPage() {
   const params = useParams();
   const router = useRouter();
   const examId = params.id as string;
   
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [examStarted, setExamStarted] = useState(false);
   const [examCompleted, setExamCompleted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [attemptId, setAttemptId] = useState<string>('');
 
   // 获取考试信息
-  const { data: exam, isLoading: examLoading } = useExamsControllerFindOne(examId);
+  const { data: exam, isLoading: examLoading, error: examError } = useExamsControllerFindOne(examId);
+  console.log('exam', exam);
 
-  // 开始考试的 mutation
+  // 获取考试题目
+  const { data: examQuestions, isLoading: questionsLoading, error: questionsError } = useExamQuestionsControllerFindByExam(examId);
+
+
+    console.log('examQuestions', examQuestions);
+
+
+
+  // API hooks
   const startExamMutation = useExamAttemptsControllerStartExam();
-  
-  // 完成考试的 mutation
-  const completeExamMutation = useExamAttemptsControllerCompleteAttempt();
-  
-  // 提交答案的 mutation
+  const completeAttemptMutation = useExamAttemptsControllerCompleteAttempt();
   const submitAnswerMutation = useAnswersControllerSubmitAnswer();
 
   // 检查用户登录状态
@@ -48,7 +49,11 @@ export default function ExamPage() {
       router.push('/login');
       return;
     }
-    setCurrentUser(JSON.parse(user));
+    const userData = JSON.parse(user);
+    setCurrentUser({
+      ...userData,
+      role: userData.role || 'student'
+    });
   }, [router]);
 
   // 计时器
@@ -92,7 +97,7 @@ export default function ExamPage() {
   const handleAnswerSelect = (questionId: string, selectedOption: string) => {
     setAnswers(prev => {
       const existingIndex = prev.findIndex(a => a.questionId === questionId);
-      const newAnswer: Answer = { questionId, selectedOption };
+      const newAnswer: UserAnswer = { questionId, selectedOption };
       
       if (existingIndex >= 0) {
         const updated = [...prev];
@@ -105,7 +110,7 @@ export default function ExamPage() {
   };
 
   const handleNextQuestion = () => {
-    if (exam && currentQuestionIndex < ((exam as any)?.questions?.length || 0) - 1) {
+    if (examQuestions && currentQuestionIndex < (examQuestions?.length || 0) - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     }
   };
@@ -132,7 +137,7 @@ export default function ExamPage() {
       }
 
       // 完成考试
-      await completeExamMutation.mutateAsync({ id: attemptId });
+      await completeAttemptMutation.mutateAsync({ id: attemptId });
 
       setExamCompleted(true);
     } catch (error) {
@@ -208,7 +213,7 @@ export default function ExamPage() {
             <div className="bg-gray-50 p-4 rounded-lg">
               <h3 className="font-semibold text-gray-900 mb-2">考试信息</h3>
               <ul className="space-y-1 text-sm text-gray-600">
-                <li>题目数量: {(exam as any)?.questions?.length || 0} 题</li>
+                <li>题目数量: {examQuestions?.length || 0} 题</li>
                 <li>考试时长: {(exam as any)?.duration} 分钟</li>
                 <li>及格分数: {(exam as any)?.passingScore} 分</li>
               </ul>
@@ -239,8 +244,8 @@ export default function ExamPage() {
     );
   }
 
-  const currentQuestion = (exam as any)?.questions?.[currentQuestionIndex];
-  const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
+  const currentQuestion = examQuestions?.[currentQuestionIndex];
+  const currentAnswer = answers.find(a => a.questionId === currentQuestion?.questionId);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -250,7 +255,7 @@ export default function ExamPage() {
           <div>
             <h1 className="text-xl font-semibold text-gray-900">{(exam as any)?.title}</h1>
             <p className="text-sm text-gray-600">
-              第 {currentQuestionIndex + 1} 题 / 共 {(exam as any)?.questions?.length || 0} 题
+              第 {currentQuestionIndex + 1} 题 / 共 {examQuestions?.length || 0} 题
             </p>
           </div>
           <div className="text-right">
@@ -268,11 +273,11 @@ export default function ExamPage() {
           <div className="bg-white rounded-lg shadow-md p-8">
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                {currentQuestion.content}
+                {currentQuestion?.question?.content}
               </h2>
               
-              <div className="space-y-3">
-                {currentQuestion?.options?.map((option: any, index: number) => {
+              {/* <div className="space-y-3">
+                {currentQuestion?.question?.options && typeof currentQuestion.question.options === 'object' ? Object.values(currentQuestion.question.options).map((option: any, index: number) => {
                   const optionKey = String.fromCharCode(65 + index); // A, B, C, D
                   const isSelected = currentAnswer?.selectedOption === optionKey;
                   
@@ -287,18 +292,18 @@ export default function ExamPage() {
                     >
                       <input
                         type="radio"
-                        name={`question-${currentQuestion?.id}`}
+                        name={`question-${currentQuestion?.questionId}`}
                         value={optionKey}
                         checked={isSelected}
-                        onChange={() => handleAnswerSelect(currentQuestion?.id, optionKey)}
+                        onChange={() => handleAnswerSelect(currentQuestion?.questionId || '', optionKey)}
                         className="mr-3 text-blue-600"
                       />
                       <span className="font-medium text-gray-700 mr-2">{optionKey}.</span>
                       <span className="text-gray-900">{option}</span>
                     </label>
                   );
-                })}
-              </div>
+                }) : null}
+              </div> */}
             </div>
 
             {/* 导航按钮 */}
@@ -312,13 +317,13 @@ export default function ExamPage() {
               </button>
               
               <div className="flex space-x-3">
-                {currentQuestionIndex === ((exam as any)?.questions?.length || 0) - 1 ? (
+                {currentQuestionIndex === (examQuestions?.length || 0) - 1 ? (
                   <button
                     onClick={handleCompleteExam}
-                    disabled={completeExamMutation.isPending}
+                    disabled={completeAttemptMutation.isPending}
                     className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {completeExamMutation.isPending ? '提交中...' : '提交考试'}
+                    {completeAttemptMutation.isPending ? '提交中...' : '提交考试'}
                   </button>
                 ) : (
                   <button
@@ -338,13 +343,13 @@ export default function ExamPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex flex-wrap gap-2">
-            {(exam as any)?.questions?.map((question: any, index: number) => {
-              const hasAnswer = answers.some(a => a.questionId === question?.id);
+            {examQuestions?.map((examQuestion: any, index: number) => {
+              const hasAnswer = answers.some(a => a.questionId === examQuestion?.questionId);
               const isCurrent = index === currentQuestionIndex;
               
               return (
                 <button
-                  key={question?.id}
+                  key={examQuestion?.id}
                   onClick={() => setCurrentQuestionIndex(index)}
                   className={`w-10 h-10 rounded-md text-sm font-medium transition-colors ${
                     isCurrent
