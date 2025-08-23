@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ExamAttemptsService } from './exam-attempts.service';
-import { ExamAttempt } from '@prisma/client';
 import {
   CreateExamAttemptDto,
   UpdateExamAttemptDto,
@@ -36,11 +35,8 @@ export class ExamAttemptsController {
   @ApiResponse({ status: 400, description: '请求参数错误' })
   create(
     @Body() createExamAttemptDto: CreateExamAttemptDto,
-  ): Promise<ExamAttempt> {
-    return this.examAttemptsService.create({
-      user: { connect: { id: createExamAttemptDto.userId } },
-      exam: { connect: { id: createExamAttemptDto.examId } },
-    });
+  ): Promise<ExamAttemptDto> {
+    return this.examAttemptsService.create(createExamAttemptDto);
   }
 
   @Post('start')
@@ -51,7 +47,7 @@ export class ExamAttemptsController {
     type: ExamAttemptDto,
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  startExam(@Body() startExamDto: StartExamDto): Promise<ExamAttempt> {
+  startExam(@Body() startExamDto: StartExamDto): Promise<ExamAttemptDto> {
     return this.examAttemptsService.startExam(
       startExamDto.userId,
       startExamDto.examId,
@@ -65,14 +61,8 @@ export class ExamAttemptsController {
     description: '成功获取考试记录列表',
     type: [ExamAttemptDto],
   })
-  findAll(@Query() query: QueryExamAttemptDto): Promise<ExamAttempt[]> {
-    return this.examAttemptsService.findAll({
-      userId: query.userId,
-      examId: query.examId,
-      isCompleted: query.isCompleted,
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
-    });
+  findAll(@Query() query: QueryExamAttemptDto): Promise<ExamAttemptDto[]> {
+    return this.examAttemptsService.findAll(query);
   }
 
   @Get('user/:userId')
@@ -83,7 +73,7 @@ export class ExamAttemptsController {
     description: '成功获取考试记录',
     type: [ExamAttemptDto],
   })
-  findByUser(@Param('userId') userId: string): Promise<ExamAttempt[]> {
+  findByUser(@Param('userId') userId: string): Promise<ExamAttemptDto[]> {
     return this.examAttemptsService.findByUser(userId);
   }
 
@@ -95,7 +85,7 @@ export class ExamAttemptsController {
     description: '成功获取考试记录',
     type: [ExamAttemptDto],
   })
-  findByExam(@Param('examId') examId: string): Promise<ExamAttempt[]> {
+  findByExam(@Param('examId') examId: string): Promise<ExamAttemptDto[]> {
     return this.examAttemptsService.findByExam(examId);
   }
 
@@ -120,7 +110,7 @@ export class ExamAttemptsController {
     type: ExamAttemptDto,
   })
   @ApiResponse({ status: 404, description: '考试记录不存在' })
-  findOne(@Param('id') id: string): Promise<ExamAttempt | null> {
+  findOne(@Param('id') id: string): Promise<ExamAttemptDto | null> {
     return this.examAttemptsService.findOne(id);
   }
 
@@ -133,7 +123,9 @@ export class ExamAttemptsController {
     type: ExamDetailStatsDto,
   })
   @ApiResponse({ status: 404, description: '考试记录不存在' })
-  getAttemptStats(@Param('id') id: string) {
+  async getAttemptStats(
+    @Param('id') id: string,
+  ): Promise<ExamDetailStatsDto | null> {
     return this.examAttemptsService.getAttemptStats(id);
   }
 
@@ -149,7 +141,7 @@ export class ExamAttemptsController {
   update(
     @Param('id') id: string,
     @Body() updateExamAttemptDto: UpdateExamAttemptDto,
-  ): Promise<ExamAttempt> {
+  ): Promise<ExamAttemptDto> {
     return this.examAttemptsService.update(id, updateExamAttemptDto);
   }
 
@@ -163,7 +155,7 @@ export class ExamAttemptsController {
   })
   @ApiResponse({ status: 404, description: '考试记录不存在' })
   @ApiResponse({ status: 400, description: '考试已完成' })
-  completeAttempt(@Param('id') id: string): Promise<ExamAttempt> {
+  completeAttempt(@Param('id') id: string): Promise<ExamAttemptDto> {
     return this.examAttemptsService.completeAttempt(id);
   }
 
@@ -176,7 +168,7 @@ export class ExamAttemptsController {
     type: ExamAttemptDto,
   })
   @ApiResponse({ status: 404, description: '考试记录不存在' })
-  remove(@Param('id') id: string): Promise<ExamAttempt> {
+  remove(@Param('id') id: string): Promise<ExamAttemptDto> {
     return this.examAttemptsService.remove(id);
   }
 }

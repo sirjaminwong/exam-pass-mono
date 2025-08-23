@@ -16,7 +16,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ExamQuestionsService } from './exam-questions.service';
-import { ExamQuestion } from '@prisma/client';
+
 import {
   CreateExamQuestionDto,
   AddQuestionToExamDto,
@@ -44,7 +44,7 @@ export class ExamQuestionsController {
   @ApiResponse({ status: 409, description: '试卷题目关联记录已存在' })
   create(
     @Body() createExamQuestionDto: CreateExamQuestionDto,
-  ): Promise<ExamQuestion> {
+  ): Promise<ExamQuestionDto> {
     return this.examQuestionsService.create(createExamQuestionDto);
   }
 
@@ -58,7 +58,9 @@ export class ExamQuestionsController {
   @ApiResponse({ status: 400, description: '请求参数错误' })
   @ApiResponse({ status: 404, description: '试卷或题目不存在' })
   @ApiResponse({ status: 409, description: '题目已存在于试卷中' })
-  addQuestionToExam(@Body() body: AddQuestionToExamDto): Promise<ExamQuestion> {
+  addQuestionToExam(
+    @Body() body: AddQuestionToExamDto,
+  ): Promise<ExamQuestionDto> {
     return this.examQuestionsService.addQuestionToExam(
       body.examId,
       body.questionId,
@@ -80,11 +82,12 @@ export class ExamQuestionsController {
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   @ApiResponse({ status: 404, description: '试卷不存在' })
-  bulkAddQuestions(@Body() body: BulkAddQuestionsDto): Promise<number> {
-    return this.examQuestionsService.bulkAddQuestions(
-      body.examId,
-      body.questionIds,
-    );
+  bulkAddQuestions(
+    @Body() body: BulkAddQuestionsDto,
+  ): Promise<{ count: number }> {
+    return this.examQuestionsService
+      .bulkAddQuestions(body.examId, body.questionIds)
+      .then((count) => ({ count }));
   }
 
   @Post('bulk-remove')
@@ -100,8 +103,10 @@ export class ExamQuestionsController {
     },
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  bulkRemove(@Body() body: BulkRemoveDto): Promise<number> {
-    return this.examQuestionsService.bulkRemove(body.ids);
+  bulkRemove(@Body() body: BulkRemoveDto): Promise<{ count: number }> {
+    return this.examQuestionsService
+      .bulkRemove(body.ids)
+      .then((count) => ({ count }));
   }
 
   @Get()
@@ -112,13 +117,8 @@ export class ExamQuestionsController {
     type: [ExamQuestionDto],
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  findAll(@Query() query: QueryExamQuestionDto): Promise<ExamQuestion[]> {
-    return this.examQuestionsService.findAll({
-      examId: query.examId,
-      questionId: query.questionId,
-      skip: query.page ? (query.page - 1) * query.limit : undefined,
-      take: query.limit ? query.limit : undefined,
-    });
+  findAll(@Query() query: QueryExamQuestionDto): Promise<ExamQuestionDto[]> {
+    return this.examQuestionsService.findAll(query);
   }
 
   @Get('exam/:examId')
@@ -130,7 +130,7 @@ export class ExamQuestionsController {
     type: [ExamQuestionDto],
   })
   @ApiResponse({ status: 404, description: '试卷不存在' })
-  findByExam(@Param('examId') examId: string): Promise<ExamQuestion[]> {
+  findByExam(@Param('examId') examId: string): Promise<ExamQuestionDto[]> {
     return this.examQuestionsService.findByExam(examId);
   }
 
@@ -145,7 +145,7 @@ export class ExamQuestionsController {
   @ApiResponse({ status: 404, description: '题目不存在' })
   findByQuestion(
     @Param('questionId') questionId: string,
-  ): Promise<ExamQuestion[]> {
+  ): Promise<ExamQuestionDto[]> {
     return this.examQuestionsService.findByQuestion(questionId);
   }
 
@@ -158,7 +158,9 @@ export class ExamQuestionsController {
     type: [ExamQuestionDto],
   })
   @ApiResponse({ status: 404, description: '试卷不存在' })
-  getQuestionsByType(@Param('examId') examId: string): Promise<ExamQuestion[]> {
+  getQuestionsByType(
+    @Param('examId') examId: string,
+  ): Promise<ExamQuestionDto[]> {
     return this.examQuestionsService.getQuestionsByType(examId);
   }
 
@@ -176,8 +178,12 @@ export class ExamQuestionsController {
     },
   })
   @ApiResponse({ status: 404, description: '试卷不存在' })
-  getExamTotalScore(@Param('examId') examId: string): Promise<number> {
-    return this.examQuestionsService.getExamTotalScore(examId);
+  getExamTotalScore(
+    @Param('examId') examId: string,
+  ): Promise<{ totalScore: number }> {
+    return this.examQuestionsService
+      .getExamTotalScore(examId)
+      .then((totalScore) => ({ totalScore }));
   }
 
   @Get('exam/:examId/question/:questionId')
@@ -193,7 +199,7 @@ export class ExamQuestionsController {
   findByExamAndQuestion(
     @Param('examId') examId: string,
     @Param('questionId') questionId: string,
-  ): Promise<ExamQuestion | null> {
+  ): Promise<ExamQuestionDto | null> {
     return this.examQuestionsService.findByExamAndQuestion(examId, questionId);
   }
 
@@ -219,7 +225,7 @@ export class ExamQuestionsController {
     type: ExamQuestionDto,
   })
   @ApiResponse({ status: 404, description: '试卷题目关联记录不存在' })
-  findOne(@Param('id') id: string): Promise<ExamQuestion | null> {
+  findOne(@Param('id') id: string): Promise<ExamQuestionDto | null> {
     return this.examQuestionsService.findOne(id);
   }
 
@@ -236,7 +242,7 @@ export class ExamQuestionsController {
   update(
     @Param('id') id: string,
     @Body() updateExamQuestionDto: UpdateExamQuestionDto,
-  ): Promise<ExamQuestion> {
+  ): Promise<ExamQuestionDto> {
     return this.examQuestionsService.update(id, updateExamQuestionDto);
   }
 
@@ -249,7 +255,7 @@ export class ExamQuestionsController {
     type: ExamQuestionDto,
   })
   @ApiResponse({ status: 404, description: '试卷题目关联记录不存在' })
-  remove(@Param('id') id: string): Promise<ExamQuestion> {
+  remove(@Param('id') id: string): Promise<ExamQuestionDto> {
     return this.examQuestionsService.remove(id);
   }
 
@@ -266,7 +272,7 @@ export class ExamQuestionsController {
   removeByExamAndQuestion(
     @Param('examId') examId: string,
     @Param('questionId') questionId: string,
-  ): Promise<ExamQuestion> {
+  ): Promise<ExamQuestionDto> {
     return this.examQuestionsService.removeByExamAndQuestion(
       examId,
       questionId,

@@ -1,24 +1,63 @@
 import { Injectable } from '@nestjs/common';
+import { ExamAttempt, User, Exam, Answer, Question } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { ExamAttempt, Prisma } from '@prisma/client';
+import {
+  CreateExamAttemptDto,
+  ExamAttemptDto,
+  UpdateExamAttempt,
+  QueryExamAttempt,
+  ExamDetailStats,
+} from './dto/exam-attempt.dto';
 
 @Injectable()
 export class ExamAttemptsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.ExamAttemptCreateInput): Promise<ExamAttempt> {
-    return this.prisma.examAttempt.create({ data });
+  async create(
+    createExamAttemptDto: CreateExamAttemptDto,
+  ): Promise<ExamAttemptDto> {
+    const examAttempt = await this.prisma.examAttempt.create({
+      data: {
+        userId: createExamAttemptDto.userId,
+        examId: createExamAttemptDto.examId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
+                type: true,
+                content: true,
+                score: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return this.transformToExamAttemptDto(examAttempt);
   }
 
-  async findAll(params?: {
-    userId?: string;
-    examId?: string;
-    isCompleted?: boolean;
-    skip?: number;
-    take?: number;
-  }): Promise<ExamAttempt[]> {
-    const { userId, examId, isCompleted, skip, take } = params || {};
-    return this.prisma.examAttempt.findMany({
+  async findAll(params?: QueryExamAttempt): Promise<ExamAttemptDto[]> {
+    const { userId, examId, isCompleted, page = 1, limit = 10 } = params || {};
+    const skip = (page - 1) * limit;
+    const take = limit;
+    const examAttempts = await this.prisma.examAttempt.findMany({
       where: {
         ...(userId && { userId }),
         ...(examId && { examId }),
@@ -56,10 +95,13 @@ export class ExamAttemptsService {
       take,
       orderBy: { startedAt: 'desc' },
     });
+    return examAttempts.map((attempt) =>
+      this.transformToExamAttemptDto(attempt),
+    );
   }
 
-  async findOne(id: string): Promise<ExamAttempt | null> {
-    return this.prisma.examAttempt.findUnique({
+  async findOne(id: string): Promise<ExamAttemptDto | null> {
+    const examAttempt = await this.prisma.examAttempt.findUnique({
       where: { id },
       include: {
         user: {
@@ -70,26 +112,31 @@ export class ExamAttemptsService {
           },
         },
         exam: {
-          include: {
-            questions: {
-              include: {
-                question: true,
-              },
-              orderBy: { order: 'asc' },
-            },
+          select: {
+            id: true,
+            title: true,
+            description: true,
           },
         },
         answers: {
           include: {
-            question: true,
+            question: {
+              select: {
+                id: true,
+                type: true,
+                content: true,
+                score: true,
+              },
+            },
           },
         },
       },
     });
+    return examAttempt ? this.transformToExamAttemptDto(examAttempt) : null;
   }
 
-  async findByUser(userId: string): Promise<ExamAttempt[]> {
-    return this.prisma.examAttempt.findMany({
+  async findByUser(userId: string): Promise<ExamAttemptDto[]> {
+    const attempts = await this.prisma.examAttempt.findMany({
       where: { userId },
       include: {
         exam: {
@@ -102,17 +149,21 @@ export class ExamAttemptsService {
         answers: {
           select: {
             id: true,
+            questionId: true,
+            userAnswer: true,
             isCorrect: true,
             score: true,
+            answeredAt: true,
           },
         },
       },
       orderBy: { startedAt: 'desc' },
     });
+    return attempts.map((attempt) => this.transformToExamAttemptDto(attempt));
   }
 
-  async findByExam(examId: string): Promise<ExamAttempt[]> {
-    return this.prisma.examAttempt.findMany({
+  async findByExam(examId: string): Promise<ExamAttemptDto[]> {
+    const attempts = await this.prisma.examAttempt.findMany({
       where: { examId },
       include: {
         user: {
@@ -125,27 +176,94 @@ export class ExamAttemptsService {
         answers: {
           select: {
             id: true,
+            questionId: true,
+            userAnswer: true,
             isCorrect: true,
             score: true,
+            answeredAt: true,
           },
         },
       },
       orderBy: { startedAt: 'desc' },
     });
+    return attempts.map((attempt) => this.transformToExamAttemptDto(attempt));
   }
 
   async update(
     id: string,
-    data: Prisma.ExamAttemptUpdateInput,
-  ): Promise<ExamAttempt> {
-    return this.prisma.examAttempt.update({ where: { id }, data });
+    updateExamAttemptDto: UpdateExamAttempt,
+  ): Promise<ExamAttemptDto> {
+    const examAttempt = await this.prisma.examAttempt.update({
+      where: { id },
+      data: updateExamAttemptDto,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
+                type: true,
+                content: true,
+                score: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return this.transformToExamAttemptDto(examAttempt);
   }
 
-  async remove(id: string): Promise<ExamAttempt> {
-    return this.prisma.examAttempt.delete({ where: { id } });
+  async remove(id: string): Promise<ExamAttemptDto> {
+    const examAttempt = await this.prisma.examAttempt.delete({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
+                type: true,
+                content: true,
+                score: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return this.transformToExamAttemptDto(examAttempt);
   }
 
-  async completeAttempt(id: string): Promise<ExamAttempt> {
+  async completeAttempt(id: string): Promise<ExamAttemptDto> {
     // 获取考试记录和所有答案
     const attempt = await this.prisma.examAttempt.findUnique({
       where: { id },
@@ -187,7 +305,7 @@ export class ExamAttemptsService {
     const accuracy = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
 
     // 更新考试记录
-    return this.prisma.examAttempt.update({
+    const updatedAttempt = await this.prisma.examAttempt.update({
       where: { id },
       data: {
         totalScore,
@@ -196,17 +314,62 @@ export class ExamAttemptsService {
         isCompleted: true,
         completedAt: new Date(),
       },
-    });
-  }
-
-  async getAttemptStats(id: string) {
-    const attempt = await this.prisma.examAttempt.findUnique({
-      where: { id },
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
         answers: {
           include: {
             question: {
               select: {
+                id: true,
+                type: true,
+                content: true,
+                score: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return this.transformToExamAttemptDto(updatedAttempt);
+  }
+
+  async getAttemptStats(id: string): Promise<ExamDetailStats | null> {
+    const attempt = await this.prisma.examAttempt.findUnique({
+      where: { id },
+      include: {
+        exam: {
+          include: {
+            questions: {
+              include: {
+                question: {
+                  select: {
+                    id: true,
+                    type: true,
+                    score: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
                 type: true,
                 score: true,
               },
@@ -218,51 +381,54 @@ export class ExamAttemptsService {
 
     if (!attempt) return null;
 
-    const totalQuestions = attempt.answers.length;
+    // 获取考试的总题目数
+    const totalQuestions = attempt.exam.questions.length;
+    // 获取已答题目数
+    const answeredQuestions = attempt.answers.length;
+    // 计算未答题目数
+    const unansweredQuestions = totalQuestions - answeredQuestions;
+
     const correctAnswers = attempt.answers.filter(
       (answer) => answer.isCorrect,
     ).length;
-    const wrongAnswers = totalQuestions - correctAnswers;
+    const wrongAnswers = answeredQuestions - correctAnswers;
 
-    // 按题型统计
-    const statsByType = attempt.answers.reduce(
-      (stats, answer) => {
-        const type = answer.question.type;
-        if (!stats[type]) {
-          stats[type] = {
-            total: 0,
-            correct: 0,
-            totalScore: 0,
-            earnedScore: 0,
-          };
-        }
-        stats[type].total++;
-        stats[type].totalScore += answer.question.score;
-        if (answer.isCorrect) {
-          stats[type].correct++;
-          stats[type].earnedScore += answer.score;
-        }
-        return stats;
-      },
-      {} as Record<
-        string,
-        {
-          total: number;
-          correct: number;
-          totalScore: number;
-          earnedScore: number;
-        }
-      >,
-    );
+    // 计算用时（分钟）
+    const timeSpent =
+      attempt.completedAt && attempt.startedAt
+        ? Math.round(
+            (new Date(attempt.completedAt).getTime() -
+              new Date(attempt.startedAt).getTime()) /
+              (1000 * 60),
+          )
+        : undefined;
+
+    // 生成题目详细统计
+    const questionStats = attempt.exam.questions.map((examQuestion) => {
+      const answer = attempt.answers.find(
+        (a) => a.questionId === examQuestion.question.id,
+      );
+      return {
+        questionId: examQuestion.question.id,
+        questionType: examQuestion.question.type,
+        isCorrect: answer?.isCorrect,
+        userAnswer: answer?.userAnswer,
+        correctAnswer: null, // 这里需要根据实际需求填充正确答案
+        score: examQuestion.question.score,
+        earnedScore: answer?.score,
+      };
+    });
 
     return {
+      attemptId: attempt.id,
       totalQuestions,
+      answeredQuestions,
       correctAnswers,
       wrongAnswers,
-      accuracy: attempt.accuracy,
-      totalScore: attempt.totalScore,
-      maxScore: attempt.maxScore,
-      statsByType,
+      unansweredQuestions,
+      accuracy: attempt.accuracy || 0,
+      timeSpent,
+      questionStats,
     };
   }
 
@@ -305,7 +471,7 @@ export class ExamAttemptsService {
     };
   }
 
-  async startExam(userId: string, examId: string): Promise<ExamAttempt> {
+  async startExam(userId: string, examId: string): Promise<ExamAttemptDto> {
     // 检查是否已有未完成的考试记录
     const existingAttempt = await this.prisma.examAttempt.findFirst({
       where: {
@@ -316,15 +482,137 @@ export class ExamAttemptsService {
     });
 
     if (existingAttempt) {
-      return existingAttempt;
+      const fullAttempt = await this.prisma.examAttempt.findUnique({
+        where: { id: existingAttempt.id },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          exam: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+            },
+          },
+          answers: {
+            include: {
+              question: {
+                select: {
+                  id: true,
+                  type: true,
+                  content: true,
+                  score: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return this.transformToExamAttemptDto(fullAttempt!);
     }
 
     // 创建新的考试记录
-    return this.prisma.examAttempt.create({
+    const newAttempt = await this.prisma.examAttempt.create({
       data: {
         userId,
         examId,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
+        answers: {
+          include: {
+            question: {
+              select: {
+                id: true,
+                type: true,
+                content: true,
+                score: true,
+              },
+            },
+          },
+        },
+      },
     });
+    return this.transformToExamAttemptDto(newAttempt);
+  }
+
+  /**
+   * 转换 Prisma 查询结果为 ExamAttemptDto
+   */
+  private transformToExamAttemptDto(
+    examAttempt: ExamAttempt & {
+      user?: Pick<User, 'id' | 'name' | 'email'>;
+      exam?: Pick<Exam, 'id' | 'title' | 'description'>;
+      answers?: (Pick<
+        Answer,
+        | 'id'
+        | 'questionId'
+        | 'userAnswer'
+        | 'isCorrect'
+        | 'score'
+        | 'answeredAt'
+      > & {
+        question?: Pick<Question, 'id' | 'type' | 'content' | 'score'>;
+      })[];
+    },
+  ): ExamAttemptDto {
+    return {
+      id: examAttempt.id,
+      userId: examAttempt.userId,
+      examId: examAttempt.examId,
+      startTime: examAttempt.startedAt.toISOString(),
+      endTime: examAttempt.completedAt?.toISOString(),
+      score: examAttempt.totalScore,
+      isCompleted: examAttempt.isCompleted,
+      createdAt: examAttempt.startedAt.toISOString(),
+      updatedAt: examAttempt.startedAt.toISOString(),
+      user: examAttempt.user
+        ? {
+            id: examAttempt.user.id,
+            name: examAttempt.user.name,
+            email: examAttempt.user.email,
+          }
+        : undefined,
+      exam: examAttempt.exam
+        ? {
+            id: examAttempt.exam.id,
+            title: examAttempt.exam.title,
+            description: examAttempt.exam.description || undefined,
+          }
+        : undefined,
+      answers: examAttempt.answers?.map((answer) => ({
+        id: answer.id,
+        questionId: answer.questionId,
+        userAnswer: answer.userAnswer,
+        isCorrect: answer.isCorrect,
+        score: answer.score,
+        question: answer.question
+          ? {
+              id: answer.question.id,
+              type: answer.question.type,
+              content: answer.question.content,
+              score: answer.question.score,
+            }
+          : undefined,
+      })),
+    };
   }
 }

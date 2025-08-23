@@ -1,17 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { ExamQuestion, Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateExamQuestion, QueryExamQuestion, ExamQuestionDto } from './dto';
+
+// 定义包含关联数据的 ExamQuestion 类型
+type ExamQuestionWithRelations = ExamQuestion & {
+  exam?: {
+    id: string;
+    title: string;
+    description: string | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    classId: string | null;
+  };
+  question?: {
+    id: string;
+    type:
+      | 'SINGLE_CHOICE'
+      | 'MULTIPLE_CHOICE'
+      | 'TRUE_FALSE'
+      | 'INDEFINITE_CHOICE';
+    content: string;
+    options: any;
+    correctAnswer: any;
+    explanation: string | null;
+    score: number;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+};
 
 @Injectable()
 export class ExamQuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: {
-    examId: string;
-    questionId: string;
-    order: number;
-  }): Promise<ExamQuestion> {
-    return this.prisma.examQuestion.create({
+  async create(data: CreateExamQuestion): Promise<ExamQuestionDto> {
+    const examQuestion = await this.prisma.examQuestion.create({
       data: {
         examId: data.examId,
         questionId: data.questionId,
@@ -23,6 +48,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -31,30 +60,61 @@ export class ExamQuestionsService {
             type: true,
             content: true,
             score: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async findAll(params?: {
-    examId?: string;
-    questionId?: string;
-    skip?: number;
-    take?: number;
-  }): Promise<ExamQuestion[]> {
-    const { examId, questionId, skip, take } = params || {};
-    return this.prisma.examQuestion.findMany({
+  async findAll(params: QueryExamQuestion): Promise<ExamQuestionDto[]> {
+    const {
+      examId,
+      questionId,
+      page = 1,
+      limit = 10,
+      sortBy = 'order',
+      sortOrder = 'asc',
+      search,
+      orderFrom,
+      orderTo,
+    } = params;
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const examQuestions = await this.prisma.examQuestion.findMany({
       where: {
         ...(examId && { examId }),
         ...(questionId && { questionId }),
+        ...(orderFrom !== undefined && { order: { gte: orderFrom } }),
+        ...(orderTo !== undefined && { order: { lte: orderTo } }),
+        ...(search && {
+          OR: [
+            { exam: { title: { contains: search, mode: 'insensitive' } } },
+            {
+              question: { content: { contains: search, mode: 'insensitive' } },
+            },
+          ],
+        }),
       },
+      skip,
+      take,
+      orderBy: { [sortBy]: sortOrder },
       include: {
         exam: {
           select: {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -63,16 +123,21 @@ export class ExamQuestionsService {
             type: true,
             content: true,
             score: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
-      skip,
-      take,
     });
+
+    return examQuestions.map((eq) => this.transformToExamQuestionDto(eq));
   }
 
-  async findOne(id: string): Promise<ExamQuestion | null> {
-    return this.prisma.examQuestion.findUnique({
+  async findOne(id: string): Promise<ExamQuestionDto | null> {
+    const examQuestion = await this.prisma.examQuestion.findUnique({
       where: { id },
       include: {
         exam: {
@@ -80,6 +145,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -87,20 +156,35 @@ export class ExamQuestionsService {
             id: true,
             type: true,
             content: true,
+            score: true,
             options: true,
             correctAnswer: true,
             explanation: true,
-            score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+
+    return examQuestion ? this.transformToExamQuestionDto(examQuestion) : null;
   }
 
-  async findByExam(examId: string): Promise<ExamQuestion[]> {
-    return this.prisma.examQuestion.findMany({
+  async findByExam(examId: string) {
+    const examQuestions = await this.prisma.examQuestion.findMany({
       where: { examId },
       include: {
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
+          },
+        },
         question: {
           select: {
             id: true,
@@ -110,14 +194,18 @@ export class ExamQuestionsService {
             correctAnswer: true,
             explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
+      orderBy: { order: 'asc' },
     });
+    return examQuestions.map((eq) => this.transformToExamQuestionDto(eq));
   }
 
-  async findByQuestion(questionId: string): Promise<ExamQuestion[]> {
-    return this.prisma.examQuestion.findMany({
+  async findByQuestion(questionId: string) {
+    const examQuestions = await this.prisma.examQuestion.findMany({
       where: { questionId },
       include: {
         exam: {
@@ -125,17 +213,32 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
+          },
+        },
+        question: {
+          select: {
+            id: true,
+            type: true,
+            content: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
+            score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return examQuestions.map((eq) => this.transformToExamQuestionDto(eq));
   }
 
-  async findByExamAndQuestion(
-    examId: string,
-    questionId: string,
-  ): Promise<ExamQuestion | null> {
-    return this.prisma.examQuestion.findUnique({
+  async findByExamAndQuestion(examId: string, questionId: string) {
+    const examQuestion = await this.prisma.examQuestion.findUnique({
       where: {
         examId_questionId: {
           examId,
@@ -148,6 +251,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -159,18 +266,17 @@ export class ExamQuestionsService {
             correctAnswer: true,
             explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return examQuestion ? this.transformToExamQuestionDto(examQuestion) : null;
   }
 
-  async addQuestionToExam(
-    examId: string,
-    questionId: string,
-    order: number,
-  ): Promise<ExamQuestion> {
-    return this.prisma.examQuestion.create({
+  async addQuestionToExam(examId: string, questionId: string, order: number) {
+    const examQuestion = await this.prisma.examQuestion.create({
       data: {
         examId,
         questionId,
@@ -182,6 +288,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -189,18 +299,21 @@ export class ExamQuestionsService {
             id: true,
             type: true,
             content: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async update(
-    id: string,
-    data: Prisma.ExamQuestionUpdateInput,
-  ): Promise<ExamQuestion> {
-    return this.prisma.examQuestion.update({
+  async update(id: string, data: Prisma.ExamQuestionUpdateInput) {
+    const examQuestion = await this.prisma.examQuestion.update({
       where: { id },
       data,
       include: {
@@ -209,6 +322,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -216,15 +333,21 @@ export class ExamQuestionsService {
             id: true,
             type: true,
             content: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async remove(id: string): Promise<ExamQuestion> {
-    return this.prisma.examQuestion.delete({
+  async remove(id: string) {
+    const examQuestion = await this.prisma.examQuestion.delete({
       where: { id },
       include: {
         exam: {
@@ -232,6 +355,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -239,18 +366,21 @@ export class ExamQuestionsService {
             id: true,
             type: true,
             content: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async removeByExamAndQuestion(
-    examId: string,
-    questionId: string,
-  ): Promise<ExamQuestion> {
-    return this.prisma.examQuestion.delete({
+  async removeByExamAndQuestion(examId: string, questionId: string) {
+    const examQuestion = await this.prisma.examQuestion.delete({
       where: {
         examId_questionId: {
           examId,
@@ -263,6 +393,10 @@ export class ExamQuestionsService {
             id: true,
             title: true,
             description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
           },
         },
         question: {
@@ -270,11 +404,17 @@ export class ExamQuestionsService {
             id: true,
             type: true,
             content: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
+    return this.transformToExamQuestionDto(examQuestion);
   }
 
   async bulkAddQuestions(
@@ -332,15 +472,31 @@ export class ExamQuestionsService {
   }
 
   async getQuestionsByType(examId: string) {
-    return this.prisma.examQuestion.findMany({
+    const examQuestions = await this.prisma.examQuestion.findMany({
       where: { examId },
       include: {
+        exam: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+            classId: true,
+          },
+        },
         question: {
           select: {
             id: true,
             type: true,
             content: true,
+            options: true,
+            correctAnswer: true,
+            explanation: true,
             score: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
@@ -350,6 +506,7 @@ export class ExamQuestionsService {
         },
       },
     });
+    return examQuestions.map((eq) => this.transformToExamQuestionDto(eq));
   }
 
   async getExamTotalScore(examId: string): Promise<number> {
@@ -365,5 +522,42 @@ export class ExamQuestionsService {
     });
 
     return examQuestions.reduce((total, eq) => total + eq.question.score, 0);
+  }
+
+  private transformToExamQuestionDto(
+    examQuestion: ExamQuestionWithRelations,
+  ): ExamQuestionDto {
+    return {
+      id: examQuestion.id,
+      examId: examQuestion.examId,
+      questionId: examQuestion.questionId,
+      order: examQuestion.order,
+      exam: examQuestion.exam
+        ? {
+            id: examQuestion.exam.id,
+            title: examQuestion.exam.title,
+            description: examQuestion.exam.description || undefined,
+            classId: examQuestion.exam.classId || undefined,
+            isActive: examQuestion.exam.isActive,
+            createdAt: examQuestion.exam.createdAt.toISOString(),
+            updatedAt: examQuestion.exam.updatedAt.toISOString(),
+          }
+        : undefined,
+      question: examQuestion.question
+        ? {
+            id: examQuestion.question.id,
+            type: examQuestion.question.type,
+            content: examQuestion.question.content,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            options: examQuestion.question.options,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            correctAnswer: examQuestion.question.correctAnswer,
+            explanation: examQuestion.question.explanation || undefined,
+            score: examQuestion.question.score,
+            createdAt: examQuestion.question.createdAt.toISOString(),
+            updatedAt: examQuestion.question.updatedAt.toISOString(),
+          }
+        : undefined,
+    };
   }
 }

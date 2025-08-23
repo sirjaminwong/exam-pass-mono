@@ -71,7 +71,7 @@ export const QuestionSchema = z.object({
   content: z.string().describe('题目内容'),
   options: z.any().optional().describe('选项列表（JSON格式）'),
   correctAnswer: z.any().describe('正确答案（JSON格式）'),
-  explanation: z.string().optional().describe('答案解析'),
+  explanation: z.string().nullable().describe('答案解析'),
   score: z.number().describe('题目分值'),
   createdAt: dateString().describe('创建时间'),
   updatedAt: dateString().describe('更新时间'),

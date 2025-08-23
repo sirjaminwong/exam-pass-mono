@@ -8,6 +8,7 @@ export {
   FavoriteQuestionDto,
   QueryFavoriteQuestionDto,
   FavoriteQuestionStatsDto,
+  FavoriteQuestionsByTypeItemDto,
   FavoriteQuestionsByTypeDto,
   SearchFavoriteQuestionsDto,
   GetRecentFavoriteQuestionsDto,

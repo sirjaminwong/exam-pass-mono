@@ -16,13 +16,15 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { QuestionsService } from './questions.service';
-import { Question, QuestionType } from '@prisma/client';
 import {
   CreateQuestionDto,
   UpdateQuestionDto,
   QuestionDto,
+  QueryQuestionDto,
+  QuestionStatsDto,
   CreateQuestionsDto,
 } from './dto/question.dto';
+import { QuestionType } from '@prisma/client';
 
 @ApiTags('questions')
 @Controller('questions')
@@ -37,16 +39,22 @@ export class QuestionsController {
     type: QuestionDto,
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  create(@Body() createQuestionDto: CreateQuestionDto): Promise<Question> {
+  create(@Body() createQuestionDto: CreateQuestionDto): Promise<QuestionDto> {
     return this.questionsService.create(createQuestionDto);
   }
 
   @Post('bulk')
   @ApiOperation({ summary: '批量创建题目' })
-  @ApiResponse({ status: 201, description: '题目批量创建成功' })
+  @ApiResponse({
+    status: 201,
+    description: '题目批量创建成功',
+    type: [QuestionDto],
+  })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  bulkCreate(@Body() questions: CreateQuestionsDto): Promise<number> {
-    return this.questionsService.bulkCreate(questions.questions);
+  createQuestions(
+    @Body() createQuestionsDto: CreateQuestionsDto,
+  ): Promise<QuestionDto[]> {
+    return this.questionsService.createQuestions(createQuestionsDto.questions);
   }
 
   @Get()
@@ -56,18 +64,8 @@ export class QuestionsController {
     description: '成功获取题目列表',
     type: [QuestionDto],
   })
-  findAll(
-    @Query('type') type?: QuestionType,
-    @Query('skip') skip?: string,
-    @Query('take') take?: string,
-  ): Promise<Question[]> {
-    const skipNum = skip ? parseInt(skip, 10) : undefined;
-    const takeNum = take ? parseInt(take, 10) : undefined;
-    return this.questionsService.findAll({
-      type,
-      skip: skipNum,
-      take: takeNum,
-    });
+  findAll(@Query() query: QueryQuestionDto): Promise<QuestionDto[]> {
+    return this.questionsService.findAll(query);
   }
 
   @Get('search')
@@ -78,14 +76,14 @@ export class QuestionsController {
     description: '搜索结果',
     type: [QuestionDto],
   })
-  search(@Query('q') query: string): Promise<Question[]> {
+  search(@Query('q') query: string): Promise<QuestionDto[]> {
     return this.questionsService.searchQuestions(query);
   }
 
   @Get('stats')
   @ApiOperation({ summary: '获取题目统计信息' })
   @ApiResponse({ status: 200, description: '统计信息' })
-  getStats() {
+  getStats(): Promise<QuestionStatsDto> {
     return this.questionsService.getQuestionStats();
   }
 
@@ -97,7 +95,7 @@ export class QuestionsController {
     description: '成功获取题目列表',
     type: [QuestionDto],
   })
-  findByType(@Param('type') type: QuestionType): Promise<Question[]> {
+  findByType(@Param('type') type: QuestionType): Promise<QuestionDto[]> {
     return this.questionsService.findByType(type);
   }
 
@@ -110,7 +108,7 @@ export class QuestionsController {
     type: QuestionDto,
   })
   @ApiResponse({ status: 404, description: '题目不存在' })
-  findOne(@Param('id') id: string): Promise<Question | null> {
+  findOne(@Param('id') id: string): Promise<QuestionDto | null> {
     return this.questionsService.findOne(id);
   }
 
@@ -126,7 +124,7 @@ export class QuestionsController {
   update(
     @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
-  ): Promise<Question> {
+  ): Promise<QuestionDto> {
     return this.questionsService.update(id, updateQuestionDto);
   }
 
@@ -139,7 +137,7 @@ export class QuestionsController {
     type: QuestionDto,
   })
   @ApiResponse({ status: 404, description: '题目不存在' })
-  remove(@Param('id') id: string): Promise<Question> {
+  remove(@Param('id') id: string): Promise<QuestionDto> {
     return this.questionsService.remove(id);
   }
 }

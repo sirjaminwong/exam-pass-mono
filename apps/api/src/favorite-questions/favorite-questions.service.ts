@@ -1,29 +1,93 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { FavoriteQuestion, Prisma } from '@prisma/client';
+import {
+  FavoriteQuestionDto,
+  CreateFavoriteQuestion,
+  AddFavoriteQuestion,
+  BulkRemoveFavoriteQuestions,
+  UpdateFavoriteQuestion,
+  QueryFavoriteQuestion,
+  FavoriteQuestionStats,
+  FavoriteQuestionsByType,
+  SearchFavoriteQuestions,
+  GetRecentFavoriteQuestions,
+} from './dto';
+
+import { FavoriteQuestion as PrismaFavoriteQuestion } from '@prisma/client';
 
 @Injectable()
 export class FavoriteQuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    data: Prisma.FavoriteQuestionCreateInput,
-  ): Promise<FavoriteQuestion> {
-    return this.prisma.favoriteQuestion.create({ data });
+  private transformToFavoriteQuestionDto(
+    favoriteQuestion: PrismaFavoriteQuestion,
+  ): FavoriteQuestionDto {
+    return {
+      ...favoriteQuestion,
+      addedAt: favoriteQuestion.addedAt.toISOString(),
+    };
   }
 
-  async findAll(params?: {
-    userId?: string;
-    questionId?: string;
-    skip?: number;
-    take?: number;
-  }): Promise<FavoriteQuestion[]> {
-    const { userId, questionId, skip, take } = params || {};
-    return this.prisma.favoriteQuestion.findMany({
-      where: {
-        ...(userId && { userId }),
-        ...(questionId && { questionId }),
+  async create(
+    createFavoriteQuestionDto: CreateFavoriteQuestion,
+  ): Promise<FavoriteQuestionDto> {
+    const data: Prisma.FavoriteQuestionCreateInput = {
+      user: {
+        connect: { id: createFavoriteQuestionDto.userId },
       },
+      question: {
+        connect: { id: createFavoriteQuestionDto.questionId },
+      },
+      note: createFavoriteQuestionDto.note || null,
+    };
+    const favoriteQuestion = await this.prisma.favoriteQuestion.create({
+      data,
+      include: {
+        user: true,
+        question: true,
+      },
+    });
+    return this.transformToFavoriteQuestionDto(favoriteQuestion);
+  }
+
+  async findAll(query?: QueryFavoriteQuestion): Promise<FavoriteQuestionDto[]> {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'addedAt',
+      sortOrder = 'desc',
+      search,
+      userId,
+      questionId,
+      hasNote,
+      addedAfter,
+      addedBefore,
+    } = query || {};
+
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const where: Prisma.FavoriteQuestionWhereInput = {};
+    if (userId) where.userId = userId;
+    if (questionId) where.questionId = questionId;
+    if (hasNote !== undefined) {
+      where.note = hasNote ? { not: null } : null;
+    }
+    if (addedAfter || addedBefore) {
+      where.addedAt = {};
+      if (addedAfter) where.addedAt.gte = new Date(addedAfter);
+      if (addedBefore) where.addedAt.lte = new Date(addedBefore);
+    }
+    if (search) {
+      where.OR = [
+        { note: { contains: search, mode: 'insensitive' } },
+        { question: { content: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
+      where,
       include: {
         user: {
           select: {
@@ -44,14 +108,18 @@ export class FavoriteQuestionsService {
           },
         },
       },
+      orderBy: { [sortBy]: sortOrder },
       skip,
       take,
-      orderBy: { addedAt: 'desc' },
     });
+
+    return favoriteQuestions.map((fq) =>
+      this.transformToFavoriteQuestionDto(fq),
+    );
   }
 
-  async findOne(id: string): Promise<FavoriteQuestion | null> {
-    return this.prisma.favoriteQuestion.findUnique({
+  async findOne(id: string): Promise<FavoriteQuestionDto | null> {
+    const favoriteQuestion = await this.prisma.favoriteQuestion.findUnique({
       where: { id },
       include: {
         user: {
@@ -74,12 +142,16 @@ export class FavoriteQuestionsService {
         },
       },
     });
+    return favoriteQuestion
+      ? this.transformToFavoriteQuestionDto(favoriteQuestion)
+      : null;
   }
 
-  async findByUser(userId: string): Promise<FavoriteQuestion[]> {
-    return this.prisma.favoriteQuestion.findMany({
+  async findByUser(userId: string): Promise<FavoriteQuestionDto[]> {
+    const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: { userId },
       include: {
+        user: true,
         question: {
           select: {
             id: true,
@@ -94,10 +166,13 @@ export class FavoriteQuestionsService {
       },
       orderBy: { addedAt: 'desc' },
     });
+    return favoriteQuestions.map((fq) =>
+      this.transformToFavoriteQuestionDto(fq),
+    );
   }
 
-  async findByQuestion(questionId: string): Promise<FavoriteQuestion[]> {
-    return this.prisma.favoriteQuestion.findMany({
+  async findByQuestion(questionId: string): Promise<FavoriteQuestionDto[]> {
+    const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: { questionId },
       include: {
         user: {
@@ -107,16 +182,20 @@ export class FavoriteQuestionsService {
             email: true,
           },
         },
+        question: true,
       },
       orderBy: { addedAt: 'desc' },
     });
+    return favoriteQuestions.map((fq) =>
+      this.transformToFavoriteQuestionDto(fq),
+    );
   }
 
   async addFavoriteQuestion(
-    userId: string,
-    questionId: string,
-    note?: string,
-  ): Promise<FavoriteQuestion> {
+    addFavoriteQuestionDto: AddFavoriteQuestion,
+  ): Promise<FavoriteQuestionDto> {
+    const { userId, questionId, note } = addFavoriteQuestionDto;
+
     // 检查是否已存在
     const existing = await this.prisma.favoriteQuestion.findUnique({
       where: {
@@ -125,62 +204,103 @@ export class FavoriteQuestionsService {
           questionId,
         },
       },
+      include: {
+        user: true,
+        question: true,
+      },
     });
 
     if (existing) {
       // 如果已存在，更新备注
-      return this.prisma.favoriteQuestion.update({
+      const updated = await this.prisma.favoriteQuestion.update({
         where: { id: existing.id },
         data: {
           note,
           addedAt: new Date(),
         },
+        include: {
+          user: true,
+          question: true,
+        },
       });
+      return this.transformToFavoriteQuestionDto(updated);
     }
 
     // 创建新的收藏记录
-    return this.prisma.favoriteQuestion.create({
+    const created = await this.prisma.favoriteQuestion.create({
       data: {
         userId,
         questionId,
         note,
       },
+      include: {
+        user: true,
+        question: true,
+      },
     });
+    return this.transformToFavoriteQuestionDto(created);
   }
 
   async update(
     id: string,
-    data: Prisma.FavoriteQuestionUpdateInput,
-  ): Promise<FavoriteQuestion> {
-    return this.prisma.favoriteQuestion.update({ where: { id }, data });
+    updateFavoriteQuestionDto: UpdateFavoriteQuestion,
+  ): Promise<FavoriteQuestionDto> {
+    const updated = await this.prisma.favoriteQuestion.update({
+      where: { id },
+      data: updateFavoriteQuestionDto,
+      include: {
+        user: true,
+        question: true,
+      },
+    });
+    return this.transformToFavoriteQuestionDto(updated);
   }
 
-  async updateNote(id: string, note: string): Promise<FavoriteQuestion> {
-    return this.prisma.favoriteQuestion.update({
+  async updateNote(id: string, note: string): Promise<FavoriteQuestionDto> {
+    const updated = await this.prisma.favoriteQuestion.update({
       where: { id },
       data: { note },
+      include: {
+        user: true,
+        question: true,
+      },
     });
+    return this.transformToFavoriteQuestionDto(updated);
   }
 
-  async remove(id: string): Promise<FavoriteQuestion> {
-    return this.prisma.favoriteQuestion.delete({ where: { id } });
+  async remove(id: string): Promise<FavoriteQuestionDto> {
+    const deleted = await this.prisma.favoriteQuestion.delete({
+      where: { id },
+      include: {
+        user: true,
+        question: true,
+      },
+    });
+    return this.transformToFavoriteQuestionDto(deleted);
   }
 
   async removeByUserAndQuestion(
     userId: string,
     questionId: string,
-  ): Promise<FavoriteQuestion> {
-    return this.prisma.favoriteQuestion.delete({
+  ): Promise<FavoriteQuestionDto> {
+    const deleted = await this.prisma.favoriteQuestion.delete({
       where: {
         userId_questionId: {
           userId,
           questionId,
         },
       },
+      include: {
+        user: true,
+        question: true,
+      },
     });
+    return this.transformToFavoriteQuestionDto(deleted);
   }
 
-  async getFavoriteQuestionStats(userId?: string) {
+  async getFavoriteQuestionStats(
+    userId?: string,
+  ): Promise<FavoriteQuestionStats> {
     const whereClause: Prisma.FavoriteQuestionWhereInput = userId
       ? { userId }
       : {};
@@ -188,13 +308,59 @@ export class FavoriteQuestionsService {
     const total = await this.prisma.favoriteQuestion.count({
       where: whereClause,
     });
+    const todayCount = await this.prisma.favoriteQuestion.count({
+      where: {
+        ...whereClause,
+        addedAt: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        },
+      },
+    });
+    const weekCount = await this.prisma.favoriteQuestion.count({
+      where: {
+        ...whereClause,
+        addedAt: {
+          gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+        },
+      },
+    });
+    const monthCount = await this.prisma.favoriteQuestion.count({
+      where: {
+        ...whereClause,
+        addedAt: {
+          gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+        },
+      },
+    });
+    const withNoteCount = await this.prisma.favoriteQuestion.count({
+      where: {
+        ...whereClause,
+        note: {
+          not: null,
+          notIn: [''],
+        },
+      },
+    });
+    const withoutNoteCount = await this.prisma.favoriteQuestion.count({
+      where: {
+        ...whereClause,
+        OR: [{ note: null }, { note: '' }],
+      },
+    });
 
     return {
-      total,
+      totalCount: total,
+      todayCount: todayCount,
+      weekCount: weekCount,
+      monthCount: monthCount,
+      withNoteCount: withNoteCount,
+      withoutNoteCount: withoutNoteCount,
     };
   }
 
-  async getFavoriteQuestionsByType(userId: string) {
+  async getFavoriteQuestionsByType(
+    userId: string,
+  ): Promise<FavoriteQuestionsByType> {
     const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: { userId },
       include: {
@@ -218,34 +384,41 @@ export class FavoriteQuestionsService {
       {} as Record<string, number>,
     );
 
-    return stats;
+    const totalCount = favoriteQuestions.length;
+
+    return Object.entries(stats).map(([questionType, count]) => ({
+      questionType,
+      count,
+      percentage:
+        totalCount > 0 ? Math.round((count / totalCount) * 100 * 100) / 100 : 0,
+    }));
   }
 
   async searchFavoriteQuestions(
-    userId: string,
-    query: string,
-  ): Promise<FavoriteQuestion[]> {
-    return this.prisma.favoriteQuestion.findMany({
+    searchDto: SearchFavoriteQuestions,
+  ): Promise<FavoriteQuestionDto[]> {
+    const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: {
-        userId,
+        ...(searchDto.userId && { userId: searchDto.userId }),
         OR: [
           {
             question: {
               content: {
-                contains: query,
+                contains: searchDto.query,
                 mode: 'insensitive',
               },
             },
           },
           {
             note: {
-              contains: query,
+              contains: searchDto.query,
               mode: 'insensitive',
             },
           },
         ],
       },
       include: {
+        user: true,
         question: {
           select: {
             id: true,
@@ -258,15 +431,19 @@ export class FavoriteQuestionsService {
           },
         },
       },
+      take: searchDto.limit || 10,
       orderBy: { addedAt: 'desc' },
     });
+    return favoriteQuestions.map((fq) =>
+      this.transformToFavoriteQuestionDto(fq),
+    );
   }
 
-  async bulkRemove(ids: string[]): Promise<number> {
+  async bulkRemove(bulkRemoveDto: BulkRemoveFavoriteQuestions) {
     const result = await this.prisma.favoriteQuestion.deleteMany({
       where: {
         id: {
-          in: ids,
+          in: bulkRemoveDto.ids,
         },
       },
     });
@@ -274,13 +451,15 @@ export class FavoriteQuestionsService {
     return result.count;
   }
 
-  async getRecentFavorites(
-    userId: string,
-    limit: number = 10,
-  ): Promise<FavoriteQuestion[]> {
-    return this.prisma.favoriteQuestion.findMany({
-      where: { userId },
+  async getRecentFavoriteQuestions(
+    getRecentDto: GetRecentFavoriteQuestions,
+  ): Promise<FavoriteQuestionDto[]> {
+    const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
+      where: {
+        ...(getRecentDto.userId && { userId: getRecentDto.userId }),
+      },
       include: {
+        user: true,
         question: {
           select: {
             id: true,
@@ -291,7 +470,10 @@ export class FavoriteQuestionsService {
         },
       },
       orderBy: { addedAt: 'desc' },
-      take: limit,
+      take: getRecentDto.limit || 10,
     });
+    return favoriteQuestions.map((fq) =>
+      this.transformToFavoriteQuestionDto(fq),
+    );
   }
 }

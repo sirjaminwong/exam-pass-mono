@@ -1,13 +1,43 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { WrongQuestion, Prisma } from '@prisma/client';
+import {
+  CreateWrongQuestion,
+  UpdateWrongQuestion,
+  WrongQuestionDto,
+} from './dto';
 
 @Injectable()
 export class WrongQuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.WrongQuestionCreateInput): Promise<WrongQuestion> {
-    return this.prisma.wrongQuestion.create({ data });
+  private transformToWrongQuestionDto(wrongQuestion: {
+    id: string;
+    userId: string;
+    questionId: string;
+    addedAt: Date;
+    isResolved: boolean;
+    resolvedAt: Date | null;
+  }): WrongQuestionDto {
+    return {
+      id: wrongQuestion.id,
+      userId: wrongQuestion.userId,
+      questionId: wrongQuestion.questionId,
+      addedAt: wrongQuestion.addedAt.toISOString(),
+      isResolved: wrongQuestion.isResolved,
+      resolvedAt: wrongQuestion.resolvedAt?.toISOString() || null,
+    };
+  }
+
+  async create(data: CreateWrongQuestion): Promise<WrongQuestionDto> {
+    const wrongQuestion = await this.prisma.wrongQuestion.create({
+      data: {
+        userId: data.userId,
+        questionId: data.questionId,
+        isResolved: data.isResolved,
+      },
+    });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
   async findAll(params?: {
@@ -16,129 +46,61 @@ export class WrongQuestionsService {
     isResolved?: boolean;
     skip?: number;
     take?: number;
-  }): Promise<WrongQuestion[]> {
+  }): Promise<WrongQuestionDto[]> {
     const { userId, questionId, isResolved, skip, take } = params || {};
-    return this.prisma.wrongQuestion.findMany({
+    const wrongQuestions = await this.prisma.wrongQuestion.findMany({
       where: {
         ...(userId && { userId }),
         ...(questionId && { questionId }),
         ...(isResolved !== undefined && { isResolved }),
       },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        question: {
-          select: {
-            id: true,
-            type: true,
-            content: true,
-            options: true,
-            correctAnswer: true,
-            explanation: true,
-            score: true,
-          },
-        },
-      },
       skip,
       take,
       orderBy: { addedAt: 'desc' },
     });
+    return wrongQuestions.map((wq) => this.transformToWrongQuestionDto(wq));
   }
 
-  async findOne(id: string): Promise<WrongQuestion | null> {
-    return this.prisma.wrongQuestion.findUnique({
+  async findOne(id: string): Promise<WrongQuestionDto | null> {
+    const wrongQuestion = await this.prisma.wrongQuestion.findUnique({
       where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        question: {
-          select: {
-            id: true,
-            type: true,
-            content: true,
-            options: true,
-            correctAnswer: true,
-            explanation: true,
-            score: true,
-          },
-        },
-      },
     });
+    return wrongQuestion
+      ? this.transformToWrongQuestionDto(wrongQuestion)
+      : null;
   }
 
-  async findByUser(userId: string): Promise<WrongQuestion[]> {
-    return this.prisma.wrongQuestion.findMany({
+  async findByUser(userId: string): Promise<WrongQuestionDto[]> {
+    const wrongQuestions = await this.prisma.wrongQuestion.findMany({
       where: { userId },
-      include: {
-        question: {
-          select: {
-            id: true,
-            type: true,
-            content: true,
-            options: true,
-            correctAnswer: true,
-            explanation: true,
-            score: true,
-          },
-        },
-      },
       orderBy: { addedAt: 'desc' },
     });
+    return wrongQuestions.map((wq) => this.transformToWrongQuestionDto(wq));
   }
 
-  async findByQuestion(questionId: string): Promise<WrongQuestion[]> {
-    return this.prisma.wrongQuestion.findMany({
+  async findByQuestion(questionId: string): Promise<WrongQuestionDto[]> {
+    const wrongQuestions = await this.prisma.wrongQuestion.findMany({
       where: { questionId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
       orderBy: { addedAt: 'desc' },
     });
+    return wrongQuestions.map((wq) => this.transformToWrongQuestionDto(wq));
   }
 
-  async findUnresolved(userId: string): Promise<WrongQuestion[]> {
-    return this.prisma.wrongQuestion.findMany({
+  async findUnresolved(userId: string): Promise<WrongQuestionDto[]> {
+    const wrongQuestions = await this.prisma.wrongQuestion.findMany({
       where: {
         userId,
         isResolved: false,
       },
-      include: {
-        question: {
-          select: {
-            id: true,
-            type: true,
-            content: true,
-            options: true,
-            correctAnswer: true,
-            explanation: true,
-            score: true,
-          },
-        },
-      },
       orderBy: { addedAt: 'desc' },
     });
+    return wrongQuestions.map((wq) => this.transformToWrongQuestionDto(wq));
   }
 
   async addWrongQuestion(
     userId: string,
     questionId: string,
-  ): Promise<WrongQuestion> {
+  ): Promise<WrongQuestionDto> {
     // 检查是否已存在
     const existing = await this.prisma.wrongQuestion.findUnique({
       where: {
@@ -152,7 +114,7 @@ export class WrongQuestionsService {
     if (existing) {
       // 如果已存在且已解决，重新标记为未解决
       if (existing.isResolved) {
-        return this.prisma.wrongQuestion.update({
+        const wrongQuestion = await this.prisma.wrongQuestion.update({
           where: { id: existing.id },
           data: {
             isResolved: false,
@@ -160,55 +122,66 @@ export class WrongQuestionsService {
             addedAt: new Date(),
           },
         });
+        return this.transformToWrongQuestionDto(wrongQuestion);
       }
-      return existing;
+      return this.transformToWrongQuestionDto(existing);
     }
 
     // 创建新的错题记录
-    return this.prisma.wrongQuestion.create({
+    const wrongQuestion = await this.prisma.wrongQuestion.create({
       data: {
         userId,
         questionId,
       },
     });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
-  async markAsResolved(id: string): Promise<WrongQuestion> {
-    return this.prisma.wrongQuestion.update({
+  async markAsResolved(id: string): Promise<WrongQuestionDto> {
+    const wrongQuestion = await this.prisma.wrongQuestion.update({
       where: { id },
       data: {
         isResolved: true,
         resolvedAt: new Date(),
       },
     });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
-  async markAsUnresolved(id: string): Promise<WrongQuestion> {
-    return this.prisma.wrongQuestion.update({
+  async markAsUnresolved(id: string): Promise<WrongQuestionDto> {
+    const wrongQuestion = await this.prisma.wrongQuestion.update({
       where: { id },
       data: {
         isResolved: false,
         resolvedAt: null,
       },
     });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
   async update(
     id: string,
-    data: Prisma.WrongQuestionUpdateInput,
-  ): Promise<WrongQuestion> {
-    return this.prisma.wrongQuestion.update({ where: { id }, data });
+    data: UpdateWrongQuestion,
+  ): Promise<WrongQuestionDto> {
+    const wrongQuestion = await this.prisma.wrongQuestion.update({
+      where: { id },
+      data,
+    });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
-  async remove(id: string): Promise<WrongQuestion> {
-    return this.prisma.wrongQuestion.delete({ where: { id } });
+  async remove(id: string): Promise<WrongQuestionDto> {
+    const wrongQuestion = await this.prisma.wrongQuestion.delete({
+      where: { id },
+    });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
   async removeByUserAndQuestion(
     userId: string,
     questionId: string,
-  ): Promise<WrongQuestion> {
-    return this.prisma.wrongQuestion.delete({
+  ): Promise<WrongQuestionDto> {
+    const wrongQuestion = await this.prisma.wrongQuestion.delete({
       where: {
         userId_questionId: {
           userId,
@@ -216,6 +189,7 @@ export class WrongQuestionsService {
         },
       },
     });
+    return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
   async getWrongQuestionStats(userId?: string) {

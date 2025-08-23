@@ -96,13 +96,20 @@ export const FavoriteQuestionStatsSchema = z.object({
 });
 
 /**
- * 按题型分类的收藏题目统计 Schema
+ * 按题型分类的收藏题目统计项 Schema
  */
-export const FavoriteQuestionsByTypeSchema = z.object({
+export const FavoriteQuestionsByTypeItemSchema = z.object({
   questionType: z.string().describe('题目类型'),
   count: z.number().min(0).describe('该类型收藏数量'),
   percentage: z.number().min(0).max(100).describe('占总收藏的百分比'),
 });
+
+/**
+ * 按题型分类的收藏题目统计 Schema
+ */
+export const FavoriteQuestionsByTypeSchema = z.array(
+  FavoriteQuestionsByTypeItemSchema,
+);
 
 /**
  * 搜索收藏题目 Schema
@@ -185,6 +192,13 @@ export class QueryFavoriteQuestionDto extends createZodDto(
  */
 export class FavoriteQuestionStatsDto extends createZodDto(
   FavoriteQuestionStatsSchema,
+) {}
+
+/**
+ * 按题型分类的收藏题目统计项 DTO
+ */
+export class FavoriteQuestionsByTypeItemDto extends createZodDto(
+  FavoriteQuestionsByTypeItemSchema,
 ) {}
 
 /**

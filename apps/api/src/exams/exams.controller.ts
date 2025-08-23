@@ -22,8 +22,9 @@ import {
   ExamDto,
   QueryExamDto,
   AddQuestionToExamDto,
+  ExamDetailDto,
+  ExamStatsDto,
 } from './dto/exam.dto';
-import { Exam } from '@prisma/client';
 import { ApiBody } from '@nestjs/swagger';
 
 @ApiTags('exams')
@@ -65,17 +66,8 @@ export class ExamsController {
     description: '成功获取试卷列表',
     type: [ExamDto],
   })
-  findAll(@Query() query: QueryExamDto): Promise<Exam[]> {
-    const skip = query.page
-      ? (query.page - 1) * (query.limit || 10)
-      : undefined;
-    const take = query.limit;
-    return this.examsService.findAll({
-      classId: query.classId,
-      isActive: query.isActive,
-      skip,
-      take,
-    });
+  findAll(@Query() query: QueryExamDto): Promise<ExamDto[]> {
+    return this.examsService.findAll(query);
   }
 
   @Get('class/:classId')
@@ -86,7 +78,7 @@ export class ExamsController {
     description: '成功获取试卷列表',
     type: [ExamDto],
   })
-  findByClass(@Param('classId') classId: string): Promise<Exam[]> {
+  findByClass(@Param('classId') classId: string): Promise<ExamDto[]> {
     return this.examsService.findByClass(classId);
   }
 
@@ -95,15 +87,15 @@ export class ExamsController {
   @ApiParam({ name: 'id', description: '试卷ID' })
   @ApiResponse({ status: 200, description: '成功获取试卷详情', type: ExamDto })
   @ApiResponse({ status: 404, description: '试卷不存在' })
-  findOne(@Param('id') id: string): Promise<Exam | null> {
+  findOne(@Param('id') id: string): Promise<ExamDetailDto | null> {
     return this.examsService.findOne(id);
   }
 
   @Get(':id/stats')
   @ApiOperation({ summary: '获取试卷统计信息' })
   @ApiParam({ name: 'id', description: '试卷ID' })
-  @ApiResponse({ status: 200, description: '统计信息' })
-  getStats(@Param('id') id: string) {
+  @ApiResponse({ status: 200, description: '统计信息', type: ExamStatsDto })
+  getStats(@Param('id') id: string): Promise<ExamStatsDto | null> {
     return this.examsService.getExamStats(id);
   }
 
@@ -115,7 +107,7 @@ export class ExamsController {
   update(
     @Param('id') id: string,
     @Body() updateExamDto: UpdateExamDto,
-  ): Promise<Exam> {
+  ): Promise<ExamDto> {
     return this.examsService.update(id, updateExamDto);
   }
 
@@ -123,7 +115,7 @@ export class ExamsController {
   @ApiOperation({ summary: '切换试卷激活状态' })
   @ApiParam({ name: 'id', description: '试卷ID' })
   @ApiResponse({ status: 200, description: '状态切换成功', type: ExamDto })
-  toggleActive(@Param('id') id: string): Promise<Exam> {
+  toggleActive(@Param('id') id: string): Promise<ExamDto> {
     return this.examsService.toggleActive(id);
   }
 
@@ -132,7 +124,7 @@ export class ExamsController {
   @ApiParam({ name: 'id', description: '试卷ID' })
   @ApiResponse({ status: 200, description: '试卷删除成功', type: ExamDto })
   @ApiResponse({ status: 404, description: '试卷不存在' })
-  remove(@Param('id') id: string): Promise<Exam> {
+  remove(@Param('id') id: string): Promise<ExamDto> {
     return this.examsService.remove(id);
   }
 

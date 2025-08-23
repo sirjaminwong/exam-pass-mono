@@ -17,12 +17,12 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { WrongQuestionsService } from './wrong-questions.service';
-import { WrongQuestion, Prisma } from '@prisma/client';
 import {
   CreateWrongQuestionDto,
   AddWrongQuestionDto,
   BulkMarkAsResolvedDto,
   BulkRemoveWrongQuestionsDto,
+  UpdateWrongQuestionDto,
   WrongQuestionDto,
   QueryWrongQuestionDto,
 } from './dto';
@@ -43,8 +43,12 @@ export class WrongQuestionsController {
   @ApiResponse({ status: 409, description: '错题记录已存在' })
   create(
     @Body() createWrongQuestionDto: CreateWrongQuestionDto,
-  ): Promise<WrongQuestion> {
-    return this.wrongQuestionsService.create(createWrongQuestionDto as any);
+  ): Promise<WrongQuestionDto> {
+    return this.wrongQuestionsService.create({
+      userId: createWrongQuestionDto.userId,
+      questionId: createWrongQuestionDto.questionId,
+      isResolved: createWrongQuestionDto.isResolved,
+    });
   }
 
   @Post('add')
@@ -57,7 +61,9 @@ export class WrongQuestionsController {
   @ApiResponse({ status: 400, description: '请求参数错误' })
   @ApiResponse({ status: 404, description: '用户或题目不存在' })
   @ApiResponse({ status: 409, description: '错题已存在' })
-  addWrongQuestion(@Body() body: AddWrongQuestionDto): Promise<WrongQuestion> {
+  addWrongQuestion(
+    @Body() body: AddWrongQuestionDto,
+  ): Promise<WrongQuestionDto> {
     return this.wrongQuestionsService.addWrongQuestion(
       body.userId,
       body.questionId,
@@ -106,8 +112,8 @@ export class WrongQuestionsController {
     type: [WrongQuestionDto],
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  findAll(@Query() query: QueryWrongQuestionDto): Promise<WrongQuestion[]> {
-    return this.wrongQuestionsService.findAll(query as any);
+  findAll(@Query() query: QueryWrongQuestionDto): Promise<WrongQuestionDto[]> {
+    return this.wrongQuestionsService.findAll(query);
   }
 
   @Get('user/:userId')
@@ -119,7 +125,7 @@ export class WrongQuestionsController {
     type: [WrongQuestionDto],
   })
   @ApiResponse({ status: 404, description: '用户不存在' })
-  findByUser(@Param('userId') userId: string): Promise<WrongQuestion[]> {
+  findByUser(@Param('userId') userId: string): Promise<WrongQuestionDto[]> {
     return this.wrongQuestionsService.findByUser(userId);
   }
 
@@ -134,7 +140,7 @@ export class WrongQuestionsController {
   @ApiResponse({ status: 404, description: '题目不存在' })
   findByQuestion(
     @Param('questionId') questionId: string,
-  ): Promise<WrongQuestion[]> {
+  ): Promise<WrongQuestionDto[]> {
     return this.wrongQuestionsService.findByQuestion(questionId);
   }
 
@@ -147,7 +153,7 @@ export class WrongQuestionsController {
     type: [WrongQuestionDto],
   })
   @ApiResponse({ status: 404, description: '用户不存在' })
-  findUnresolved(@Param('userId') userId: string): Promise<WrongQuestion[]> {
+  findUnresolved(@Param('userId') userId: string): Promise<WrongQuestionDto[]> {
     return this.wrongQuestionsService.findUnresolved(userId);
   }
 
@@ -204,7 +210,7 @@ export class WrongQuestionsController {
     type: WrongQuestionDto,
   })
   @ApiResponse({ status: 404, description: '错题记录不存在' })
-  findOne(@Param('id') id: string): Promise<WrongQuestion | null> {
+  findOne(@Param('id') id: string): Promise<WrongQuestionDto | null> {
     return this.wrongQuestionsService.findOne(id);
   }
 
@@ -217,7 +223,7 @@ export class WrongQuestionsController {
     type: WrongQuestionDto,
   })
   @ApiResponse({ status: 404, description: '错题记录不存在' })
-  markAsResolved(@Param('id') id: string): Promise<WrongQuestion> {
+  markAsResolved(@Param('id') id: string): Promise<WrongQuestionDto> {
     return this.wrongQuestionsService.markAsResolved(id);
   }
 
@@ -230,7 +236,7 @@ export class WrongQuestionsController {
     type: WrongQuestionDto,
   })
   @ApiResponse({ status: 404, description: '错题记录不存在' })
-  markAsUnresolved(@Param('id') id: string): Promise<WrongQuestion> {
+  markAsUnresolved(@Param('id') id: string): Promise<WrongQuestionDto> {
     return this.wrongQuestionsService.markAsUnresolved(id);
   }
 
@@ -259,8 +265,8 @@ export class WrongQuestionsController {
   @ApiResponse({ status: 404, description: '错题记录不存在' })
   update(
     @Param('id') id: string,
-    @Body() updateWrongQuestionDto: Prisma.WrongQuestionUpdateInput,
-  ): Promise<WrongQuestion> {
+    @Body() updateWrongQuestionDto: UpdateWrongQuestionDto,
+  ): Promise<WrongQuestionDto> {
     return this.wrongQuestionsService.update(id, updateWrongQuestionDto);
   }
 
@@ -273,7 +279,7 @@ export class WrongQuestionsController {
     type: WrongQuestionDto,
   })
   @ApiResponse({ status: 404, description: '错题记录不存在' })
-  remove(@Param('id') id: string): Promise<WrongQuestion> {
+  remove(@Param('id') id: string): Promise<WrongQuestionDto> {
     return this.wrongQuestionsService.remove(id);
   }
 
@@ -290,7 +296,7 @@ export class WrongQuestionsController {
   removeByUserAndQuestion(
     @Param('userId') userId: string,
     @Param('questionId') questionId: string,
-  ): Promise<WrongQuestion> {
+  ): Promise<WrongQuestionDto> {
     return this.wrongQuestionsService.removeByUserAndQuestion(
       userId,
       questionId,

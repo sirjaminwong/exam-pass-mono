@@ -1,24 +1,47 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { Answer, Prisma } from '@prisma/client';
+import {
+  UpdateAnswer,
+  SubmitAnswer,
+  BatchSubmitAnswers,
+  QueryAnswers,
+  AnswerStatsQuery,
+  AnswerDto,
+  AnswerDetailDto,
+  AnswerStats,
+  CreateAnswerDto,
+} from './dto';
+import { Answer as PrismaAnswer, Question, ExamAttempt } from '@prisma/client';
 
 @Injectable()
 export class AnswersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.AnswerCreateInput): Promise<Answer> {
-    return this.prisma.answer.create({ data });
+  async create(data: CreateAnswerDto): Promise<AnswerDto> {
+    const answer = await this.prisma.answer.create({
+      data: {
+        attempt: { connect: { id: data.attemptId } },
+        question: { connect: { id: data.questionId } },
+        userAnswer: data.userAnswer,
+        isCorrect: data.isCorrect ?? false,
+        score: data.score ?? 0,
+      },
+    });
+    return this.transformToAnswerDto(answer);
   }
 
-  async findAll(params?: {
-    attemptId?: string;
-    questionId?: string;
-    isCorrect?: boolean;
-    skip?: number;
-    take?: number;
-  }): Promise<Answer[]> {
-    const { attemptId, questionId, isCorrect, skip, take } = params || {};
-    return this.prisma.answer.findMany({
+  async findAll(params?: QueryAnswers): Promise<AnswerDetailDto[]> {
+    const {
+      attemptId,
+      questionId,
+      isCorrect,
+      page = 1,
+      limit = 10,
+    } = params || {};
+    const skip = (page - 1) * limit;
+    const take = limit;
+    const answers = await this.prisma.answer.findMany({
       where: {
         ...(attemptId && { attemptId }),
         ...(questionId && { questionId }),
@@ -47,93 +70,101 @@ export class AnswersService {
       take,
       orderBy: { answeredAt: 'desc' },
     });
+    return answers.map((answer) => this.transformToAnswerDetailDto(answer));
   }
 
-  async findOne(id: string): Promise<Answer | null> {
-    return this.prisma.answer.findUnique({
+  async findOne(id: string): Promise<AnswerDetailDto | null> {
+    const answer = await this.prisma.answer.findUnique({
       where: { id },
-      include: {
-        attempt: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-            exam: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
-          },
-        },
-        question: true,
-      },
-    });
-  }
-
-  async findByAttempt(attemptId: string): Promise<Answer[]> {
-    return this.prisma.answer.findMany({
-      where: { attemptId },
       include: {
         question: {
           select: {
             id: true,
             type: true,
             content: true,
-            options: true,
             correctAnswer: true,
-            explanation: true,
             score: true,
           },
         },
-      },
-      orderBy: { answeredAt: 'asc' },
-    });
-  }
-
-  async findByQuestion(questionId: string): Promise<Answer[]> {
-    return this.prisma.answer.findMany({
-      where: { questionId },
-      include: {
         attempt: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-            exam: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
+          select: {
+            id: true,
+            userId: true,
+            examId: true,
+            isCompleted: true,
           },
         },
       },
-      orderBy: { answeredAt: 'desc' },
     });
+    return answer ? this.transformToAnswerDetailDto(answer) : null;
   }
 
-  async update(id: string, data: Prisma.AnswerUpdateInput): Promise<Answer> {
-    return this.prisma.answer.update({ where: { id }, data });
+  async findByAttempt(attemptId: string): Promise<AnswerDetailDto[]> {
+    const answers = await this.prisma.answer.findMany({
+      where: { attemptId },
+      orderBy: { answeredAt: 'asc' },
+      include: {
+        question: {
+          select: {
+            id: true,
+            type: true,
+            content: true,
+            correctAnswer: true,
+            score: true,
+          },
+        },
+        attempt: {
+          select: {
+            id: true,
+            userId: true,
+            examId: true,
+            isCompleted: true,
+          },
+        },
+      },
+    });
+    return answers.map((answer) => this.transformToAnswerDetailDto(answer));
   }
 
-  async remove(id: string): Promise<Answer> {
-    return this.prisma.answer.delete({ where: { id } });
+  async findByQuestion(questionId: string): Promise<AnswerDetailDto[]> {
+    const answers = await this.prisma.answer.findMany({
+      where: { questionId },
+      orderBy: { answeredAt: 'desc' },
+      include: {
+        question: {
+          select: {
+            id: true,
+            type: true,
+            content: true,
+            correctAnswer: true,
+            score: true,
+          },
+        },
+        attempt: {
+          select: {
+            id: true,
+            userId: true,
+            examId: true,
+            isCompleted: true,
+          },
+        },
+      },
+    });
+    return answers.map((answer) => this.transformToAnswerDetailDto(answer));
   }
 
-  async submitAnswer(
-    attemptId: string,
-    questionId: string,
-    userAnswer: Prisma.InputJsonValue,
-  ): Promise<Answer> {
+  async update(id: string, data: UpdateAnswer): Promise<AnswerDto> {
+    const answer = await this.prisma.answer.update({ where: { id }, data });
+    return this.transformToAnswerDto(answer);
+  }
+
+  async remove(id: string): Promise<AnswerDto> {
+    const answer = await this.prisma.answer.delete({ where: { id } });
+    return this.transformToAnswerDto(answer);
+  }
+
+  async submitAnswer(data: SubmitAnswer): Promise<AnswerDto> {
+    const { attemptId, questionId, userAnswer } = data;
     // 获取题目信息
     const question = await this.prisma.question.findUnique({
       where: { id: questionId },
@@ -160,9 +191,10 @@ export class AnswersService {
       },
     });
 
+    let answer: PrismaAnswer;
     if (existingAnswer) {
       // 更新现有答案
-      return this.prisma.answer.update({
+      answer = await this.prisma.answer.update({
         where: { id: existingAnswer.id },
         data: {
           userAnswer,
@@ -173,7 +205,7 @@ export class AnswersService {
       });
     } else {
       // 创建新答案
-      return this.prisma.answer.create({
+      answer = await this.prisma.answer.create({
         data: {
           attemptId,
           questionId,
@@ -183,103 +215,64 @@ export class AnswersService {
         },
       });
     }
+    return this.transformToAnswerDto(answer);
   }
 
-  async batchSubmitAnswers(
-    attemptId: string,
-    answers: Array<{
-      questionId: string;
-      userAnswer: Prisma.InputJsonValue;
-    }>,
-  ): Promise<Answer[]> {
-    const results: Answer[] = [];
+  async batchSubmitAnswers(data: BatchSubmitAnswers): Promise<AnswerDto[]> {
+    const { attemptId, answers } = data;
+    const results: AnswerDto[] = [];
 
     for (const answer of answers) {
-      const result = await this.submitAnswer(
+      const result = await this.submitAnswer({
         attemptId,
-        answer.questionId,
-        answer.userAnswer,
-      );
+        questionId: answer.questionId,
+        userAnswer: answer.userAnswer,
+      });
       results.push(result);
     }
 
     return results;
   }
 
-  async getAnswerStats(params?: {
-    attemptId?: string;
-    questionId?: string;
-    userId?: string;
-  }) {
+  async getAnswerStats(params?: AnswerStatsQuery): Promise<AnswerStats> {
     const { attemptId, questionId, userId } = params || {};
 
-    const whereClause: Prisma.AnswerWhereInput = {};
-    if (attemptId) whereClause.attemptId = attemptId;
-    if (questionId) whereClause.questionId = questionId;
-    if (userId) whereClause.attempt = { userId };
+    const where: Prisma.AnswerWhereInput = {};
+    if (attemptId) where.attemptId = attemptId;
+    if (questionId) where.questionId = questionId;
+    if (userId) {
+      where.attempt = {
+        userId,
+      };
+    }
 
-    const answers = await this.prisma.answer.findMany({
-      where: whereClause,
-      include: {
-        question: {
-          select: {
-            type: true,
-            score: true,
-          },
+    const [totalAnswers, correctAnswers, totalScore] = await Promise.all([
+      this.prisma.answer.count({ where }),
+      this.prisma.answer.count({
+        where: {
+          ...where,
+          isCorrect: true,
         },
-      },
-    });
+      }),
+      this.prisma.answer.aggregate({
+        where,
+        _sum: {
+          score: true,
+        },
+      }),
+    ]);
 
-    const totalAnswers = answers.length;
-    const correctAnswers = answers.filter((answer) => answer.isCorrect).length;
-    const wrongAnswers = totalAnswers - correctAnswers;
-    const totalScore = answers.reduce((sum, answer) => sum + answer.score, 0);
-    const maxPossibleScore = answers.reduce(
-      (sum, answer) => sum + answer.question.score,
-      0,
-    );
     const accuracy =
       totalAnswers > 0 ? (correctAnswers / totalAnswers) * 100 : 0;
 
-    // 按题型统计
-    const statsByType = answers.reduce(
-      (stats, answer) => {
-        const type = answer.question.type;
-        if (!stats[type]) {
-          stats[type] = {
-            total: 0,
-            correct: 0,
-            totalScore: 0,
-            earnedScore: 0,
-          };
-        }
-        stats[type].total++;
-        stats[type].totalScore += answer.question.score;
-        if (answer.isCorrect) {
-          stats[type].correct++;
-          stats[type].earnedScore += answer.score;
-        }
-        return stats;
-      },
-      {} as Record<
-        string,
-        {
-          total: number;
-          correct: number;
-          totalScore: number;
-          earnedScore: number;
-        }
-      >,
-    );
-
     return {
+      incorrectAnswers: totalAnswers - correctAnswers,
+      maxScore: totalScore._sum.score || 0,
+      scoreRate: totalScore._sum.score || 0,
       totalAnswers,
       correctAnswers,
-      wrongAnswers,
-      accuracy,
-      totalScore,
-      maxPossibleScore,
-      statsByType,
+      accuracy: Math.round(accuracy * 100) / 100,
+      totalScore: totalScore._sum.score || 0,
     };
   }
 
@@ -296,5 +289,65 @@ export class AnswersService {
       // 单选题、判断题等：直接比较
       return JSON.stringify(userAnswer) === JSON.stringify(correctAnswer);
     }
+  }
+
+  private transformToAnswerDto(answer: PrismaAnswer): AnswerDto {
+    return {
+      id: answer.id,
+      attemptId: answer.attemptId,
+      questionId: answer.questionId,
+      userAnswer: answer.userAnswer as string | boolean | string[],
+      isCorrect: answer.isCorrect,
+      score: answer.score,
+      answeredAt: answer.answeredAt.toISOString(),
+    };
+  }
+
+  private transformToAnswerDetailDto(
+    answer: PrismaAnswer & {
+      question?: Pick<
+        Question,
+        'id' | 'type' | 'content' | 'correctAnswer' | 'score'
+      >;
+      attempt?: Pick<ExamAttempt, 'id' | 'userId' | 'examId' | 'isCompleted'>;
+    },
+  ): AnswerDetailDto {
+    const result: AnswerDetailDto = {
+      id: answer.id,
+      attemptId: answer.attemptId,
+      questionId: answer.questionId,
+      userAnswer: answer.userAnswer as string | boolean | string[],
+      isCorrect: answer.isCorrect,
+      score: answer.score,
+      answeredAt: answer.answeredAt.toISOString(),
+    };
+
+    if (answer.question) {
+      result.question = {
+        id: answer.question.id,
+        type: answer.question.type as
+          | 'SINGLE_CHOICE'
+          | 'MULTIPLE_CHOICE'
+          | 'TRUE_FALSE'
+          | 'INDEFINITE_CHOICE',
+        content: answer.question.content,
+        correctAnswer: answer.question.correctAnswer as
+          | string
+          | boolean
+          | string[],
+        score: answer.question.score,
+      };
+    }
+
+    if (answer.attempt) {
+      result.attempt = {
+        id: answer.attempt.id,
+        userId: answer.attempt.userId,
+        examId: answer.attempt.examId,
+        isCompleted: answer.attempt.isCompleted,
+      };
+    }
+
+    return result;
   }
 }
