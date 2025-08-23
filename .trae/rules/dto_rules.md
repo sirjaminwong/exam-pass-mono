@@ -11,14 +11,27 @@ export class UserDto extends createZodDto(UserSchema) {}
 
 #### 3. Type 导出规范
 
-为每个 Schema 导出对应的 TypeScript 类型：
+为每个 Schema 导出对应的 TypeScript 类型，使用语义化命名避免与 Prisma 类型冲突：
 
 ```typescript
-// Type 导出命名规范
-export type CreateUser = z.infer<typeof CreateUserSchema>;
-export type UpdateUser = z.infer<typeof UpdateUserSchema>;
-export type User = z.infer<typeof UserSchema>;
+// Type 导出命名规范 - 使用语义化后缀
+export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
+export type UpdateUserRequest = z.infer<typeof UpdateUserSchema>;
+export type UserResponse = z.infer<typeof UserSchema>;
+export type QueryUserParams = z.infer<typeof QueryUserSchema>;
+export type UserStatsResponse = z.infer<typeof UserStatsSchema>;
 ```
+
+**命名规范说明**：
+- **请求类型**：使用 `Request` 后缀（如 `CreateUserRequest`、`UpdateUserRequest`）
+- **响应类型**：使用 `Response` 后缀（如 `UserResponse`、`UserStatsResponse`）
+- **查询参数**：使用 `Params` 后缀（如 `QueryUserParams`、`FilterUserParams`）
+
+**优势**：
+- 避免与 Prisma Client 导出的类型命名冲突
+- 语义清晰，明确表达类型用途
+- 符合 REST API 最佳实践
+- 便于团队理解和代码维护
 
 #### 4. 通用验证器使用
 
@@ -315,9 +328,9 @@ async getComplexReport(params: ReportParams): Promise<ComplexReportResult> {
 ```typescript
 // Controller 层
 @Post()
-create(@Body() createUserDto: CreateUserDto): Promise<User> {
+create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
   // 将 DTO 转换为 Type
-  const userData: CreateUser = {
+  const userData: CreateUserRequest = {
     email: createUserDto.email,
     password: createUserDto.password,
     name: createUserDto.name,
@@ -327,7 +340,7 @@ create(@Body() createUserDto: CreateUserDto): Promise<User> {
 
 // Service 层
 class UsersService {
-  async create(data: CreateUser): Promise<User> {
+  async create(data: CreateUserRequest): Promise<UserResponse> {
     // 专注于业务逻辑，不依赖 HTTP 层
     return this.prisma.user.create({ data });
   }
@@ -339,7 +352,7 @@ class UsersService {
 ```typescript
 // Controller 层
 @Post()
-create(@Body() createUserDto: CreateUserDto): Promise<User> {
+create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
   // 直接传递 DTO，利用 TypeScript 的结构化类型系统
   // Service 层方法参数使用 Type，但可以接收 DTO 实例
   return this.usersService.create(createUserDto);
@@ -347,7 +360,7 @@ create(@Body() createUserDto: CreateUserDto): Promise<User> {
 
 // Service 层
 class UsersService {
-  async create(data: CreateUser): Promise<User> {
+  async create(data: CreateUserRequest): Promise<UserResponse> {
     // 参数类型必须是 Type，不是 DTO 类
     // TypeScript 会自动进行类型兼容性检查
     return this.prisma.user.create({ data });
@@ -363,6 +376,7 @@ class UsersService {
 // user.dto.ts
 import { z } from "zod";
 import { createZodDto } from "nestjs-zod";
+import { emailString, passwordString } from "../common/utils/zod";
 
 // Schema 定义
 export const CreateUserSchema = z.object({
@@ -371,11 +385,20 @@ export const CreateUserSchema = z.object({
   name: z.string().min(1).describe("用户姓名"),
 });
 
+export const UserSchema = z.object({
+  id: z.string().describe("用户ID"),
+  email: emailString().describe("用户邮箱"),
+  name: z.string().describe("用户姓名"),
+  createdAt: z.date().describe("创建时间"),
+});
+
 // DTO 类（用于 Controller 层）
 export class CreateUserDto extends createZodDto(CreateUserSchema) {}
+export class UserDto extends createZodDto(UserSchema) {}
 
-// Type 导出（用于 Service 层）
-export type CreateUser = z.infer<typeof CreateUserSchema>;
+// Type 导出（用于 Service 层）- 使用语义化命名
+export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
+export type UserResponse = z.infer<typeof UserSchema>;
 ```
 
 #### 4. 使用场景指导
@@ -455,7 +478,7 @@ class UsersService {
   }
   
   // ✅ 可选：参数使用 Type 进行纯业务处理
-  async create(data: CreateUser) {
+  async create(data: CreateUserRequest) {
     return this.prisma.user.create({ data });
   }
 }
