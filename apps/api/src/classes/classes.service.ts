@@ -176,7 +176,7 @@ export class ClassesService {
     });
   }
 
-  async getMembers(classId: string) {
+  async getMembers(classId: string): Promise<any[]> {
     return this.prisma.classMember.findMany({
       where: { classId },
       include: {

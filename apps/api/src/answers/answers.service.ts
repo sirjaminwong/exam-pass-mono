@@ -153,7 +153,7 @@ export class AnswersService {
     return answers.map((answer) => this.transformToAnswerDetailDto(answer));
   }
 
-  async update(id: string, data: UpdateAnswer): Promise<AnswerDto> {
+  async update(id: string, data: UpdateAnswerRequest): Promise<AnswerDto> {
     const answer = await this.prisma.answer.update({ where: { id }, data });
     return this.transformToAnswerDto(answer);
   }
@@ -163,7 +163,7 @@ export class AnswersService {
     return this.transformToAnswerDto(answer);
   }
 
-  async submitAnswer(data: SubmitAnswer): Promise<AnswerDto> {
+  async submitAnswer(data: SubmitAnswerRequest): Promise<AnswerDto> {
     const { attemptId, questionId, userAnswer } = data;
     // 获取题目信息
     const question = await this.prisma.question.findUnique({
@@ -218,7 +218,9 @@ export class AnswersService {
     return this.transformToAnswerDto(answer);
   }
 
-  async batchSubmitAnswers(data: BatchSubmitAnswers): Promise<AnswerDto[]> {
+  async batchSubmitAnswers(
+    data: BatchSubmitAnswersRequest,
+  ): Promise<AnswerDto[]> {
     const { attemptId, answers } = data;
     const results: AnswerDto[] = [];
 

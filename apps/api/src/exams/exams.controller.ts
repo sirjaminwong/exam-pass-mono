@@ -36,7 +36,7 @@ export class ExamsController {
   @ApiOperation({ summary: '创建新试卷' })
   @ApiResponse({ status: 201, description: '试卷创建成功', type: ExamDto })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  create(@Body() createExamDto: CreateExamDto) {
+  create(@Body() createExamDto: CreateExamDto): Promise<ExamDto> {
     return this.examsService.create(createExamDto);
   }
 

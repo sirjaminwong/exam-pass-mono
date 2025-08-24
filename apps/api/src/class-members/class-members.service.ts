@@ -320,7 +320,7 @@ export class ClassMembersService {
   }
 
   async batchRemoveMembers(
-    data: BatchRemoveClassMembers,
+    data: BatchRemoveClassMembersRequest,
   ): Promise<{ count: number }> {
     const { userIds, classId } = data;
     const result = await this.prisma.classMember.deleteMany({

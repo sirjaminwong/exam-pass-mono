@@ -192,7 +192,7 @@ export class WrongQuestionsService {
     return this.transformToWrongQuestionDto(wrongQuestion);
   }
 
-  async getWrongQuestionStats(userId?: string) {
+  async getWrongQuestionStats(userId?: string): Promise<any> {
     const whereClause: Prisma.WrongQuestionWhereInput = userId
       ? { userId }
       : {};
@@ -217,7 +217,7 @@ export class WrongQuestionsService {
     };
   }
 
-  async getWrongQuestionsByType(userId: string) {
+  async getWrongQuestionsByType(userId: string): Promise<any> {
     const wrongQuestions = await this.prisma.wrongQuestion.findMany({
       where: { userId },
       include: {

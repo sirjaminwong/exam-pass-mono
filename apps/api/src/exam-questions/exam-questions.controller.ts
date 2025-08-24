@@ -205,14 +205,17 @@ export class ExamQuestionsController {
 
   @Get('stats')
   @ApiOperation({ summary: '获取试卷题目关联统计信息' })
-  @ApiQuery({ name: 'examId', required: false, description: '试卷ID' })
+  @ApiQuery({ name: 'examId', required: true, description: '试卷ID' })
   @ApiResponse({
     status: 200,
     description: '成功获取统计信息',
     type: ExamQuestionStatsDto,
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  getExamQuestionStats(@Query('examId') examId?: string) {
+  @ApiResponse({ status: 404, description: '试卷不存在' })
+  getExamQuestionStats(
+    @Query('examId') examId: string,
+  ): Promise<ExamQuestionStatsDto> {
     return this.examQuestionsService.getExamQuestionStats(examId);
   }
 
@@ -257,25 +260,5 @@ export class ExamQuestionsController {
   @ApiResponse({ status: 404, description: '试卷题目关联记录不存在' })
   remove(@Param('id') id: string): Promise<ExamQuestionDto> {
     return this.examQuestionsService.remove(id);
-  }
-
-  @Delete('exam/:examId/question/:questionId')
-  @ApiOperation({ summary: '删除指定试卷中的指定题目关联记录' })
-  @ApiParam({ name: 'examId', description: '试卷ID' })
-  @ApiParam({ name: 'questionId', description: '题目ID' })
-  @ApiResponse({
-    status: 200,
-    description: '试卷题目关联记录删除成功',
-    type: ExamQuestionDto,
-  })
-  @ApiResponse({ status: 404, description: '试卷题目关联记录不存在' })
-  removeByExamAndQuestion(
-    @Param('examId') examId: string,
-    @Param('questionId') questionId: string,
-  ): Promise<ExamQuestionDto> {
-    return this.examQuestionsService.removeByExamAndQuestion(
-      examId,
-      questionId,
-    );
   }
 }

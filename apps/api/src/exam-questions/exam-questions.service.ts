@@ -5,6 +5,7 @@ import {
   CreateExamQuestionRequest,
   QueryExamQuestionParams,
   ExamQuestionDto,
+  ExamQuestionStatsDto,
 } from './dto';
 
 // 定义包含关联数据的 ExamQuestion 类型
@@ -174,7 +175,7 @@ export class ExamQuestionsService {
     return examQuestion ? this.transformToExamQuestionDto(examQuestion) : null;
   }
 
-  async findByExam(examId: string) {
+  async findByExam(examId: string): Promise<ExamQuestionDto[]> {
     const examQuestions = await this.prisma.examQuestion.findMany({
       where: { examId },
       include: {
@@ -208,7 +209,7 @@ export class ExamQuestionsService {
     return examQuestions.map((eq) => this.transformToExamQuestionDto(eq));
   }
 
-  async findByQuestion(questionId: string) {
+  async findByQuestion(questionId: string): Promise<ExamQuestionDto[]> {
     const examQuestions = await this.prisma.examQuestion.findMany({
       where: { questionId },
       include: {
@@ -241,7 +242,10 @@ export class ExamQuestionsService {
     return examQuestions.map((eq) => this.transformToExamQuestionDto(eq));
   }
 
-  async findByExamAndQuestion(examId: string, questionId: string) {
+  async findByExamAndQuestion(
+    examId: string,
+    questionId: string,
+  ): Promise<ExamQuestionDto | null> {
     const examQuestion = await this.prisma.examQuestion.findUnique({
       where: {
         examId_questionId: {
@@ -279,7 +283,11 @@ export class ExamQuestionsService {
     return examQuestion ? this.transformToExamQuestionDto(examQuestion) : null;
   }
 
-  async addQuestionToExam(examId: string, questionId: string, order: number) {
+  async addQuestionToExam(
+    examId: string,
+    questionId: string,
+    order: number,
+  ): Promise<ExamQuestionDto> {
     const examQuestion = await this.prisma.examQuestion.create({
       data: {
         examId,
@@ -316,7 +324,10 @@ export class ExamQuestionsService {
     return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async update(id: string, data: Prisma.ExamQuestionUpdateInput) {
+  async update(
+    id: string,
+    data: Prisma.ExamQuestionUpdateInput,
+  ): Promise<ExamQuestionDto> {
     const examQuestion = await this.prisma.examQuestion.update({
       where: { id },
       data,
@@ -350,7 +361,7 @@ export class ExamQuestionsService {
     return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<ExamQuestionDto> {
     const examQuestion = await this.prisma.examQuestion.delete({
       where: { id },
       include: {
@@ -383,7 +394,10 @@ export class ExamQuestionsService {
     return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async removeByExamAndQuestion(examId: string, questionId: string) {
+  async removeByExamAndQuestion(
+    examId: string,
+    questionId: string,
+  ): Promise<ExamQuestionDto> {
     const examQuestion = await this.prisma.examQuestion.delete({
       where: {
         examId_questionId: {
@@ -449,33 +463,54 @@ export class ExamQuestionsService {
     return result.count;
   }
 
-  async getExamQuestionStats(examId?: string) {
-    const where = examId ? { examId } : {};
+  async getExamQuestionStats(examId: string): Promise<ExamQuestionStatsDto> {
+    const where = { examId };
 
-    const [totalQuestions, questionsByType] = await Promise.all([
-      this.prisma.examQuestion.count({ where }),
-      this.prisma.examQuestion.groupBy({
-        by: ['examId'],
-        where,
-        _count: {
-          id: true,
+    // 获取总题目数
+    const totalQuestions = await this.prisma.examQuestion.count({ where });
+
+    // 获取按题目类型分组的统计
+    const questionsWithType = await this.prisma.examQuestion.findMany({
+      where,
+      include: {
+        question: {
+          select: {
+            type: true,
+            score: true,
+          },
         },
-      }),
-    ]);
+      },
+    });
+
+    // 统计按类型分组的题目数量
+    const questionsByType = questionsWithType.reduce(
+      (acc, item) => {
+        const type = item.question?.type;
+        if (type) {
+          acc[type] = (acc[type] || 0) + 1;
+        }
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    // 计算总分和平均分
+    const totalScore = questionsWithType.reduce(
+      (sum, item) => sum + (item.question?.score || 0),
+      0,
+    );
+    const averageScore = totalQuestions > 0 ? totalScore / totalQuestions : 0;
 
     return {
+      examId,
       totalQuestions,
-      questionsByExam: questionsByType.reduce(
-        (acc, item) => {
-          acc[item.examId] = item._count.id;
-          return acc;
-        },
-        {} as Record<string, number>,
-      ),
+      questionsByType,
+      totalScore,
+      averageScore,
     };
   }
 
-  async getQuestionsByType(examId: string) {
+  async getQuestionsByType(examId: string): Promise<ExamQuestionDto[]> {
     const examQuestions = await this.prisma.examQuestion.findMany({
       where: { examId },
       include: {

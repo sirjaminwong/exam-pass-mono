@@ -12,7 +12,7 @@ import {
   FavoriteQuestionsByTypeResponse,
   SearchFavoriteQuestionsParams,
   GetRecentFavoriteQuestionsParams,
-} from './dto';
+} from './dto/favorite-question.dto';
 
 import { FavoriteQuestion as PrismaFavoriteQuestion } from '@prisma/client';
 

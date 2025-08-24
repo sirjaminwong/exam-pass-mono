@@ -138,7 +138,7 @@ export class ClassesController {
   @ApiParam({ name: 'id', description: '班级ID' })
   @ApiResponse({ status: 200, description: '成功获取班级成员列表' })
   @ApiResponse({ status: 404, description: '班级不存在' })
-  getMembers(@Param('id') classId: string) {
+  getMembers(@Param('id') classId: string): Promise<any[]> {
     return this.classesService.getMembers(classId);
   }
 

@@ -27,7 +27,7 @@ import {
   QueryFavoriteQuestionDto,
   FavoriteQuestionStatsDto,
   FavoriteQuestionsByTypeItemDto,
-} from './dto';
+} from './dto/favorite-question.dto';
 
 @ApiTags('favorite-questions')
 @Controller('favorite-questions')

@@ -25,7 +25,7 @@ import {
   UpdateWrongQuestionDto,
   WrongQuestionDto,
   QueryWrongQuestionDto,
-} from './dto';
+} from './dto/wrong-question.dto';
 
 @ApiTags('wrong-questions')
 @Controller('wrong-questions')
@@ -174,7 +174,7 @@ export class WrongQuestionsController {
     },
   })
   @ApiResponse({ status: 400, description: '请求参数错误' })
-  getWrongQuestionStats(@Query('userId') userId?: string) {
+  getWrongQuestionStats(@Query('userId') userId?: string): Promise<any> {
     return this.wrongQuestionsService.getWrongQuestionStats(userId);
   }
 
@@ -197,7 +197,7 @@ export class WrongQuestionsController {
     },
   })
   @ApiResponse({ status: 404, description: '用户不存在' })
-  getWrongQuestionsByType(@Param('userId') userId: string) {
+  getWrongQuestionsByType(@Param('userId') userId: string): Promise<any> {
     return this.wrongQuestionsService.getWrongQuestionsByType(userId);
   }
 

@@ -173,7 +173,7 @@ export class QuestionsService {
     };
   }
 
-  async createQuestions(data: CreateQuestion[]): Promise<QuestionDto[]> {
+  async createQuestions(data: CreateQuestionRequest[]): Promise<QuestionDto[]> {
     const questions = await this.prisma.question.createMany({
       data,
       skipDuplicates: true,

@@ -97,7 +97,7 @@ export class ExamAttemptsController {
     description: '成功获取统计信息',
     type: UserExamStatsDto,
   })
-  getUserStats(@Param('userId') userId: string) {
+  getUserStats(@Param('userId') userId: string): Promise<UserExamStatsDto> {
     return this.examAttemptsService.getUserStats(userId);
   }
 

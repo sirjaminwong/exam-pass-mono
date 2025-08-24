@@ -21,6 +21,3 @@ export type {
   QueryExamQuestionParams,
   ExamQuestionStatsResponse,
 } from './exam-question.dto';
-
-// 保留旧的响应 DTO 以保持兼容性
-export { ExamQuestionResponseDto } from './exam-question-response.dto';

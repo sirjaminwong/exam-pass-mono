@@ -6,8 +6,37 @@ import {
   ExamAttemptDto,
   UpdateExamAttemptRequest,
   QueryExamAttemptParams,
-  ExamDetailStatsResponse,
+  ExamDetailStatsDto,
+  UserExamStatsDto,
 } from './dto/exam-attempt.dto';
+
+// Type aliases for Prisma query results
+type ExamAttemptWithRelations = ExamAttempt & {
+  user?: Pick<User, 'id' | 'name' | 'email'>;
+  exam?: Pick<Exam, 'id' | 'title' | 'description'>;
+  answers?: (Pick<
+    Answer,
+    'id' | 'questionId' | 'userAnswer' | 'isCorrect' | 'score' | 'answeredAt'
+  > & {
+    question?: Pick<Question, 'id' | 'type' | 'content' | 'score'>;
+  })[];
+};
+
+type ExamAttemptWithExam = ExamAttempt & {
+  exam?: Pick<Exam, 'id' | 'title' | 'description'>;
+  answers?: Pick<
+    Answer,
+    'id' | 'questionId' | 'userAnswer' | 'isCorrect' | 'score' | 'answeredAt'
+  >[];
+};
+
+type ExamAttemptWithUser = ExamAttempt & {
+  user?: Pick<User, 'id' | 'name' | 'email'>;
+  answers?: Pick<
+    Answer,
+    'id' | 'questionId' | 'userAnswer' | 'isCorrect' | 'score' | 'answeredAt'
+  >[];
+};
 
 @Injectable()
 export class ExamAttemptsService {
@@ -57,7 +86,7 @@ export class ExamAttemptsService {
     const { userId, examId, isCompleted, page = 1, limit = 10 } = params || {};
     const skip = (page - 1) * limit;
     const take = limit;
-    const examAttempts = await this.prisma.examAttempt.findMany({
+    const examAttempts = (await this.prisma.examAttempt.findMany({
       where: {
         ...(userId && { userId }),
         ...(examId && { examId }),
@@ -94,14 +123,14 @@ export class ExamAttemptsService {
       skip,
       take,
       orderBy: { startedAt: 'desc' },
-    });
+    })) as ExamAttemptWithRelations[];
     return examAttempts.map((attempt) =>
       this.transformToExamAttemptDto(attempt),
     );
   }
 
   async findOne(id: string): Promise<ExamAttemptDto | null> {
-    const examAttempt = await this.prisma.examAttempt.findUnique({
+    const examAttempt = (await this.prisma.examAttempt.findUnique({
       where: { id },
       include: {
         user: {
@@ -131,12 +160,12 @@ export class ExamAttemptsService {
           },
         },
       },
-    });
+    })) as ExamAttemptWithRelations | null;
     return examAttempt ? this.transformToExamAttemptDto(examAttempt) : null;
   }
 
   async findByUser(userId: string): Promise<ExamAttemptDto[]> {
-    const attempts = await this.prisma.examAttempt.findMany({
+    const attempts = (await this.prisma.examAttempt.findMany({
       where: { userId },
       include: {
         exam: {
@@ -158,12 +187,12 @@ export class ExamAttemptsService {
         },
       },
       orderBy: { startedAt: 'desc' },
-    });
+    })) as ExamAttemptWithExam[];
     return attempts.map((attempt) => this.transformToExamAttemptDto(attempt));
   }
 
   async findByExam(examId: string): Promise<ExamAttemptDto[]> {
-    const attempts = await this.prisma.examAttempt.findMany({
+    const attempts = (await this.prisma.examAttempt.findMany({
       where: { examId },
       include: {
         user: {
@@ -185,7 +214,7 @@ export class ExamAttemptsService {
         },
       },
       orderBy: { startedAt: 'desc' },
-    });
+    })) as ExamAttemptWithUser[];
     return attempts.map((attempt) => this.transformToExamAttemptDto(attempt));
   }
 
@@ -193,7 +222,7 @@ export class ExamAttemptsService {
     id: string,
     updateExamAttemptDto: UpdateExamAttemptRequest,
   ): Promise<ExamAttemptDto> {
-    const examAttempt = await this.prisma.examAttempt.update({
+    const examAttempt = (await this.prisma.examAttempt.update({
       where: { id },
       data: updateExamAttemptDto,
       include: {
@@ -224,12 +253,12 @@ export class ExamAttemptsService {
           },
         },
       },
-    });
+    })) as ExamAttemptWithRelations;
     return this.transformToExamAttemptDto(examAttempt);
   }
 
   async remove(id: string): Promise<ExamAttemptDto> {
-    const examAttempt = await this.prisma.examAttempt.delete({
+    const examAttempt = (await this.prisma.examAttempt.delete({
       where: { id },
       include: {
         user: {
@@ -259,7 +288,7 @@ export class ExamAttemptsService {
           },
         },
       },
-    });
+    })) as ExamAttemptWithRelations;
     return this.transformToExamAttemptDto(examAttempt);
   }
 
@@ -305,7 +334,7 @@ export class ExamAttemptsService {
     const accuracy = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
 
     // 更新考试记录
-    const updatedAttempt = await this.prisma.examAttempt.update({
+    const updatedAttempt = (await this.prisma.examAttempt.update({
       where: { id },
       data: {
         totalScore,
@@ -342,11 +371,11 @@ export class ExamAttemptsService {
           },
         },
       },
-    });
+    })) as ExamAttemptWithRelations;
     return this.transformToExamAttemptDto(updatedAttempt);
   }
 
-  async getAttemptStats(id: string): Promise<ExamDetailStats | null> {
+  async getAttemptStats(id: string): Promise<ExamDetailStatsDto | null> {
     const attempt = await this.prisma.examAttempt.findUnique({
       where: { id },
       include: {
@@ -432,8 +461,8 @@ export class ExamAttemptsService {
     };
   }
 
-  async getUserStats(userId: string) {
-    const attempts = await this.prisma.examAttempt.findMany({
+  async getUserStats(userId: string): Promise<UserExamStatsDto> {
+    const attempts = (await this.prisma.examAttempt.findMany({
       where: {
         userId,
         isCompleted: true,
@@ -441,11 +470,13 @@ export class ExamAttemptsService {
       include: {
         exam: {
           select: {
+            id: true,
             title: true,
+            description: true,
           },
         },
       },
-    });
+    })) as ExamAttemptWithExam[];
 
     const totalAttempts = attempts.length;
     const averageScore =
@@ -453,21 +484,18 @@ export class ExamAttemptsService {
         ? attempts.reduce((sum, attempt) => sum + attempt.totalScore, 0) /
           totalAttempts
         : 0;
-    const averageAccuracy =
-      totalAttempts > 0
-        ? attempts.reduce((sum, attempt) => sum + attempt.accuracy, 0) /
-          totalAttempts
-        : 0;
     const bestScore = Math.max(...attempts.map((a) => a.totalScore), 0);
-    const bestAccuracy = Math.max(...attempts.map((a) => a.accuracy), 0);
 
     return {
-      totalAttempts,
+      userId,
+      totalExams: totalAttempts,
+      completedExams: totalAttempts,
       averageScore,
-      averageAccuracy,
       bestScore,
-      bestAccuracy,
-      recentAttempts: attempts.slice(0, 5),
+      totalStudyTime: undefined,
+      recentAttempts: attempts
+        .slice(0, 5)
+        .map((attempt) => this.transformToExamAttemptDto(attempt)),
     };
   }
 
@@ -482,7 +510,7 @@ export class ExamAttemptsService {
     });
 
     if (existingAttempt) {
-      const fullAttempt = await this.prisma.examAttempt.findUnique({
+      const fullAttempt = (await this.prisma.examAttempt.findUnique({
         where: { id: existingAttempt.id },
         include: {
           user: {
@@ -512,12 +540,12 @@ export class ExamAttemptsService {
             },
           },
         },
-      });
+      })) as ExamAttemptWithRelations | null;
       return this.transformToExamAttemptDto(fullAttempt!);
     }
 
     // 创建新的考试记录
-    const newAttempt = await this.prisma.examAttempt.create({
+    const newAttempt = (await this.prisma.examAttempt.create({
       data: {
         userId,
         examId,
@@ -550,15 +578,7 @@ export class ExamAttemptsService {
           },
         },
       },
-    });
-    return this.transformToExamAttemptDto(newAttempt);
-  }
-
-  /**
-   * 转换 Prisma 查询结果为 ExamAttemptDto
-   */
-  private transformToExamAttemptDto(
-    examAttempt: ExamAttempt & {
+    })) as ExamAttempt & {
       user?: Pick<User, 'id' | 'name' | 'email'>;
       exam?: Pick<Exam, 'id' | 'title' | 'description'>;
       answers?: (Pick<
@@ -572,7 +592,15 @@ export class ExamAttemptsService {
       > & {
         question?: Pick<Question, 'id' | 'type' | 'content' | 'score'>;
       })[];
-    },
+    };
+    return this.transformToExamAttemptDto(newAttempt);
+  }
+
+  /**
+   * 转换 Prisma 查询结果为 ExamAttemptDto
+   */
+  private transformToExamAttemptDto(
+    examAttempt: ExamAttemptWithRelations,
   ): ExamAttemptDto {
     return {
       id: examAttempt.id,
