@@ -1,4 +1,6 @@
 import type { QuestionDtoType } from './questionDtoType';
+import type { QuestionDtoOptions } from './questionDtoOptions';
+import type { QuestionDtoCorrectAnswer } from './questionDtoCorrectAnswer';
 import type { QuestionDtoExplanation } from './questionDtoExplanation';
 
 export interface QuestionDto {
@@ -11,10 +13,10 @@ export interface QuestionDto {
   type: QuestionDtoType;
   /** 题目内容 */
   content: string;
-  /** 选项列表（JSON格式） */
-  options?: unknown;
-  /** 正确答案（JSON格式） */
-  correctAnswer: unknown;
+  /** 选项列表 */
+  options?: QuestionDtoOptions;
+  /** 正确答案 */
+  correctAnswer: QuestionDtoCorrectAnswer;
   /** 答案解析 */
   explanation: QuestionDtoExplanation;
   /** 题目分值 */
