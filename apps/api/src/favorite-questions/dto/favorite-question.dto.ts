@@ -224,28 +224,34 @@ export class GetRecentFavoriteQuestionsDto extends createZodDto(
 
 // ============= Type Exports =============
 
-export type CreateFavoriteQuestion = z.infer<
+export type CreateFavoriteQuestionRequest = z.infer<
   typeof CreateFavoriteQuestionSchema
 >;
-export type AddFavoriteQuestion = z.infer<typeof AddFavoriteQuestionSchema>;
-export type BulkRemoveFavoriteQuestions = z.infer<
+export type AddFavoriteQuestionRequest = z.infer<
+  typeof AddFavoriteQuestionSchema
+>;
+export type BulkRemoveFavoriteQuestionsRequest = z.infer<
   typeof BulkRemoveFavoriteQuestionsSchema
 >;
-export type UpdateFavoriteQuestion = z.infer<
+export type UpdateFavoriteQuestionRequest = z.infer<
   typeof UpdateFavoriteQuestionSchema
 >;
-export type UpdateFavoriteQuestionNote = z.infer<
+export type UpdateFavoriteQuestionNoteRequest = z.infer<
   typeof UpdateFavoriteQuestionNoteSchema
 >;
-export type FavoriteQuestion = z.infer<typeof FavoriteQuestionSchema>;
-export type QueryFavoriteQuestion = z.infer<typeof QueryFavoriteQuestionSchema>;
-export type FavoriteQuestionStats = z.infer<typeof FavoriteQuestionStatsSchema>;
-export type FavoriteQuestionsByType = z.infer<
+export type FavoriteQuestionResponse = z.infer<typeof FavoriteQuestionSchema>;
+export type QueryFavoriteQuestionParams = z.infer<
+  typeof QueryFavoriteQuestionSchema
+>;
+export type FavoriteQuestionStatsResponse = z.infer<
+  typeof FavoriteQuestionStatsSchema
+>;
+export type FavoriteQuestionsByTypeResponse = z.infer<
   typeof FavoriteQuestionsByTypeSchema
 >;
-export type SearchFavoriteQuestions = z.infer<
+export type SearchFavoriteQuestionsParams = z.infer<
   typeof SearchFavoriteQuestionsSchema
 >;
-export type GetRecentFavoriteQuestions = z.infer<
+export type GetRecentFavoriteQuestionsParams = z.infer<
   typeof GetRecentFavoriteQuestionsSchema
 >;

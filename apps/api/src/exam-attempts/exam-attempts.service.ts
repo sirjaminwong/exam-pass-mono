@@ -4,9 +4,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateExamAttemptDto,
   ExamAttemptDto,
-  UpdateExamAttempt,
-  QueryExamAttempt,
-  ExamDetailStats,
+  UpdateExamAttemptRequest,
+  QueryExamAttemptParams,
+  ExamDetailStatsResponse,
 } from './dto/exam-attempt.dto';
 
 @Injectable()
@@ -53,7 +53,7 @@ export class ExamAttemptsService {
     return this.transformToExamAttemptDto(examAttempt);
   }
 
-  async findAll(params?: QueryExamAttempt): Promise<ExamAttemptDto[]> {
+  async findAll(params?: QueryExamAttemptParams): Promise<ExamAttemptDto[]> {
     const { userId, examId, isCompleted, page = 1, limit = 10 } = params || {};
     const skip = (page - 1) * limit;
     const take = limit;
@@ -191,7 +191,7 @@ export class ExamAttemptsService {
 
   async update(
     id: string,
-    updateExamAttemptDto: UpdateExamAttempt,
+    updateExamAttemptDto: UpdateExamAttemptRequest,
   ): Promise<ExamAttemptDto> {
     const examAttempt = await this.prisma.examAttempt.update({
       where: { id },

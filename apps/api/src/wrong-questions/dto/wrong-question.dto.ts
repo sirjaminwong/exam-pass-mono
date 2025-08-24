@@ -220,19 +220,29 @@ export class MarkAsUnresolvedDto extends createZodDto(MarkAsUnresolvedSchema) {}
 
 // ============= Type Exports =============
 
-export type CreateWrongQuestion = z.infer<typeof CreateWrongQuestionSchema>;
-export type AddWrongQuestion = z.infer<typeof AddWrongQuestionSchema>;
-export type BulkMarkAsResolved = z.infer<typeof BulkMarkAsResolvedSchema>;
-export type BulkRemoveWrongQuestions = z.infer<
+export type CreateWrongQuestionRequest = z.infer<
+  typeof CreateWrongQuestionSchema
+>;
+export type AddWrongQuestionRequest = z.infer<typeof AddWrongQuestionSchema>;
+export type BulkMarkAsResolvedRequest = z.infer<
+  typeof BulkMarkAsResolvedSchema
+>;
+export type BulkRemoveWrongQuestionsRequest = z.infer<
   typeof BulkRemoveWrongQuestionsSchema
 >;
-export type UpdateWrongQuestion = z.infer<typeof UpdateWrongQuestionSchema>;
-export type WrongQuestion = z.infer<typeof WrongQuestionSchema>;
-export type QueryWrongQuestion = z.infer<typeof QueryWrongQuestionSchema>;
-export type WrongQuestionStats = z.infer<typeof WrongQuestionStatsSchema>;
-export type WrongQuestionsByType = z.infer<typeof WrongQuestionsByTypeSchema>;
-export type GetUnresolvedWrongQuestions = z.infer<
+export type UpdateWrongQuestionRequest = z.infer<
+  typeof UpdateWrongQuestionSchema
+>;
+export type WrongQuestionResponse = z.infer<typeof WrongQuestionSchema>;
+export type QueryWrongQuestionParams = z.infer<typeof QueryWrongQuestionSchema>;
+export type WrongQuestionStatsResponse = z.infer<
+  typeof WrongQuestionStatsSchema
+>;
+export type WrongQuestionsByTypeResponse = z.infer<
+  typeof WrongQuestionsByTypeSchema
+>;
+export type GetUnresolvedWrongQuestionsParams = z.infer<
   typeof GetUnresolvedWrongQuestionsSchema
 >;
-export type MarkAsResolved = z.infer<typeof MarkAsResolvedSchema>;
-export type MarkAsUnresolved = z.infer<typeof MarkAsUnresolvedSchema>;
+export type MarkAsResolvedRequest = z.infer<typeof MarkAsResolvedSchema>;
+export type MarkAsUnresolvedRequest = z.infer<typeof MarkAsUnresolvedSchema>;

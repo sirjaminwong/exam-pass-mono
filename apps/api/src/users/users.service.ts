@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserDto, CreateUser, UpdateUser, QueryUser } from './dto/user.dto';
+import {
+  UserDto,
+  CreateUserRequest,
+  UpdateUserRequest,
+  QueryUserParams,
+} from './dto/user.dto';
 import { Prisma, User as PrismaUser } from '@prisma/client';
 
 @Injectable()
@@ -15,12 +20,12 @@ export class UsersService {
     };
   }
 
-  async create(data: CreateUser): Promise<UserDto> {
+  async create(data: CreateUserRequest): Promise<UserDto> {
     const user = await this.prisma.user.create({ data });
     return this.transformToUserDto(user);
   }
 
-  async findAll(query?: QueryUser): Promise<UserDto[]> {
+  async findAll(query?: QueryUserParams): Promise<UserDto[]> {
     const { email, name, role, search, page = 1, limit = 10 } = query || {};
 
     const skip = (page - 1) * limit;
@@ -52,7 +57,7 @@ export class UsersService {
     return user ? this.transformToUserDto(user) : null;
   }
 
-  async update(id: string, data: UpdateUser): Promise<UserDto> {
+  async update(id: string, data: UpdateUserRequest): Promise<UserDto> {
     const user = await this.prisma.user.update({ where: { id }, data });
     return this.transformToUserDto(user);
   }

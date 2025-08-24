@@ -7,8 +7,8 @@ import {
   ClassDetailDto,
   AddClassMemberDto,
   ClassStatsDto,
-  CreateClass,
-  UpdateClass,
+  CreateClassRequest,
+  UpdateClassRequest,
 } from './dto';
 import { Prisma, Class, ClassMember, Exam } from '@prisma/client';
 
@@ -17,7 +17,7 @@ export class ClassesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createClassDto: CreateClassDto): Promise<ClassDetailDto> {
-    const classData: CreateClass = {
+    const classData: CreateClassRequest = {
       name: createClassDto.name,
       code: createClassDto.code,
       teacherId: createClassDto.teacherId,
@@ -110,7 +110,7 @@ export class ClassesService {
     id: string,
     updateClassDto: UpdateClassDto,
   ): Promise<ClassDetailDto> {
-    const updateData: UpdateClass = {};
+    const updateData: UpdateClassRequest = {};
     if (updateClassDto.name !== undefined)
       updateData.name = updateClassDto.name;
     if (updateClassDto.code !== undefined)

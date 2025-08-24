@@ -209,11 +209,15 @@ export class ExamQuestionStatsDto extends createZodDto(
 
 // ============= Type Exports =============
 
-export type CreateExamQuestion = z.infer<typeof CreateExamQuestionSchema>;
-export type AddQuestionToExam = z.infer<typeof AddQuestionToExamSchema>;
-export type BulkAddQuestions = z.infer<typeof BulkAddQuestionsSchema>;
-export type BulkRemove = z.infer<typeof BulkRemoveSchema>;
-export type UpdateExamQuestion = z.infer<typeof UpdateExamQuestionSchema>;
-export type ExamQuestion = z.infer<typeof ExamQuestionSchema>;
-export type QueryExamQuestion = z.infer<typeof QueryExamQuestionSchema>;
-export type ExamQuestionStats = z.infer<typeof ExamQuestionStatsSchema>;
+export type CreateExamQuestionRequest = z.infer<
+  typeof CreateExamQuestionSchema
+>;
+export type AddQuestionToExamRequest = z.infer<typeof AddQuestionToExamSchema>;
+export type BulkAddQuestionsRequest = z.infer<typeof BulkAddQuestionsSchema>;
+export type BulkRemoveRequest = z.infer<typeof BulkRemoveSchema>;
+export type UpdateExamQuestionRequest = z.infer<
+  typeof UpdateExamQuestionSchema
+>;
+export type ExamQuestionResponse = z.infer<typeof ExamQuestionSchema>;
+export type QueryExamQuestionParams = z.infer<typeof QueryExamQuestionSchema>;
+export type ExamQuestionStatsResponse = z.infer<typeof ExamQuestionStatsSchema>;

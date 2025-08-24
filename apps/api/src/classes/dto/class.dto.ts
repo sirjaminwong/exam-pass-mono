@@ -167,11 +167,11 @@ export class ClassStatsDto extends createZodDto(ClassStatsSchema) {}
 
 // ============= Type Exports =============
 
-export type CreateClass = z.infer<typeof CreateClassSchema>;
-export type UpdateClass = z.infer<typeof UpdateClassSchema>;
-export type QueryClasses = z.infer<typeof QueryClassesSchema>;
-export type AddClassMember = z.infer<typeof AddClassMemberSchema>;
-export type ClassStatsQuery = z.infer<typeof ClassStatsQuerySchema>;
-export type Class = z.infer<typeof ClassSchema>;
-export type ClassDetail = z.infer<typeof ClassDetailSchema>;
-export type ClassStats = z.infer<typeof ClassStatsSchema>;
+export type CreateClassRequest = z.infer<typeof CreateClassSchema>;
+export type UpdateClassRequest = z.infer<typeof UpdateClassSchema>;
+export type QueryClassesParams = z.infer<typeof QueryClassesSchema>;
+export type AddClassMemberRequest = z.infer<typeof AddClassMemberSchema>;
+export type ClassStatsQueryParams = z.infer<typeof ClassStatsQuerySchema>;
+export type ClassResponse = z.infer<typeof ClassSchema>;
+export type ClassDetailResponse = z.infer<typeof ClassDetailSchema>;
+export type ClassStatsResponse = z.infer<typeof ClassStatsSchema>;

@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ExamQuestion, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateExamQuestion, QueryExamQuestion, ExamQuestionDto } from './dto';
+import {
+  CreateExamQuestionRequest,
+  QueryExamQuestionParams,
+  ExamQuestionDto,
+} from './dto';
 
 // 定义包含关联数据的 ExamQuestion 类型
 type ExamQuestionWithRelations = ExamQuestion & {
@@ -35,7 +39,7 @@ type ExamQuestionWithRelations = ExamQuestion & {
 export class ExamQuestionsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateExamQuestion): Promise<ExamQuestionDto> {
+  async create(data: CreateExamQuestionRequest): Promise<ExamQuestionDto> {
     const examQuestion = await this.prisma.examQuestion.create({
       data: {
         examId: data.examId,
@@ -72,7 +76,7 @@ export class ExamQuestionsService {
     return this.transformToExamQuestionDto(examQuestion);
   }
 
-  async findAll(params: QueryExamQuestion): Promise<ExamQuestionDto[]> {
+  async findAll(params: QueryExamQuestionParams): Promise<ExamQuestionDto[]> {
     const {
       examId,
       questionId,

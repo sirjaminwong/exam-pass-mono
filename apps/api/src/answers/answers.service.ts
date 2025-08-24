@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  UpdateAnswer,
-  SubmitAnswer,
-  BatchSubmitAnswers,
-  QueryAnswers,
-  AnswerStatsQuery,
+  UpdateAnswerRequest,
+  SubmitAnswerRequest,
+  BatchSubmitAnswersRequest,
+  QueryAnswersParams,
+  AnswerStatsQueryParams,
   AnswerDto,
   AnswerDetailDto,
-  AnswerStats,
+  AnswerStatsResponse,
   CreateAnswerDto,
 } from './dto';
 import { Answer as PrismaAnswer, Question, ExamAttempt } from '@prisma/client';
@@ -31,7 +31,7 @@ export class AnswersService {
     return this.transformToAnswerDto(answer);
   }
 
-  async findAll(params?: QueryAnswers): Promise<AnswerDetailDto[]> {
+  async findAll(params?: QueryAnswersParams): Promise<AnswerDetailDto[]> {
     const {
       attemptId,
       questionId,
@@ -234,7 +234,9 @@ export class AnswersService {
     return results;
   }
 
-  async getAnswerStats(params?: AnswerStatsQuery): Promise<AnswerStats> {
+  async getAnswerStats(
+    params?: AnswerStatsQueryParams,
+  ): Promise<AnswerStatsResponse> {
     const { attemptId, questionId, userId } = params || {};
 
     const where: Prisma.AnswerWhereInput = {};

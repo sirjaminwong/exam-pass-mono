@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  CreateWrongQuestion,
-  UpdateWrongQuestion,
+  CreateWrongQuestionRequest,
+  UpdateWrongQuestionRequest,
   WrongQuestionDto,
-} from './dto';
+} from './dto/wrong-question.dto';
 
 @Injectable()
 export class WrongQuestionsService {
@@ -29,7 +29,7 @@ export class WrongQuestionsService {
     };
   }
 
-  async create(data: CreateWrongQuestion): Promise<WrongQuestionDto> {
+  async create(data: CreateWrongQuestionRequest): Promise<WrongQuestionDto> {
     const wrongQuestion = await this.prisma.wrongQuestion.create({
       data: {
         userId: data.userId,
@@ -161,7 +161,7 @@ export class WrongQuestionsService {
 
   async update(
     id: string,
-    data: UpdateWrongQuestion,
+    data: UpdateWrongQuestionRequest,
   ): Promise<WrongQuestionDto> {
     const wrongQuestion = await this.prisma.wrongQuestion.update({
       where: { id },

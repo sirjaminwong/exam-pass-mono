@@ -186,17 +186,21 @@ export class ClassMemberStatsDto extends createZodDto(ClassMemberStatsSchema) {}
 
 // ============= Type Exports =============
 
-export type CreateClassMember = z.infer<typeof CreateClassMemberSchema>;
-export type UpdateClassMember = z.infer<typeof UpdateClassMemberSchema>;
-export type QueryClassMembers = z.infer<typeof QueryClassMembersSchema>;
-export type AddClassMember = z.infer<typeof AddClassMemberSchema>;
-export type BatchAddClassMembers = z.infer<typeof BatchAddClassMembersSchema>;
-export type BatchRemoveClassMembers = z.infer<
+export type CreateClassMemberRequest = z.infer<typeof CreateClassMemberSchema>;
+export type UpdateClassMemberRequest = z.infer<typeof UpdateClassMemberSchema>;
+export type QueryClassMembersParams = z.infer<typeof QueryClassMembersSchema>;
+export type AddClassMemberRequest = z.infer<typeof AddClassMemberSchema>;
+export type BatchAddClassMembersRequest = z.infer<
+  typeof BatchAddClassMembersSchema
+>;
+export type BatchRemoveClassMembersRequest = z.infer<
   typeof BatchRemoveClassMembersSchema
 >;
-export type ClassMemberStatsQuery = z.infer<typeof ClassMemberStatsQuerySchema>;
-export type UserInfo = z.infer<typeof UserInfoSchema>;
-export type ClassInfo = z.infer<typeof ClassInfoSchema>;
-export type ClassMember = z.infer<typeof ClassMemberSchema>;
-export type ClassMemberDetail = z.infer<typeof ClassMemberDetailSchema>;
-export type ClassMemberStats = z.infer<typeof ClassMemberStatsSchema>;
+export type ClassMemberStatsQueryParams = z.infer<
+  typeof ClassMemberStatsQuerySchema
+>;
+export type UserInfoResponse = z.infer<typeof UserInfoSchema>;
+export type ClassInfoResponse = z.infer<typeof ClassInfoSchema>;
+export type ClassMemberResponse = z.infer<typeof ClassMemberSchema>;
+export type ClassMemberDetailResponse = z.infer<typeof ClassMemberDetailSchema>;
+export type ClassMemberStatsResponse = z.infer<typeof ClassMemberStatsSchema>;

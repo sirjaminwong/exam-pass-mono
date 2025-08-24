@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  CreateClassMember,
-  UpdateClassMember,
-  QueryClassMembers,
+  CreateClassMemberRequest,
+  UpdateClassMemberRequest,
+  QueryClassMembersParams,
   ClassMemberDetailDto,
   ClassMemberStatsDto,
-  BatchRemoveClassMembers,
-  ClassMemberStatsQuery,
+  BatchRemoveClassMembersRequest,
+  ClassMemberStatsQueryParams,
 } from './dto';
 
 @Injectable()
 export class ClassMembersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateClassMember): Promise<ClassMemberDetailDto> {
+  async create(data: CreateClassMemberRequest): Promise<ClassMemberDetailDto> {
     const classMember = await this.prisma.classMember.create({
       data: {
         userId: data.userId,
@@ -41,7 +41,9 @@ export class ClassMembersService {
     return this.transformToClassMemberDetailDto(classMember);
   }
 
-  async findAll(params: QueryClassMembers): Promise<ClassMemberDetailDto[]> {
+  async findAll(
+    params: QueryClassMembersParams,
+  ): Promise<ClassMemberDetailDto[]> {
     const { userId, classId, page = 1, limit = 10 } = params;
     const skip = (page - 1) * limit;
 
@@ -218,7 +220,7 @@ export class ClassMembersService {
 
   async update(
     id: string,
-    data: UpdateClassMember,
+    data: UpdateClassMemberRequest,
   ): Promise<ClassMemberDetailDto> {
     const classMember = await this.prisma.classMember.update({
       where: { id },
@@ -340,7 +342,7 @@ export class ClassMembersService {
   }
 
   async getClassMemberStats(
-    query: ClassMemberStatsQuery,
+    query: ClassMemberStatsQueryParams,
   ): Promise<ClassMemberStatsDto> {
     const where = query.classId ? { classId: query.classId } : {};
 

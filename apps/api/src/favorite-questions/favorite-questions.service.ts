@@ -3,15 +3,15 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   FavoriteQuestionDto,
-  CreateFavoriteQuestion,
-  AddFavoriteQuestion,
-  BulkRemoveFavoriteQuestions,
-  UpdateFavoriteQuestion,
-  QueryFavoriteQuestion,
-  FavoriteQuestionStats,
-  FavoriteQuestionsByType,
-  SearchFavoriteQuestions,
-  GetRecentFavoriteQuestions,
+  CreateFavoriteQuestionRequest,
+  AddFavoriteQuestionRequest,
+  BulkRemoveFavoriteQuestionsRequest,
+  UpdateFavoriteQuestionRequest,
+  QueryFavoriteQuestionParams,
+  FavoriteQuestionStatsResponse,
+  FavoriteQuestionsByTypeResponse,
+  SearchFavoriteQuestionsParams,
+  GetRecentFavoriteQuestionsParams,
 } from './dto';
 
 import { FavoriteQuestion as PrismaFavoriteQuestion } from '@prisma/client';
@@ -30,7 +30,7 @@ export class FavoriteQuestionsService {
   }
 
   async create(
-    createFavoriteQuestionDto: CreateFavoriteQuestion,
+    createFavoriteQuestionDto: CreateFavoriteQuestionRequest,
   ): Promise<FavoriteQuestionDto> {
     const data: Prisma.FavoriteQuestionCreateInput = {
       user: {
@@ -51,7 +51,9 @@ export class FavoriteQuestionsService {
     return this.transformToFavoriteQuestionDto(favoriteQuestion);
   }
 
-  async findAll(query?: QueryFavoriteQuestion): Promise<FavoriteQuestionDto[]> {
+  async findAll(
+    query?: QueryFavoriteQuestionParams,
+  ): Promise<FavoriteQuestionDto[]> {
     const {
       page = 1,
       limit = 10,
@@ -192,7 +194,7 @@ export class FavoriteQuestionsService {
   }
 
   async addFavoriteQuestion(
-    addFavoriteQuestionDto: AddFavoriteQuestion,
+    addFavoriteQuestionDto: AddFavoriteQuestionRequest,
   ): Promise<FavoriteQuestionDto> {
     const { userId, questionId, note } = addFavoriteQuestionDto;
 
@@ -243,7 +245,7 @@ export class FavoriteQuestionsService {
 
   async update(
     id: string,
-    updateFavoriteQuestionDto: UpdateFavoriteQuestion,
+    updateFavoriteQuestionDto: UpdateFavoriteQuestionRequest,
   ): Promise<FavoriteQuestionDto> {
     const updated = await this.prisma.favoriteQuestion.update({
       where: { id },
@@ -300,7 +302,7 @@ export class FavoriteQuestionsService {
 
   async getFavoriteQuestionStats(
     userId?: string,
-  ): Promise<FavoriteQuestionStats> {
+  ): Promise<FavoriteQuestionStatsResponse> {
     const whereClause: Prisma.FavoriteQuestionWhereInput = userId
       ? { userId }
       : {};
@@ -360,7 +362,7 @@ export class FavoriteQuestionsService {
 
   async getFavoriteQuestionsByType(
     userId: string,
-  ): Promise<FavoriteQuestionsByType> {
+  ): Promise<FavoriteQuestionsByTypeResponse> {
     const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: { userId },
       include: {
@@ -395,7 +397,7 @@ export class FavoriteQuestionsService {
   }
 
   async searchFavoriteQuestions(
-    searchDto: SearchFavoriteQuestions,
+    searchDto: SearchFavoriteQuestionsParams,
   ): Promise<FavoriteQuestionDto[]> {
     const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: {
@@ -439,7 +441,7 @@ export class FavoriteQuestionsService {
     );
   }
 
-  async bulkRemove(bulkRemoveDto: BulkRemoveFavoriteQuestions) {
+  async bulkRemove(bulkRemoveDto: BulkRemoveFavoriteQuestionsRequest) {
     const result = await this.prisma.favoriteQuestion.deleteMany({
       where: {
         id: {
@@ -452,7 +454,7 @@ export class FavoriteQuestionsService {
   }
 
   async getRecentFavoriteQuestions(
-    getRecentDto: GetRecentFavoriteQuestions,
+    getRecentDto: GetRecentFavoriteQuestionsParams,
   ): Promise<FavoriteQuestionDto[]> {
     const favoriteQuestions = await this.prisma.favoriteQuestion.findMany({
       where: {

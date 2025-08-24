@@ -3,10 +3,10 @@ import { Prisma, QuestionType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   QuestionDto,
-  CreateQuestion,
-  UpdateQuestion,
-  QueryQuestion,
-  QuestionStats,
+  CreateQuestionRequest,
+  UpdateQuestionRequest,
+  QueryQuestionParams,
+  QuestionStatsResponse,
 } from './dto/question.dto';
 
 import { Question as PrismaQuestion } from '@prisma/client';
@@ -23,12 +23,12 @@ export class QuestionsService {
     };
   }
 
-  async create(data: CreateQuestion): Promise<QuestionDto> {
+  async create(data: CreateQuestionRequest): Promise<QuestionDto> {
     const question = await this.prisma.question.create({ data });
     return this.transformToQuestionDto(question);
   }
 
-  async findAll(query?: QueryQuestion): Promise<QuestionDto[]> {
+  async findAll(query?: QueryQuestionParams): Promise<QuestionDto[]> {
     const {
       type,
       content,
@@ -116,7 +116,7 @@ export class QuestionsService {
     return questions.map((q) => this.transformToQuestionDto(q));
   }
 
-  async update(id: string, data: UpdateQuestion): Promise<QuestionDto> {
+  async update(id: string, data: UpdateQuestionRequest): Promise<QuestionDto> {
     const question = await this.prisma.question.update({ where: { id }, data });
     return this.transformToQuestionDto(question);
   }
@@ -139,7 +139,7 @@ export class QuestionsService {
     return questions.map((q) => this.transformToQuestionDto(q));
   }
 
-  async getQuestionStats(): Promise<QuestionStats> {
+  async getQuestionStats(): Promise<QuestionStatsResponse> {
     const totalQuestions = await this.prisma.question.count();
     const questionsByType = await this.prisma.question.groupBy({
       by: ['type'],

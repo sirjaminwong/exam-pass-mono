@@ -123,9 +123,9 @@ export class ChangePasswordDto extends createZodDto(ChangePasswordSchema) {}
 
 // ============= Type Exports =============
 
-export type CreateUser = z.infer<typeof CreateUserSchema>;
-export type UpdateUser = z.infer<typeof UpdateUserSchema>;
-export type User = z.infer<typeof UserSchema>;
-export type QueryUser = z.infer<typeof QueryUserSchema>;
-export type LoginUser = z.infer<typeof LoginUserSchema>;
-export type ChangePassword = z.infer<typeof ChangePasswordSchema>;
+export type CreateUserRequest = z.infer<typeof CreateUserSchema>;
+export type UpdateUserRequest = z.infer<typeof UpdateUserSchema>;
+export type UserResponse = z.infer<typeof UserSchema>;
+export type QueryUserParams = z.infer<typeof QueryUserSchema>;
+export type LoginUserRequest = z.infer<typeof LoginUserSchema>;
+export type ChangePasswordRequest = z.infer<typeof ChangePasswordSchema>;

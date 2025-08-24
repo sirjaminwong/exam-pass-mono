@@ -197,12 +197,14 @@ export class AnswerStatsDto extends createZodDto(AnswerStatsSchema) {}
 
 // ============= Type Exports =============
 
-export type CreateAnswer = z.infer<typeof CreateAnswerSchema>;
-export type UpdateAnswer = z.infer<typeof UpdateAnswerSchema>;
-export type SubmitAnswer = z.infer<typeof SubmitAnswerSchema>;
-export type BatchSubmitAnswers = z.infer<typeof BatchSubmitAnswersSchema>;
-export type QueryAnswers = z.infer<typeof QueryAnswersSchema>;
-export type AnswerStatsQuery = z.infer<typeof AnswerStatsQuerySchema>;
-export type Answer = z.infer<typeof AnswerSchema>;
-export type AnswerDetail = z.infer<typeof AnswerDetailSchema>;
-export type AnswerStats = z.infer<typeof AnswerStatsSchema>;
+export type CreateAnswerRequest = z.infer<typeof CreateAnswerSchema>;
+export type UpdateAnswerRequest = z.infer<typeof UpdateAnswerSchema>;
+export type SubmitAnswerRequest = z.infer<typeof SubmitAnswerSchema>;
+export type BatchSubmitAnswersRequest = z.infer<
+  typeof BatchSubmitAnswersSchema
+>;
+export type QueryAnswersParams = z.infer<typeof QueryAnswersSchema>;
+export type AnswerStatsQueryParams = z.infer<typeof AnswerStatsQuerySchema>;
+export type AnswerResponse = z.infer<typeof AnswerSchema>;
+export type AnswerDetailResponse = z.infer<typeof AnswerDetailSchema>;
+export type AnswerStatsResponse = z.infer<typeof AnswerStatsSchema>;

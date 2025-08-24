@@ -2,19 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  CreateExam,
-  UpdateExam,
+  CreateExamRequest,
+  UpdateExamRequest,
   ExamDto,
   ExamDetailDto,
   ExamStatsDto,
-  QueryExam,
+  QueryExamParams,
 } from './dto/exam.dto';
 
 @Injectable()
 export class ExamsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateExam): Promise<ExamDto> {
+  async create(data: CreateExamRequest): Promise<ExamDto> {
     const exam = await this.prisma.exam.create({
       data,
       include: {
@@ -30,7 +30,7 @@ export class ExamsService {
     return this.transformToExamDto(exam);
   }
 
-  async findAll(params: QueryExam): Promise<ExamDto[]> {
+  async findAll(params: QueryExamParams): Promise<ExamDto[]> {
     const skip = params.page
       ? (params.page - 1) * (params.limit || 10)
       : undefined;
@@ -162,7 +162,7 @@ export class ExamsService {
     return exams.map((exam) => this.transformToExamDto(exam));
   }
 
-  async update(id: string, data: UpdateExam): Promise<ExamDto> {
+  async update(id: string, data: UpdateExamRequest): Promise<ExamDto> {
     const exam = await this.prisma.exam.update({
       where: { id },
       data,

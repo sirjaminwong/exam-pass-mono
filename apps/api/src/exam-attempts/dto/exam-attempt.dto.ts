@@ -246,12 +246,14 @@ export class ExamDetailStatsDto extends createZodDto(ExamDetailStatsSchema) {}
 
 // ============= Type Exports =============
 
-export type CreateExamAttempt = z.infer<typeof CreateExamAttemptSchema>;
-export type StartExam = z.infer<typeof StartExamSchema>;
-export type UpdateExamAttempt = z.infer<typeof UpdateExamAttemptSchema>;
-export type CompleteExamAttempt = z.infer<typeof CompleteExamAttemptSchema>;
-export type ExamAttempt = z.infer<typeof ExamAttemptSchema>;
-export type QueryExamAttempt = z.infer<typeof QueryExamAttemptSchema>;
-export type ExamAttemptStats = z.infer<typeof ExamAttemptStatsSchema>;
-export type UserExamStats = z.infer<typeof UserExamStatsSchema>;
-export type ExamDetailStats = z.infer<typeof ExamDetailStatsSchema>;
+export type CreateExamAttemptRequest = z.infer<typeof CreateExamAttemptSchema>;
+export type StartExamRequest = z.infer<typeof StartExamSchema>;
+export type UpdateExamAttemptRequest = z.infer<typeof UpdateExamAttemptSchema>;
+export type CompleteExamAttemptRequest = z.infer<
+  typeof CompleteExamAttemptSchema
+>;
+export type ExamAttemptResponse = z.infer<typeof ExamAttemptSchema>;
+export type QueryExamAttemptParams = z.infer<typeof QueryExamAttemptSchema>;
+export type ExamAttemptStatsResponse = z.infer<typeof ExamAttemptStatsSchema>;
+export type UserExamStatsResponse = z.infer<typeof UserExamStatsSchema>;
+export type ExamDetailStatsResponse = z.infer<typeof ExamDetailStatsSchema>;
