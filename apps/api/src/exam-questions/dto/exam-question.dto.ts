@@ -6,6 +6,10 @@ import {
   PaginationSchema,
   SortSchema,
   SearchSchema,
+  QuestionOptionsSchema,
+  CorrectAnswerSchema,
+  jsonField,
+  optionalJsonField,
 } from '../../common/utils/zod';
 
 // ============= ExamQuestion Schemas =============
@@ -99,8 +103,8 @@ export const ExamQuestionSchema = z.object({
         'INDEFINITE_CHOICE',
       ]),
       content: z.string(),
-      options: z.any().optional(),
-      correctAnswer: z.any(),
+      options: optionalJsonField(QuestionOptionsSchema),
+      correctAnswer: jsonField(CorrectAnswerSchema),
       explanation: z.string().optional(),
       score: z.number(),
       createdAt: dateString(),

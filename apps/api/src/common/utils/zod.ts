@@ -120,19 +120,54 @@ export const accuracyNumber = () =>
   z.number().min(0).max(1, { message: '正确率必须在 0-1 之间' });
 
 /**
- * 题目选项验证器
+ * 题目选项项验证器
+ * 单个选项的结构：{ key: string, text: string }
  */
-export const QuestionOptionsSchema = z.array(z.string()).min(2, {
+export const QuestionOptionItemSchema = z.object({
+  key: z
+    .string()
+    .min(1, { message: '选项标识不能为空' })
+    .describe('选项标识（如 A、B、C、D）'),
+  text: z
+    .string()
+    .min(1, { message: '选项内容不能为空' })
+    .describe('选项文本内容'),
+});
+
+/**
+ * 题目选项验证器
+ * 支持单选、多选、判断题等不同类型的选项
+ */
+export const QuestionOptionsSchema = z.array(QuestionOptionItemSchema).min(2, {
   message: '选择题至少需要 2 个选项',
 });
+
+/**
+ * 判断题选项验证器
+ * 专门用于判断题的固定选项格式
+ */
+export const TrueFalseOptionsSchema = z
+  .array(QuestionOptionItemSchema)
+  .length(2, {
+    message: '判断题必须有且仅有 2 个选项',
+  })
+  .refine(
+    (options) => {
+      const keys = options.map((opt) => opt.key.toUpperCase());
+      return keys.includes('A') && keys.includes('B');
+    },
+    {
+      message: '判断题选项必须包含 A 和 B 两个选项',
+    },
+  );
 
 /**
  * 题目正确答案验证器
  * 支持单选、多选、判断题等不同格式
  */
 export const CorrectAnswerSchema = z.union([
-  z.string(), // 单选题答案 (如 "A")
-  z.array(z.string()), // 多选题答案 (如 ["A", "C"])
+  z.string().min(1, { message: '答案不能为空' }), // 单选题答案 (如 "A")
+  z.array(z.string().min(1)).min(1, { message: '多选题至少需要一个答案' }), // 多选题答案 (如 ["A", "C"])
   z.boolean(), // 判断题答案
 ]);
 
@@ -141,3 +176,25 @@ export const CorrectAnswerSchema = z.union([
  * 与正确答案格式相同
  */
 export const UserAnswerSchema = CorrectAnswerSchema;
+
+// ============= Type Exports =============
+
+/**
+ * 题目选项项类型
+ */
+export type QuestionOptionItem = z.infer<typeof QuestionOptionItemSchema>;
+
+/**
+ * 题目选项类型
+ */
+export type QuestionOptions = z.infer<typeof QuestionOptionsSchema>;
+
+/**
+ * 正确答案类型
+ */
+export type CorrectAnswer = z.infer<typeof CorrectAnswerSchema>;
+
+/**
+ * 用户答案类型
+ */
+export type UserAnswer = z.infer<typeof UserAnswerSchema>;

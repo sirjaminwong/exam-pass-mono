@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { QuestionOptionItem } from '../../common/utils/zod';
 
 class ExamResponseDto {
   @ApiProperty({ description: '试卷ID' })
@@ -41,11 +42,26 @@ class QuestionResponseDto {
   @ApiProperty({ description: '题目内容' })
   content: string;
 
-  @ApiProperty({ description: '选项（JSON格式）', required: false })
-  options?: any;
+  @ApiProperty({
+    description: '选项列表',
+    type: [Object],
+    required: false,
+    example: [
+      { key: 'A', text: '选项A' },
+      { key: 'B', text: '选项B' },
+    ],
+  })
+  options?: QuestionOptionItem[];
 
-  @ApiProperty({ description: '正确答案（JSON格式）' })
-  correctAnswer: any;
+  @ApiProperty({
+    description: '正确答案',
+    oneOf: [
+      { type: 'string', example: 'A' },
+      { type: 'array', items: { type: 'string' }, example: ['A', 'B'] },
+      { type: 'boolean', example: true },
+    ],
+  })
+  correctAnswer: string | string[] | boolean;
 
   @ApiProperty({ description: '解析', required: false })
   explanation?: string;

@@ -10,6 +10,7 @@ import {
 } from './dto/question.dto';
 
 import { Question as PrismaQuestion } from '@prisma/client';
+import { QuestionOptions } from 'src/common/utils/zod';
 
 @Injectable()
 export class QuestionsService {
@@ -18,6 +19,8 @@ export class QuestionsService {
   private transformToQuestionDto(question: PrismaQuestion): QuestionDto {
     return {
       ...question,
+      options: question.options as QuestionOptions,
+      correctAnswer: question.correctAnswer as string | boolean | string[],
       createdAt: question.createdAt.toISOString(),
       updatedAt: question.updatedAt.toISOString(),
     };

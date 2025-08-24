@@ -9,6 +9,7 @@ import {
   ExamStatsDto,
   QueryExamParams,
 } from './dto/exam.dto';
+import { QuestionOptions } from 'src/common/utils/zod';
 
 @Injectable()
 export class ExamsService {
@@ -365,7 +366,7 @@ export class ExamsService {
             type: eq.question.type,
             content: eq.question.content,
             score: eq.question.score,
-            options: eq.question.options,
+            options: eq.question.options as QuestionOptions,
           },
         })) || [],
       totalScore:

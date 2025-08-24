@@ -7,6 +7,7 @@ import {
   ExamQuestionDto,
   ExamQuestionStatsDto,
 } from './dto';
+import { QuestionOptions, CorrectAnswer } from '../common/utils/zod';
 
 // 定义包含关联数据的 ExamQuestion 类型
 type ExamQuestionWithRelations = ExamQuestion & {
@@ -27,8 +28,8 @@ type ExamQuestionWithRelations = ExamQuestion & {
       | 'TRUE_FALSE'
       | 'INDEFINITE_CHOICE';
     content: string;
-    options: any;
-    correctAnswer: any;
+    options: Prisma.JsonValue;
+    correctAnswer: Prisma.JsonValue;
     explanation: string | null;
     score: number;
     createdAt: Date;
@@ -587,10 +588,8 @@ export class ExamQuestionsService {
             id: examQuestion.question.id,
             type: examQuestion.question.type,
             content: examQuestion.question.content,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            options: examQuestion.question.options,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            correctAnswer: examQuestion.question.correctAnswer,
+            options: examQuestion.question.options as QuestionOptions,
+            correctAnswer: examQuestion.question.correctAnswer as CorrectAnswer,
             explanation: examQuestion.question.explanation || undefined,
             score: examQuestion.question.score,
             createdAt: examQuestion.question.createdAt.toISOString(),

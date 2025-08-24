@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
-import { cuidString, dateString, accuracyNumber } from '../../common/utils/zod';
+import {
+  cuidString,
+  dateString,
+  accuracyNumber,
+  QuestionOptionsSchema,
+  optionalJsonField,
+} from '../../common/utils/zod';
 
 // ============= Exam Schemas =============
 
@@ -97,7 +103,9 @@ export const ExamDetailSchema = ExamSchema.extend({
           id: cuidString().describe('题目ID'),
           type: z.string().describe('题目类型'),
           content: z.string().describe('题目内容'),
-          options: z.any().optional().describe('选项列表'),
+          options: optionalJsonField(QuestionOptionsSchema).describe(
+            '选项列表',
+          ),
           score: z.number().describe('题目分值'),
         }),
       }),
