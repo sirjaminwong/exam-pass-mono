@@ -18,9 +18,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ClassesControllerAddMemberBody,
-  ClassesControllerCreateBody,
-  ClassesControllerUpdateBody
+  AddClassMemberDto,
+  ClassDetailDto,
+  ClassStatsDto,
+  ClassesControllerFindAllParams,
+  ClassesControllerGetStatsParams,
+  CreateClassDto,
+  UpdateClassDto
 } from '../../models';
 
 import { customInstance } from '../../utils/orval-mutator';
@@ -35,24 +39,24 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新班级
  */
 export const classesControllerCreate = (
-    classesControllerCreateBody: BodyType<ClassesControllerCreateBody>,
+    createClassDto: BodyType<CreateClassDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ClassDetailDto>(
       {url: `/classes`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: classesControllerCreateBody, signal
+      data: createClassDto, signal
     },
       options);
     }
   
 
 
-export const getClassesControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerCreate>>, TError,{data: BodyType<ClassesControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classesControllerCreate>>, TError,{data: BodyType<ClassesControllerCreateBody>}, TContext> => {
+export const getClassesControllerCreateMutationOptions = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerCreate>>, TError,{data: BodyType<CreateClassDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classesControllerCreate>>, TError,{data: BodyType<CreateClassDto>}, TContext> => {
 
 const mutationKey = ['classesControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -64,7 +68,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classesControllerCreate>>, {data: BodyType<ClassesControllerCreateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classesControllerCreate>>, {data: BodyType<CreateClassDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  classesControllerCreate(data,requestOptions)
@@ -76,18 +80,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassesControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof classesControllerCreate>>>
-    export type ClassesControllerCreateMutationBody = BodyType<ClassesControllerCreateBody>
-    export type ClassesControllerCreateMutationError = ErrorType<null>
+    export type ClassesControllerCreateMutationBody = BodyType<CreateClassDto>
+    export type ClassesControllerCreateMutationError = ErrorType<null | null>
 
     /**
  * @summary 创建新班级
  */
-export const useClassesControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerCreate>>, TError,{data: BodyType<ClassesControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useClassesControllerCreate = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerCreate>>, TError,{data: BodyType<CreateClassDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classesControllerCreate>>,
         TError,
-        {data: BodyType<ClassesControllerCreateBody>},
+        {data: BodyType<CreateClassDto>},
         TContext
       > => {
 
@@ -96,36 +100,37 @@ export const useClassesControllerCreate = <TError = ErrorType<null>,
       return useMutation(mutationOptions , queryClient);
     }
     /**
- * @summary 获取所有班级列表
+ * @summary 获取班级列表
  */
 export const classesControllerFindAll = (
-    
+    params?: ClassesControllerFindAllParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
-      {url: `/classes`, method: 'GET', signal
+      return customInstance<ClassDetailDto[]>(
+      {url: `/classes`, method: 'GET',
+        params, signal
     },
       options);
     }
   
 
-export const getClassesControllerFindAllQueryKey = () => {
-    return [`/classes`] as const;
+export const getClassesControllerFindAllQueryKey = (params?: ClassesControllerFindAllParams,) => {
+    return [`/classes`, ...(params ? [params]: [])] as const;
     }
 
     
-export const getClassesControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof classesControllerFindAll>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getClassesControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof classesControllerFindAll>>, TError = ErrorType<unknown>>(params?: ClassesControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getClassesControllerFindAllQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getClassesControllerFindAllQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof classesControllerFindAll>>> = ({ signal }) => classesControllerFindAll(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof classesControllerFindAll>>> = ({ signal }) => classesControllerFindAll(params, requestOptions, signal);
 
       
 
@@ -139,7 +144,7 @@ export type ClassesControllerFindAllQueryError = ErrorType<unknown>
 
 
 export function useClassesControllerFindAll<TData = Awaited<ReturnType<typeof classesControllerFindAll>>, TError = ErrorType<unknown>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>> & Pick<
+ params: undefined |  ClassesControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof classesControllerFindAll>>,
           TError,
@@ -149,7 +154,7 @@ export function useClassesControllerFindAll<TData = Awaited<ReturnType<typeof cl
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useClassesControllerFindAll<TData = Awaited<ReturnType<typeof classesControllerFindAll>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>> & Pick<
+ params?: ClassesControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof classesControllerFindAll>>,
           TError,
@@ -159,19 +164,19 @@ export function useClassesControllerFindAll<TData = Awaited<ReturnType<typeof cl
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useClassesControllerFindAll<TData = Awaited<ReturnType<typeof classesControllerFindAll>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: ClassesControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 获取所有班级列表
+ * @summary 获取班级列表
  */
 
 export function useClassesControllerFindAll<TData = Awaited<ReturnType<typeof classesControllerFindAll>>, TError = ErrorType<unknown>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ params?: ClassesControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getClassesControllerFindAllQueryOptions(options)
+  const queryOptions = getClassesControllerFindAllQueryOptions(params,options)
 
   const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -191,7 +196,7 @@ export const classesControllerFindByCode = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ClassDetailDto>(
       {url: `/classes/by-code/${code}`, method: 'GET', signal
     },
       options);
@@ -278,7 +283,7 @@ export const classesControllerFindOne = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ClassDetailDto>(
       {url: `/classes/${id}`, method: 'GET', signal
     },
       options);
@@ -361,23 +366,23 @@ export function useClassesControllerFindOne<TData = Awaited<ReturnType<typeof cl
  */
 export const classesControllerUpdate = (
     id: string,
-    classesControllerUpdateBody: BodyType<ClassesControllerUpdateBody>,
+    updateClassDto: BodyType<UpdateClassDto>,
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<ClassDetailDto>(
       {url: `/classes/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: classesControllerUpdateBody
+      data: updateClassDto
     },
       options);
     }
   
 
 
-export const getClassesControllerUpdateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerUpdate>>, TError,{id: string;data: BodyType<ClassesControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classesControllerUpdate>>, TError,{id: string;data: BodyType<ClassesControllerUpdateBody>}, TContext> => {
+export const getClassesControllerUpdateMutationOptions = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerUpdate>>, TError,{id: string;data: BodyType<UpdateClassDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classesControllerUpdate>>, TError,{id: string;data: BodyType<UpdateClassDto>}, TContext> => {
 
 const mutationKey = ['classesControllerUpdate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -389,7 +394,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classesControllerUpdate>>, {id: string;data: BodyType<ClassesControllerUpdateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classesControllerUpdate>>, {id: string;data: BodyType<UpdateClassDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  classesControllerUpdate(id,data,requestOptions)
@@ -401,18 +406,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassesControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof classesControllerUpdate>>>
-    export type ClassesControllerUpdateMutationBody = BodyType<ClassesControllerUpdateBody>
-    export type ClassesControllerUpdateMutationError = ErrorType<null>
+    export type ClassesControllerUpdateMutationBody = BodyType<UpdateClassDto>
+    export type ClassesControllerUpdateMutationError = ErrorType<null | null>
 
     /**
  * @summary 更新班级信息
  */
-export const useClassesControllerUpdate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerUpdate>>, TError,{id: string;data: BodyType<ClassesControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useClassesControllerUpdate = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerUpdate>>, TError,{id: string;data: BodyType<UpdateClassDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classesControllerUpdate>>,
         TError,
-        {id: string;data: BodyType<ClassesControllerUpdateBody>},
+        {id: string;data: BodyType<UpdateClassDto>},
         TContext
       > => {
 
@@ -428,7 +433,7 @@ export const classesControllerRemove = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<ClassDetailDto>(
       {url: `/classes/${id}`, method: 'DELETE'
     },
       options);
@@ -486,7 +491,7 @@ export const useClassesControllerRemove = <TError = ErrorType<null>,
  */
 export const classesControllerAddMember = (
     id: string,
-    classesControllerAddMemberBody: BodyType<ClassesControllerAddMemberBody>,
+    addClassMemberDto: BodyType<AddClassMemberDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
@@ -494,16 +499,16 @@ export const classesControllerAddMember = (
       return customInstance<null>(
       {url: `/classes/${id}/members`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: classesControllerAddMemberBody, signal
+      data: addClassMemberDto, signal
     },
       options);
     }
   
 
 
-export const getClassesControllerAddMemberMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerAddMember>>, TError,{id: string;data: BodyType<ClassesControllerAddMemberBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof classesControllerAddMember>>, TError,{id: string;data: BodyType<ClassesControllerAddMemberBody>}, TContext> => {
+export const getClassesControllerAddMemberMutationOptions = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerAddMember>>, TError,{id: string;data: BodyType<AddClassMemberDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof classesControllerAddMember>>, TError,{id: string;data: BodyType<AddClassMemberDto>}, TContext> => {
 
 const mutationKey = ['classesControllerAddMember'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -515,7 +520,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classesControllerAddMember>>, {id: string;data: BodyType<ClassesControllerAddMemberBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof classesControllerAddMember>>, {id: string;data: BodyType<AddClassMemberDto>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  classesControllerAddMember(id,data,requestOptions)
@@ -527,18 +532,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type ClassesControllerAddMemberMutationResult = NonNullable<Awaited<ReturnType<typeof classesControllerAddMember>>>
-    export type ClassesControllerAddMemberMutationBody = BodyType<ClassesControllerAddMemberBody>
-    export type ClassesControllerAddMemberMutationError = ErrorType<null>
+    export type ClassesControllerAddMemberMutationBody = BodyType<AddClassMemberDto>
+    export type ClassesControllerAddMemberMutationError = ErrorType<null | null>
 
     /**
  * @summary 添加班级成员
  */
-export const useClassesControllerAddMember = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerAddMember>>, TError,{id: string;data: BodyType<ClassesControllerAddMemberBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useClassesControllerAddMember = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof classesControllerAddMember>>, TError,{id: string;data: BodyType<AddClassMemberDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof classesControllerAddMember>>,
         TError,
-        {id: string;data: BodyType<ClassesControllerAddMemberBody>},
+        {id: string;data: BodyType<AddClassMemberDto>},
         TContext
       > => {
 
@@ -567,7 +572,7 @@ export const getClassesControllerGetMembersQueryKey = (id?: string,) => {
     }
 
     
-export const getClassesControllerGetMembersQueryOptions = <TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getClassesControllerGetMembersQueryOptions = <TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<null>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -586,10 +591,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ClassesControllerGetMembersQueryResult = NonNullable<Awaited<ReturnType<typeof classesControllerGetMembers>>>
-export type ClassesControllerGetMembersQueryError = ErrorType<unknown>
+export type ClassesControllerGetMembersQueryError = ErrorType<null>
 
 
-export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<unknown>>(
+export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<null>>(
  id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetMembers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof classesControllerGetMembers>>,
@@ -599,7 +604,7 @@ export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<unknown>>(
+export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<null>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetMembers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof classesControllerGetMembers>>,
@@ -609,7 +614,7 @@ export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<unknown>>(
+export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<null>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -617,7 +622,7 @@ export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof
  * @summary 获取班级成员列表
  */
 
-export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<unknown>>(
+export function useClassesControllerGetMembers<TData = Awaited<ReturnType<typeof classesControllerGetMembers>>, TError = ErrorType<null>>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -695,4 +700,98 @@ export const useClassesControllerRemoveMember = <TError = ErrorType<null>,
 
       return useMutation(mutationOptions , queryClient);
     }
+    /**
+ * @summary 获取班级统计信息
+ */
+export const classesControllerGetStats = (
+    id: string,
+    params?: ClassesControllerGetStatsParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ClassStatsDto>(
+      {url: `/classes/${id}/stats`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
+
+export const getClassesControllerGetStatsQueryKey = (id?: string,
+    params?: ClassesControllerGetStatsParams,) => {
+    return [`/classes/${id}/stats`, ...(params ? [params]: [])] as const;
+    }
+
     
+export const getClassesControllerGetStatsQueryOptions = <TData = Awaited<ReturnType<typeof classesControllerGetStats>>, TError = ErrorType<null>>(id: string,
+    params?: ClassesControllerGetStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getClassesControllerGetStatsQueryKey(id,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof classesControllerGetStats>>> = ({ signal }) => classesControllerGetStats(id,params, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetStats>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ClassesControllerGetStatsQueryResult = NonNullable<Awaited<ReturnType<typeof classesControllerGetStats>>>
+export type ClassesControllerGetStatsQueryError = ErrorType<null>
+
+
+export function useClassesControllerGetStats<TData = Awaited<ReturnType<typeof classesControllerGetStats>>, TError = ErrorType<null>>(
+ id: string,
+    params: undefined |  ClassesControllerGetStatsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetStats>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof classesControllerGetStats>>,
+          TError,
+          Awaited<ReturnType<typeof classesControllerGetStats>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useClassesControllerGetStats<TData = Awaited<ReturnType<typeof classesControllerGetStats>>, TError = ErrorType<null>>(
+ id: string,
+    params?: ClassesControllerGetStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetStats>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof classesControllerGetStats>>,
+          TError,
+          Awaited<ReturnType<typeof classesControllerGetStats>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useClassesControllerGetStats<TData = Awaited<ReturnType<typeof classesControllerGetStats>>, TError = ErrorType<null>>(
+ id: string,
+    params?: ClassesControllerGetStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 获取班级统计信息
+ */
+
+export function useClassesControllerGetStats<TData = Awaited<ReturnType<typeof classesControllerGetStats>>, TError = ErrorType<null>>(
+ id: string,
+    params?: ClassesControllerGetStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof classesControllerGetStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getClassesControllerGetStatsQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions , queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+

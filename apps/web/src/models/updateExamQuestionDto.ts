@@ -1,7 +1,8 @@
 
 export interface UpdateExamQuestionDto {
-  /** 题目在试卷中的顺序 */
+  /**
+   * 题目在试卷中的顺序
+   * @minimum 1
+   */
   order?: number;
-  /** 题目分值 */
-  score?: number;
 }

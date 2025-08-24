@@ -21,6 +21,7 @@ import type {
   AddQuestionToExamDto,
   CreateExamDto,
   ExamDto,
+  ExamStatsDto,
   ExamsControllerFindAllParams,
   ExamsControllerUpdateQuestionOrderBody,
   UpdateExamDto
@@ -494,7 +495,7 @@ export const examsControllerGetStats = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamStatsDto>(
       {url: `/exams/${id}/stats`, method: 'GET', signal
     },
       options);

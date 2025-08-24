@@ -18,10 +18,14 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  FavoriteQuestionsControllerAddFavoriteQuestionBody,
-  FavoriteQuestionsControllerBulkRemoveBody,
-  FavoriteQuestionsControllerCreateBody,
+  AddFavoriteQuestionDto,
+  BulkRemoveFavoriteQuestionsDto,
+  CreateFavoriteQuestionDto,
+  FavoriteQuestionDto,
+  FavoriteQuestionsByTypeItemDto,
+  FavoriteQuestionsControllerBulkRemove200,
   FavoriteQuestionsControllerFindAllParams,
+  FavoriteQuestionsControllerGetFavoriteQuestionStats200,
   FavoriteQuestionsControllerGetFavoriteQuestionStatsParams,
   FavoriteQuestionsControllerGetRecentFavoritesParams,
   FavoriteQuestionsControllerSearchFavoriteQuestionsParams,
@@ -41,24 +45,24 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新的收藏题目记录
  */
 export const favoriteQuestionsControllerCreate = (
-    favoriteQuestionsControllerCreateBody: BodyType<FavoriteQuestionsControllerCreateBody>,
+    createFavoriteQuestionDto: BodyType<CreateFavoriteQuestionDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: favoriteQuestionsControllerCreateBody, signal
+      data: createFavoriteQuestionDto, signal
     },
       options);
     }
   
 
 
-export const getFavoriteQuestionsControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<FavoriteQuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<FavoriteQuestionsControllerCreateBody>}, TContext> => {
+export const getFavoriteQuestionsControllerCreateMutationOptions = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<CreateFavoriteQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<CreateFavoriteQuestionDto>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -70,7 +74,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, {data: BodyType<FavoriteQuestionsControllerCreateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, {data: BodyType<CreateFavoriteQuestionDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  favoriteQuestionsControllerCreate(data,requestOptions)
@@ -82,18 +86,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>>
-    export type FavoriteQuestionsControllerCreateMutationBody = BodyType<FavoriteQuestionsControllerCreateBody>
-    export type FavoriteQuestionsControllerCreateMutationError = ErrorType<null>
+    export type FavoriteQuestionsControllerCreateMutationBody = BodyType<CreateFavoriteQuestionDto>
+    export type FavoriteQuestionsControllerCreateMutationError = ErrorType<null | null>
 
     /**
  * @summary 创建新的收藏题目记录
  */
-export const useFavoriteQuestionsControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<FavoriteQuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useFavoriteQuestionsControllerCreate = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>, TError,{data: BodyType<CreateFavoriteQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerCreate>>,
         TError,
-        {data: BodyType<FavoriteQuestionsControllerCreateBody>},
+        {data: BodyType<CreateFavoriteQuestionDto>},
         TContext
       > => {
 
@@ -110,7 +114,7 @@ export const favoriteQuestionsControllerFindAll = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto[]>(
       {url: `/favorite-questions`, method: 'GET',
         params, signal
     },
@@ -123,7 +127,7 @@ export const getFavoriteQuestionsControllerFindAllQueryKey = (params?: FavoriteQ
     }
 
     
-export const getFavoriteQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(params?: FavoriteQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFavoriteQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<null>>(params?: FavoriteQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -142,10 +146,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type FavoriteQuestionsControllerFindAllQueryResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>>
-export type FavoriteQuestionsControllerFindAllQueryError = ErrorType<unknown>
+export type FavoriteQuestionsControllerFindAllQueryError = ErrorType<null>
 
 
-export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params: undefined |  FavoriteQuestionsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>,
@@ -155,7 +159,7 @@ export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: FavoriteQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>,
@@ -165,7 +169,7 @@ export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: FavoriteQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -173,7 +177,7 @@ export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType
  * @summary 获取收藏题目记录列表
  */
 
-export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: FavoriteQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -193,24 +197,24 @@ export function useFavoriteQuestionsControllerFindAll<TData = Awaited<ReturnType
  * @summary 添加收藏题目
  */
 export const favoriteQuestionsControllerAddFavoriteQuestion = (
-    favoriteQuestionsControllerAddFavoriteQuestionBody: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>,
+    addFavoriteQuestionDto: BodyType<AddFavoriteQuestionDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions/add`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: favoriteQuestionsControllerAddFavoriteQuestionBody, signal
+      data: addFavoriteQuestionDto, signal
     },
       options);
     }
   
 
 
-export const getFavoriteQuestionsControllerAddFavoriteQuestionMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}, TContext> => {
+export const getFavoriteQuestionsControllerAddFavoriteQuestionMutationOptions = <TError = ErrorType<null | null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<AddFavoriteQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<AddFavoriteQuestionDto>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerAddFavoriteQuestion'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -222,7 +226,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, {data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, {data: BodyType<AddFavoriteQuestionDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  favoriteQuestionsControllerAddFavoriteQuestion(data,requestOptions)
@@ -234,18 +238,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerAddFavoriteQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>>
-    export type FavoriteQuestionsControllerAddFavoriteQuestionMutationBody = BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>
-    export type FavoriteQuestionsControllerAddFavoriteQuestionMutationError = ErrorType<null>
+    export type FavoriteQuestionsControllerAddFavoriteQuestionMutationBody = BodyType<AddFavoriteQuestionDto>
+    export type FavoriteQuestionsControllerAddFavoriteQuestionMutationError = ErrorType<null | null | null>
 
     /**
  * @summary 添加收藏题目
  */
-export const useFavoriteQuestionsControllerAddFavoriteQuestion = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useFavoriteQuestionsControllerAddFavoriteQuestion = <TError = ErrorType<null | null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>, TError,{data: BodyType<AddFavoriteQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerAddFavoriteQuestion>>,
         TError,
-        {data: BodyType<FavoriteQuestionsControllerAddFavoriteQuestionBody>},
+        {data: BodyType<AddFavoriteQuestionDto>},
         TContext
       > => {
 
@@ -257,15 +261,15 @@ export const useFavoriteQuestionsControllerAddFavoriteQuestion = <TError = Error
  * @summary 批量删除收藏题目记录
  */
 export const favoriteQuestionsControllerBulkRemove = (
-    favoriteQuestionsControllerBulkRemoveBody: BodyType<FavoriteQuestionsControllerBulkRemoveBody>,
+    bulkRemoveFavoriteQuestionsDto: BodyType<BulkRemoveFavoriteQuestionsDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionsControllerBulkRemove200>(
       {url: `/favorite-questions/bulk-remove`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: favoriteQuestionsControllerBulkRemoveBody, signal
+      data: bulkRemoveFavoriteQuestionsDto, signal
     },
       options);
     }
@@ -273,8 +277,8 @@ export const favoriteQuestionsControllerBulkRemove = (
 
 
 export const getFavoriteQuestionsControllerBulkRemoveMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<BulkRemoveFavoriteQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<BulkRemoveFavoriteQuestionsDto>}, TContext> => {
 
 const mutationKey = ['favoriteQuestionsControllerBulkRemove'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -286,7 +290,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, {data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, {data: BodyType<BulkRemoveFavoriteQuestionsDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  favoriteQuestionsControllerBulkRemove(data,requestOptions)
@@ -298,18 +302,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type FavoriteQuestionsControllerBulkRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>>
-    export type FavoriteQuestionsControllerBulkRemoveMutationBody = BodyType<FavoriteQuestionsControllerBulkRemoveBody>
+    export type FavoriteQuestionsControllerBulkRemoveMutationBody = BodyType<BulkRemoveFavoriteQuestionsDto>
     export type FavoriteQuestionsControllerBulkRemoveMutationError = ErrorType<null>
 
     /**
  * @summary 批量删除收藏题目记录
  */
 export const useFavoriteQuestionsControllerBulkRemove = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>, TError,{data: BodyType<BulkRemoveFavoriteQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerBulkRemove>>,
         TError,
-        {data: BodyType<FavoriteQuestionsControllerBulkRemoveBody>},
+        {data: BodyType<BulkRemoveFavoriteQuestionsDto>},
         TContext
       > => {
 
@@ -326,7 +330,7 @@ export const favoriteQuestionsControllerFindByUser = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto[]>(
       {url: `/favorite-questions/user/${userId}`, method: 'GET', signal
     },
       options);
@@ -338,7 +342,7 @@ export const getFavoriteQuestionsControllerFindByUserQueryKey = (userId?: string
     }
 
     
-export const getFavoriteQuestionsControllerFindByUserQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFavoriteQuestionsControllerFindByUserQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<null>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -357,10 +361,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type FavoriteQuestionsControllerFindByUserQueryResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>>
-export type FavoriteQuestionsControllerFindByUserQueryError = ErrorType<unknown>
+export type FavoriteQuestionsControllerFindByUserQueryError = ErrorType<null>
 
 
-export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>,
@@ -370,7 +374,7 @@ export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnT
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>,
@@ -380,7 +384,7 @@ export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnT
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -388,7 +392,7 @@ export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnT
  * @summary 获取指定用户的收藏题目记录
  */
 
-export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -413,7 +417,7 @@ export const favoriteQuestionsControllerFindByQuestion = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto[]>(
       {url: `/favorite-questions/question/${questionId}`, method: 'GET', signal
     },
       options);
@@ -425,7 +429,7 @@ export const getFavoriteQuestionsControllerFindByQuestionQueryKey = (questionId?
     }
 
     
-export const getFavoriteQuestionsControllerFindByQuestionQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFavoriteQuestionsControllerFindByQuestionQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -444,10 +448,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type FavoriteQuestionsControllerFindByQuestionQueryResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>>
-export type FavoriteQuestionsControllerFindByQuestionQueryError = ErrorType<unknown>
+export type FavoriteQuestionsControllerFindByQuestionQueryError = ErrorType<null>
 
 
-export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>,
@@ -457,7 +461,7 @@ export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<Ret
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>,
@@ -467,7 +471,7 @@ export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<Ret
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -475,7 +479,7 @@ export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<Ret
  * @summary 获取指定题目的收藏记录
  */
 
-export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -501,7 +505,7 @@ export const favoriteQuestionsControllerGetRecentFavorites = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto[]>(
       {url: `/favorite-questions/user/${userId}/recent`, method: 'GET',
         params, signal
     },
@@ -515,7 +519,7 @@ export const getFavoriteQuestionsControllerGetRecentFavoritesQueryKey = (userId?
     }
 
     
-export const getFavoriteQuestionsControllerGetRecentFavoritesQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<unknown>>(userId: string,
+export const getFavoriteQuestionsControllerGetRecentFavoritesQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<null>>(userId: string,
     params?: FavoriteQuestionsControllerGetRecentFavoritesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -535,10 +539,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type FavoriteQuestionsControllerGetRecentFavoritesQueryResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>>
-export type FavoriteQuestionsControllerGetRecentFavoritesQueryError = ErrorType<unknown>
+export type FavoriteQuestionsControllerGetRecentFavoritesQueryError = ErrorType<null>
 
 
-export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<null>>(
  userId: string,
     params: undefined |  FavoriteQuestionsControllerGetRecentFavoritesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -549,7 +553,7 @@ export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<null>>(
  userId: string,
     params?: FavoriteQuestionsControllerGetRecentFavoritesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -560,7 +564,7 @@ export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<null>>(
  userId: string,
     params?: FavoriteQuestionsControllerGetRecentFavoritesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
@@ -569,7 +573,7 @@ export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited
  * @summary 获取指定用户的最近收藏题目
  */
 
-export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetRecentFavorites<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError = ErrorType<null>>(
  userId: string,
     params?: FavoriteQuestionsControllerGetRecentFavoritesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetRecentFavorites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
@@ -596,7 +600,7 @@ export const favoriteQuestionsControllerSearchFavoriteQuestions = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto[]>(
       {url: `/favorite-questions/user/${userId}/search`, method: 'GET',
         params, signal
     },
@@ -610,7 +614,7 @@ export const getFavoriteQuestionsControllerSearchFavoriteQuestionsQueryKey = (us
     }
 
     
-export const getFavoriteQuestionsControllerSearchFavoriteQuestionsQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<unknown>>(userId: string,
+export const getFavoriteQuestionsControllerSearchFavoriteQuestionsQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<null>>(userId: string,
     params: FavoriteQuestionsControllerSearchFavoriteQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -630,10 +634,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type FavoriteQuestionsControllerSearchFavoriteQuestionsQueryResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>>
-export type FavoriteQuestionsControllerSearchFavoriteQuestionsQueryError = ErrorType<unknown>
+export type FavoriteQuestionsControllerSearchFavoriteQuestionsQueryError = ErrorType<null>
 
 
-export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<null>>(
  userId: string,
     params: FavoriteQuestionsControllerSearchFavoriteQuestionsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -644,7 +648,7 @@ export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Aw
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<null>>(
  userId: string,
     params: FavoriteQuestionsControllerSearchFavoriteQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -655,7 +659,7 @@ export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Aw
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<null>>(
  userId: string,
     params: FavoriteQuestionsControllerSearchFavoriteQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
@@ -664,7 +668,7 @@ export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Aw
  * @summary 搜索指定用户的收藏题目
  */
 
-export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerSearchFavoriteQuestions<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError = ErrorType<null>>(
  userId: string,
     params: FavoriteQuestionsControllerSearchFavoriteQuestionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerSearchFavoriteQuestions>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
@@ -690,7 +694,7 @@ export const favoriteQuestionsControllerGetFavoriteQuestionStats = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionsControllerGetFavoriteQuestionStats200>(
       {url: `/favorite-questions/stats`, method: 'GET',
         params, signal
     },
@@ -778,7 +782,7 @@ export const favoriteQuestionsControllerGetFavoriteQuestionsByType = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionsByTypeItemDto[]>(
       {url: `/favorite-questions/user/${userId}/stats-by-type`, method: 'GET', signal
     },
       options);
@@ -790,7 +794,7 @@ export const getFavoriteQuestionsControllerGetFavoriteQuestionsByTypeQueryKey = 
     }
 
     
-export const getFavoriteQuestionsControllerGetFavoriteQuestionsByTypeQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<unknown>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getFavoriteQuestionsControllerGetFavoriteQuestionsByTypeQueryOptions = <TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<null>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -809,10 +813,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type FavoriteQuestionsControllerGetFavoriteQuestionsByTypeQueryResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>>
-export type FavoriteQuestionsControllerGetFavoriteQuestionsByTypeQueryError = ErrorType<unknown>
+export type FavoriteQuestionsControllerGetFavoriteQuestionsByTypeQueryError = ErrorType<null>
 
 
-export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>,
@@ -822,7 +826,7 @@ export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData =
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>,
@@ -832,7 +836,7 @@ export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData =
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -840,7 +844,7 @@ export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData =
  * @summary 获取指定用户按题型分类的收藏题目统计
  */
 
-export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useFavoriteQuestionsControllerGetFavoriteQuestionsByType<TData = Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerGetFavoriteQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -865,7 +869,7 @@ export const favoriteQuestionsControllerFindOne = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions/${id}`, method: 'GET', signal
     },
       options);
@@ -952,7 +956,7 @@ export const favoriteQuestionsControllerUpdate = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: favoriteQuestionsControllerUpdateBody
@@ -962,7 +966,7 @@ export const favoriteQuestionsControllerUpdate = (
   
 
 
-export const getFavoriteQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null>,
+export const getFavoriteQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}, TContext> => {
 
@@ -989,12 +993,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type FavoriteQuestionsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>>
     export type FavoriteQuestionsControllerUpdateMutationBody = BodyType<FavoriteQuestionsControllerUpdateBody>
-    export type FavoriteQuestionsControllerUpdateMutationError = ErrorType<null>
+    export type FavoriteQuestionsControllerUpdateMutationError = ErrorType<null | null>
 
     /**
  * @summary 更新收藏题目记录
  */
-export const useFavoriteQuestionsControllerUpdate = <TError = ErrorType<null>,
+export const useFavoriteQuestionsControllerUpdate = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<FavoriteQuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof favoriteQuestionsControllerUpdate>>,
@@ -1015,7 +1019,7 @@ export const favoriteQuestionsControllerRemove = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions/${id}`, method: 'DELETE'
     },
       options);
@@ -1077,7 +1081,7 @@ export const favoriteQuestionsControllerUpdateNote = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions/${id}/note`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: favoriteQuestionsControllerUpdateNoteBody
@@ -1141,7 +1145,7 @@ export const favoriteQuestionsControllerRemoveByUserAndQuestion = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<FavoriteQuestionDto>(
       {url: `/favorite-questions/user/${userId}/question/${questionId}`, method: 'DELETE'
     },
       options);

@@ -22,11 +22,13 @@ import type {
   BulkAddQuestionsDto,
   BulkRemoveDto,
   CreateExamQuestionDto,
-  ExamQuestionResponseDto,
-  ExamQuestionsControllerFindAll200Item,
+  ExamQuestionDto,
+  ExamQuestionStatsDto,
+  ExamQuestionsControllerBulkAddQuestions201,
+  ExamQuestionsControllerBulkRemove200,
   ExamQuestionsControllerFindAllParams,
   ExamQuestionsControllerGetExamQuestionStatsParams,
-  ExamQuestionsControllerUpdate200,
+  ExamQuestionsControllerGetExamTotalScore200,
   UpdateExamQuestionDto
 } from '../../models';
 
@@ -47,7 +49,7 @@ export const examQuestionsControllerCreate = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto>(
       {url: `/exam-questions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createExamQuestionDto, signal
@@ -57,7 +59,7 @@ export const examQuestionsControllerCreate = (
   
 
 
-export const getExamQuestionsControllerCreateMutationOptions = <TError = ErrorType<null>,
+export const getExamQuestionsControllerCreateMutationOptions = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerCreate>>, TError,{data: BodyType<CreateExamQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerCreate>>, TError,{data: BodyType<CreateExamQuestionDto>}, TContext> => {
 
@@ -84,12 +86,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type ExamQuestionsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerCreate>>>
     export type ExamQuestionsControllerCreateMutationBody = BodyType<CreateExamQuestionDto>
-    export type ExamQuestionsControllerCreateMutationError = ErrorType<null>
+    export type ExamQuestionsControllerCreateMutationError = ErrorType<null | null>
 
     /**
  * @summary 创建新的试卷题目关联记录
  */
-export const useExamQuestionsControllerCreate = <TError = ErrorType<null>,
+export const useExamQuestionsControllerCreate = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerCreate>>, TError,{data: BodyType<CreateExamQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examQuestionsControllerCreate>>,
@@ -111,7 +113,7 @@ export const examQuestionsControllerFindAll = (
 ) => {
       
       
-      return customInstance<ExamQuestionsControllerFindAll200Item[]>(
+      return customInstance<ExamQuestionDto[]>(
       {url: `/exam-questions`, method: 'GET',
         params, signal
     },
@@ -124,7 +126,7 @@ export const getExamQuestionsControllerFindAllQueryKey = (params?: ExamQuestions
     }
 
     
-export const getExamQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(params?: ExamQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExamQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<null>>(params?: ExamQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -143,10 +145,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ExamQuestionsControllerFindAllQueryResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>>
-export type ExamQuestionsControllerFindAllQueryError = ErrorType<unknown>
+export type ExamQuestionsControllerFindAllQueryError = ErrorType<null>
 
 
-export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params: undefined |  ExamQuestionsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerFindAll>>,
@@ -156,7 +158,7 @@ export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typ
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: ExamQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerFindAll>>,
@@ -166,7 +168,7 @@ export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typ
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: ExamQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -174,7 +176,7 @@ export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typ
  * @summary 获取试卷题目关联记录列表
  */
 
-export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: ExamQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -199,7 +201,7 @@ export const examQuestionsControllerAddQuestionToExam = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto>(
       {url: `/exam-questions/add`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: addQuestionToExamDto, signal
@@ -209,7 +211,7 @@ export const examQuestionsControllerAddQuestionToExam = (
   
 
 
-export const getExamQuestionsControllerAddQuestionToExamMutationOptions = <TError = ErrorType<null>,
+export const getExamQuestionsControllerAddQuestionToExamMutationOptions = <TError = ErrorType<null | null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerAddQuestionToExam>>, TError,{data: BodyType<AddQuestionToExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerAddQuestionToExam>>, TError,{data: BodyType<AddQuestionToExamDto>}, TContext> => {
 
@@ -236,12 +238,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type ExamQuestionsControllerAddQuestionToExamMutationResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerAddQuestionToExam>>>
     export type ExamQuestionsControllerAddQuestionToExamMutationBody = BodyType<AddQuestionToExamDto>
-    export type ExamQuestionsControllerAddQuestionToExamMutationError = ErrorType<null>
+    export type ExamQuestionsControllerAddQuestionToExamMutationError = ErrorType<null | null | null>
 
     /**
  * @summary 添加题目到试卷
  */
-export const useExamQuestionsControllerAddQuestionToExam = <TError = ErrorType<null>,
+export const useExamQuestionsControllerAddQuestionToExam = <TError = ErrorType<null | null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerAddQuestionToExam>>, TError,{data: BodyType<AddQuestionToExamDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examQuestionsControllerAddQuestionToExam>>,
@@ -263,7 +265,7 @@ export const examQuestionsControllerBulkAddQuestions = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionsControllerBulkAddQuestions201>(
       {url: `/exam-questions/bulk-add`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: bulkAddQuestionsDto, signal
@@ -273,7 +275,7 @@ export const examQuestionsControllerBulkAddQuestions = (
   
 
 
-export const getExamQuestionsControllerBulkAddQuestionsMutationOptions = <TError = ErrorType<null>,
+export const getExamQuestionsControllerBulkAddQuestionsMutationOptions = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerBulkAddQuestions>>, TError,{data: BodyType<BulkAddQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerBulkAddQuestions>>, TError,{data: BodyType<BulkAddQuestionsDto>}, TContext> => {
 
@@ -300,12 +302,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type ExamQuestionsControllerBulkAddQuestionsMutationResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerBulkAddQuestions>>>
     export type ExamQuestionsControllerBulkAddQuestionsMutationBody = BodyType<BulkAddQuestionsDto>
-    export type ExamQuestionsControllerBulkAddQuestionsMutationError = ErrorType<null>
+    export type ExamQuestionsControllerBulkAddQuestionsMutationError = ErrorType<null | null>
 
     /**
  * @summary 批量添加题目到试卷
  */
-export const useExamQuestionsControllerBulkAddQuestions = <TError = ErrorType<null>,
+export const useExamQuestionsControllerBulkAddQuestions = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerBulkAddQuestions>>, TError,{data: BodyType<BulkAddQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examQuestionsControllerBulkAddQuestions>>,
@@ -327,7 +329,7 @@ export const examQuestionsControllerBulkRemove = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionsControllerBulkRemove200>(
       {url: `/exam-questions/bulk-remove`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: bulkRemoveDto, signal
@@ -391,7 +393,7 @@ export const examQuestionsControllerFindByExam = (
 ) => {
       
       
-      return customInstance<ExamQuestionResponseDto[]>(
+      return customInstance<ExamQuestionDto[]>(
       {url: `/exam-questions/exam/${examId}`, method: 'GET', signal
     },
       options);
@@ -403,7 +405,7 @@ export const getExamQuestionsControllerFindByExamQueryKey = (examId?: string,) =
     }
 
     
-export const getExamQuestionsControllerFindByExamQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<unknown>>(examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExamQuestionsControllerFindByExamQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<null>>(examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -422,10 +424,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ExamQuestionsControllerFindByExamQueryResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>>
-export type ExamQuestionsControllerFindByExamQueryError = ErrorType<unknown>
+export type ExamQuestionsControllerFindByExamQueryError = ErrorType<null>
 
 
-export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<null>>(
  examId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>,
@@ -435,7 +437,7 @@ export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>,
@@ -445,7 +447,7 @@ export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -453,7 +455,7 @@ export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<
  * @summary 获取指定试卷的题目列表
  */
 
-export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByExam<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByExam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -478,7 +480,7 @@ export const examQuestionsControllerFindByQuestion = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto[]>(
       {url: `/exam-questions/question/${questionId}`, method: 'GET', signal
     },
       options);
@@ -490,7 +492,7 @@ export const getExamQuestionsControllerFindByQuestionQueryKey = (questionId?: st
     }
 
     
-export const getExamQuestionsControllerFindByQuestionQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExamQuestionsControllerFindByQuestionQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -509,10 +511,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ExamQuestionsControllerFindByQuestionQueryResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>>
-export type ExamQuestionsControllerFindByQuestionQueryError = ErrorType<unknown>
+export type ExamQuestionsControllerFindByQuestionQueryError = ErrorType<null>
 
 
-export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>,
@@ -522,7 +524,7 @@ export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnT
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>,
@@ -532,7 +534,7 @@ export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnT
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -540,7 +542,7 @@ export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnT
  * @summary 获取指定题目关联的试卷列表
  */
 
-export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -565,7 +567,7 @@ export const examQuestionsControllerGetQuestionsByType = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto[]>(
       {url: `/exam-questions/exam/${examId}/by-type`, method: 'GET', signal
     },
       options);
@@ -577,7 +579,7 @@ export const getExamQuestionsControllerGetQuestionsByTypeQueryKey = (examId?: st
     }
 
     
-export const getExamQuestionsControllerGetQuestionsByTypeQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<unknown>>(examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExamQuestionsControllerGetQuestionsByTypeQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<null>>(examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -596,10 +598,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ExamQuestionsControllerGetQuestionsByTypeQueryResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>>
-export type ExamQuestionsControllerGetQuestionsByTypeQueryError = ErrorType<unknown>
+export type ExamQuestionsControllerGetQuestionsByTypeQueryError = ErrorType<null>
 
 
-export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<null>>(
  examId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>,
@@ -609,7 +611,7 @@ export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<Ret
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>,
@@ -619,7 +621,7 @@ export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<Ret
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -627,7 +629,7 @@ export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<Ret
  * @summary 获取指定试卷按题型分类的题目
  */
 
-export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetQuestionsByType<TData = Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -652,7 +654,7 @@ export const examQuestionsControllerGetExamTotalScore = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionsControllerGetExamTotalScore200>(
       {url: `/exam-questions/exam/${examId}/total-score`, method: 'GET', signal
     },
       options);
@@ -664,7 +666,7 @@ export const getExamQuestionsControllerGetExamTotalScoreQueryKey = (examId?: str
     }
 
     
-export const getExamQuestionsControllerGetExamTotalScoreQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<unknown>>(examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExamQuestionsControllerGetExamTotalScoreQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<null>>(examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -683,10 +685,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ExamQuestionsControllerGetExamTotalScoreQueryResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>>
-export type ExamQuestionsControllerGetExamTotalScoreQueryError = ErrorType<unknown>
+export type ExamQuestionsControllerGetExamTotalScoreQueryError = ErrorType<null>
 
 
-export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<null>>(
  examId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>,
@@ -696,7 +698,7 @@ export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<Retu
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>,
@@ -706,7 +708,7 @@ export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<Retu
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -714,7 +716,7 @@ export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<Retu
  * @summary 获取指定试卷的总分
  */
 
-export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<unknown>>(
+export function useExamQuestionsControllerGetExamTotalScore<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError = ErrorType<null>>(
  examId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamTotalScore>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -740,7 +742,7 @@ export const examQuestionsControllerFindByExamAndQuestion = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto>(
       {url: `/exam-questions/exam/${examId}/question/${questionId}`, method: 'GET', signal
     },
       options);
@@ -825,77 +827,15 @@ export function useExamQuestionsControllerFindByExamAndQuestion<TData = Awaited<
 
 
 /**
- * @summary 删除指定试卷中的指定题目关联记录
- */
-export const examQuestionsControllerRemoveByExamAndQuestion = (
-    examId: string,
-    questionId: string,
- options?: SecondParameter<typeof customInstance>,) => {
-      
-      
-      return customInstance<null>(
-      {url: `/exam-questions/exam/${examId}/question/${questionId}`, method: 'DELETE'
-    },
-      options);
-    }
-  
-
-
-export const getExamQuestionsControllerRemoveByExamAndQuestionMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerRemoveByExamAndQuestion>>, TError,{examId: string;questionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerRemoveByExamAndQuestion>>, TError,{examId: string;questionId: string}, TContext> => {
-
-const mutationKey = ['examQuestionsControllerRemoveByExamAndQuestion'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof examQuestionsControllerRemoveByExamAndQuestion>>, {examId: string;questionId: string}> = (props) => {
-          const {examId,questionId} = props ?? {};
-
-          return  examQuestionsControllerRemoveByExamAndQuestion(examId,questionId,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ExamQuestionsControllerRemoveByExamAndQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerRemoveByExamAndQuestion>>>
-    
-    export type ExamQuestionsControllerRemoveByExamAndQuestionMutationError = ErrorType<null>
-
-    /**
- * @summary 删除指定试卷中的指定题目关联记录
- */
-export const useExamQuestionsControllerRemoveByExamAndQuestion = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerRemoveByExamAndQuestion>>, TError,{examId: string;questionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof examQuestionsControllerRemoveByExamAndQuestion>>,
-        TError,
-        {examId: string;questionId: string},
-        TContext
-      > => {
-
-      const mutationOptions = getExamQuestionsControllerRemoveByExamAndQuestionMutationOptions(options);
-
-      return useMutation(mutationOptions , queryClient);
-    }
-    /**
  * @summary 获取试卷题目关联统计信息
  */
 export const examQuestionsControllerGetExamQuestionStats = (
-    params?: ExamQuestionsControllerGetExamQuestionStatsParams,
+    params: ExamQuestionsControllerGetExamQuestionStatsParams,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionStatsDto>(
       {url: `/exam-questions/stats`, method: 'GET',
         params, signal
     },
@@ -908,7 +848,7 @@ export const getExamQuestionsControllerGetExamQuestionStatsQueryKey = (params?: 
     }
 
     
-export const getExamQuestionsControllerGetExamQuestionStatsQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<unknown>>(params?: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getExamQuestionsControllerGetExamQuestionStatsQueryOptions = <TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<null | null>>(params: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -927,11 +867,11 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ExamQuestionsControllerGetExamQuestionStatsQueryResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>>
-export type ExamQuestionsControllerGetExamQuestionStatsQueryError = ErrorType<unknown>
+export type ExamQuestionsControllerGetExamQuestionStatsQueryError = ErrorType<null | null>
 
 
-export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<unknown>>(
- params: undefined |  ExamQuestionsControllerGetExamQuestionStatsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>> & Pick<
+export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<null | null>>(
+ params: ExamQuestionsControllerGetExamQuestionStatsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>,
           TError,
@@ -940,8 +880,8 @@ export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<R
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<unknown>>(
- params?: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>> & Pick<
+export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<null | null>>(
+ params: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>,
           TError,
@@ -950,16 +890,16 @@ export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<R
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<unknown>>(
- params?: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<null | null>>(
+ params: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 获取试卷题目关联统计信息
  */
 
-export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<unknown>>(
- params?: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useExamQuestionsControllerGetExamQuestionStats<TData = Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError = ErrorType<null | null>>(
+ params: ExamQuestionsControllerGetExamQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof examQuestionsControllerGetExamQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -983,7 +923,7 @@ export const examQuestionsControllerFindOne = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto>(
       {url: `/exam-questions/${id}`, method: 'GET', signal
     },
       options);
@@ -1070,7 +1010,7 @@ export const examQuestionsControllerUpdate = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<ExamQuestionsControllerUpdate200>(
+      return customInstance<ExamQuestionDto>(
       {url: `/exam-questions/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: updateExamQuestionDto
@@ -1080,7 +1020,7 @@ export const examQuestionsControllerUpdate = (
   
 
 
-export const getExamQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null>,
+export const getExamQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateExamQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateExamQuestionDto>}, TContext> => {
 
@@ -1107,12 +1047,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type ExamQuestionsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof examQuestionsControllerUpdate>>>
     export type ExamQuestionsControllerUpdateMutationBody = BodyType<UpdateExamQuestionDto>
-    export type ExamQuestionsControllerUpdateMutationError = ErrorType<null>
+    export type ExamQuestionsControllerUpdateMutationError = ErrorType<null | null>
 
     /**
  * @summary 更新试卷题目关联记录
  */
-export const useExamQuestionsControllerUpdate = <TError = ErrorType<null>,
+export const useExamQuestionsControllerUpdate = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof examQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<UpdateExamQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof examQuestionsControllerUpdate>>,
@@ -1133,7 +1073,7 @@ export const examQuestionsControllerRemove = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<ExamQuestionDto>(
       {url: `/exam-questions/${id}`, method: 'DELETE'
     },
       options);

@@ -1,19 +1,21 @@
 
 export type ClassMembersControllerFindAllParams = {
 /**
- * 用户ID
+ * 按用户ID筛选
+ * @pattern ^[cC][^\s-]{8,}$
  */
 userId?: string;
 /**
- * 班级ID
+ * 按班级ID筛选
+ * @pattern ^[cC][^\s-]{8,}$
  */
 classId?: string;
 /**
- * 跳过数量
+ * 页码，默认为 1
  */
-skip?: number;
+page?: string;
 /**
- * 获取数量
+ * 每页数量，默认为 10，最大 100
  */
-take?: number;
+limit?: string;
 };

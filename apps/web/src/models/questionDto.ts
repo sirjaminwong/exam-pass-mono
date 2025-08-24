@@ -1,4 +1,5 @@
 import type { QuestionDtoType } from './questionDtoType';
+import type { QuestionDtoExplanation } from './questionDtoExplanation';
 
 export interface QuestionDto {
   /**
@@ -15,7 +16,7 @@ export interface QuestionDto {
   /** 正确答案（JSON格式） */
   correctAnswer: unknown;
   /** 答案解析 */
-  explanation?: string;
+  explanation: QuestionDtoExplanation;
   /** 题目分值 */
   score: number;
   /**

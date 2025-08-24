@@ -18,12 +18,17 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  WrongQuestionsControllerAddWrongQuestionBody,
-  WrongQuestionsControllerBulkMarkAsResolvedBody,
-  WrongQuestionsControllerBulkRemoveBody,
-  WrongQuestionsControllerCreateBody,
+  AddWrongQuestionDto,
+  BulkMarkAsResolvedDto,
+  BulkRemoveWrongQuestionsDto,
+  CreateWrongQuestionDto,
+  WrongQuestionDto,
+  WrongQuestionsControllerBulkMarkAsResolved200,
+  WrongQuestionsControllerBulkRemove200,
   WrongQuestionsControllerFindAllParams,
+  WrongQuestionsControllerGetWrongQuestionStats200,
   WrongQuestionsControllerGetWrongQuestionStatsParams,
+  WrongQuestionsControllerGetWrongQuestionsByType200,
   WrongQuestionsControllerUpdateBody
 } from '../../models';
 
@@ -39,24 +44,24 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * @summary 创建新的错题记录
  */
 export const wrongQuestionsControllerCreate = (
-    wrongQuestionsControllerCreateBody: BodyType<WrongQuestionsControllerCreateBody>,
+    createWrongQuestionDto: BodyType<CreateWrongQuestionDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: wrongQuestionsControllerCreateBody, signal
+      data: createWrongQuestionDto, signal
     },
       options);
     }
   
 
 
-export const getWrongQuestionsControllerCreateMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, TError,{data: BodyType<WrongQuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, TError,{data: BodyType<WrongQuestionsControllerCreateBody>}, TContext> => {
+export const getWrongQuestionsControllerCreateMutationOptions = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, TError,{data: BodyType<CreateWrongQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, TError,{data: BodyType<CreateWrongQuestionDto>}, TContext> => {
 
 const mutationKey = ['wrongQuestionsControllerCreate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -68,7 +73,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, {data: BodyType<WrongQuestionsControllerCreateBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, {data: BodyType<CreateWrongQuestionDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  wrongQuestionsControllerCreate(data,requestOptions)
@@ -80,18 +85,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type WrongQuestionsControllerCreateMutationResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>>
-    export type WrongQuestionsControllerCreateMutationBody = BodyType<WrongQuestionsControllerCreateBody>
-    export type WrongQuestionsControllerCreateMutationError = ErrorType<null>
+    export type WrongQuestionsControllerCreateMutationBody = BodyType<CreateWrongQuestionDto>
+    export type WrongQuestionsControllerCreateMutationError = ErrorType<null | null>
 
     /**
  * @summary 创建新的错题记录
  */
-export const useWrongQuestionsControllerCreate = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, TError,{data: BodyType<WrongQuestionsControllerCreateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useWrongQuestionsControllerCreate = <TError = ErrorType<null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>, TError,{data: BodyType<CreateWrongQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof wrongQuestionsControllerCreate>>,
         TError,
-        {data: BodyType<WrongQuestionsControllerCreateBody>},
+        {data: BodyType<CreateWrongQuestionDto>},
         TContext
       > => {
 
@@ -108,7 +113,7 @@ export const wrongQuestionsControllerFindAll = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto[]>(
       {url: `/wrong-questions`, method: 'GET',
         params, signal
     },
@@ -121,7 +126,7 @@ export const getWrongQuestionsControllerFindAllQueryKey = (params?: WrongQuestio
     }
 
     
-export const getWrongQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(params?: WrongQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getWrongQuestionsControllerFindAllQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<null>>(params?: WrongQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -140,10 +145,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type WrongQuestionsControllerFindAllQueryResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>>
-export type WrongQuestionsControllerFindAllQueryError = ErrorType<unknown>
+export type WrongQuestionsControllerFindAllQueryError = ErrorType<null>
 
 
-export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params: undefined |  WrongQuestionsControllerFindAllParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>,
@@ -153,7 +158,7 @@ export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<ty
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: WrongQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>,
@@ -163,7 +168,7 @@ export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<ty
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: WrongQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -171,7 +176,7 @@ export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<ty
  * @summary 获取错题记录列表
  */
 
-export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError = ErrorType<null>>(
  params?: WrongQuestionsControllerFindAllParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindAll>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -191,24 +196,24 @@ export function useWrongQuestionsControllerFindAll<TData = Awaited<ReturnType<ty
  * @summary 添加错题
  */
 export const wrongQuestionsControllerAddWrongQuestion = (
-    wrongQuestionsControllerAddWrongQuestionBody: BodyType<WrongQuestionsControllerAddWrongQuestionBody>,
+    addWrongQuestionDto: BodyType<AddWrongQuestionDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/add`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: wrongQuestionsControllerAddWrongQuestionBody, signal
+      data: addWrongQuestionDto, signal
     },
       options);
     }
   
 
 
-export const getWrongQuestionsControllerAddWrongQuestionMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, TError,{data: BodyType<WrongQuestionsControllerAddWrongQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, TError,{data: BodyType<WrongQuestionsControllerAddWrongQuestionBody>}, TContext> => {
+export const getWrongQuestionsControllerAddWrongQuestionMutationOptions = <TError = ErrorType<null | null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, TError,{data: BodyType<AddWrongQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, TError,{data: BodyType<AddWrongQuestionDto>}, TContext> => {
 
 const mutationKey = ['wrongQuestionsControllerAddWrongQuestion'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -220,7 +225,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, {data: BodyType<WrongQuestionsControllerAddWrongQuestionBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, {data: BodyType<AddWrongQuestionDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  wrongQuestionsControllerAddWrongQuestion(data,requestOptions)
@@ -232,18 +237,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type WrongQuestionsControllerAddWrongQuestionMutationResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>>
-    export type WrongQuestionsControllerAddWrongQuestionMutationBody = BodyType<WrongQuestionsControllerAddWrongQuestionBody>
-    export type WrongQuestionsControllerAddWrongQuestionMutationError = ErrorType<null>
+    export type WrongQuestionsControllerAddWrongQuestionMutationBody = BodyType<AddWrongQuestionDto>
+    export type WrongQuestionsControllerAddWrongQuestionMutationError = ErrorType<null | null | null>
 
     /**
  * @summary 添加错题
  */
-export const useWrongQuestionsControllerAddWrongQuestion = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, TError,{data: BodyType<WrongQuestionsControllerAddWrongQuestionBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useWrongQuestionsControllerAddWrongQuestion = <TError = ErrorType<null | null | null>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>, TError,{data: BodyType<AddWrongQuestionDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof wrongQuestionsControllerAddWrongQuestion>>,
         TError,
-        {data: BodyType<WrongQuestionsControllerAddWrongQuestionBody>},
+        {data: BodyType<AddWrongQuestionDto>},
         TContext
       > => {
 
@@ -255,15 +260,15 @@ export const useWrongQuestionsControllerAddWrongQuestion = <TError = ErrorType<n
  * @summary 批量标记为已解决
  */
 export const wrongQuestionsControllerBulkMarkAsResolved = (
-    wrongQuestionsControllerBulkMarkAsResolvedBody: BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>,
+    bulkMarkAsResolvedDto: BodyType<BulkMarkAsResolvedDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionsControllerBulkMarkAsResolved200>(
       {url: `/wrong-questions/bulk-resolve`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: wrongQuestionsControllerBulkMarkAsResolvedBody, signal
+      data: bulkMarkAsResolvedDto, signal
     },
       options);
     }
@@ -271,8 +276,8 @@ export const wrongQuestionsControllerBulkMarkAsResolved = (
 
 
 export const getWrongQuestionsControllerBulkMarkAsResolvedMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, TError,{data: BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, TError,{data: BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, TError,{data: BodyType<BulkMarkAsResolvedDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, TError,{data: BodyType<BulkMarkAsResolvedDto>}, TContext> => {
 
 const mutationKey = ['wrongQuestionsControllerBulkMarkAsResolved'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -284,7 +289,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, {data: BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, {data: BodyType<BulkMarkAsResolvedDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  wrongQuestionsControllerBulkMarkAsResolved(data,requestOptions)
@@ -296,18 +301,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type WrongQuestionsControllerBulkMarkAsResolvedMutationResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>>
-    export type WrongQuestionsControllerBulkMarkAsResolvedMutationBody = BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>
+    export type WrongQuestionsControllerBulkMarkAsResolvedMutationBody = BodyType<BulkMarkAsResolvedDto>
     export type WrongQuestionsControllerBulkMarkAsResolvedMutationError = ErrorType<null>
 
     /**
  * @summary 批量标记为已解决
  */
 export const useWrongQuestionsControllerBulkMarkAsResolved = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, TError,{data: BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>, TError,{data: BodyType<BulkMarkAsResolvedDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof wrongQuestionsControllerBulkMarkAsResolved>>,
         TError,
-        {data: BodyType<WrongQuestionsControllerBulkMarkAsResolvedBody>},
+        {data: BodyType<BulkMarkAsResolvedDto>},
         TContext
       > => {
 
@@ -319,15 +324,15 @@ export const useWrongQuestionsControllerBulkMarkAsResolved = <TError = ErrorType
  * @summary 批量删除错题记录
  */
 export const wrongQuestionsControllerBulkRemove = (
-    wrongQuestionsControllerBulkRemoveBody: BodyType<WrongQuestionsControllerBulkRemoveBody>,
+    bulkRemoveWrongQuestionsDto: BodyType<BulkRemoveWrongQuestionsDto>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionsControllerBulkRemove200>(
       {url: `/wrong-questions/bulk-remove`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: wrongQuestionsControllerBulkRemoveBody, signal
+      data: bulkRemoveWrongQuestionsDto, signal
     },
       options);
     }
@@ -335,8 +340,8 @@ export const wrongQuestionsControllerBulkRemove = (
 
 
 export const getWrongQuestionsControllerBulkRemoveMutationOptions = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, TError,{data: BodyType<WrongQuestionsControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, TError,{data: BodyType<WrongQuestionsControllerBulkRemoveBody>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, TError,{data: BodyType<BulkRemoveWrongQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, TError,{data: BodyType<BulkRemoveWrongQuestionsDto>}, TContext> => {
 
 const mutationKey = ['wrongQuestionsControllerBulkRemove'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -348,7 +353,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, {data: BodyType<WrongQuestionsControllerBulkRemoveBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, {data: BodyType<BulkRemoveWrongQuestionsDto>}> = (props) => {
           const {data} = props ?? {};
 
           return  wrongQuestionsControllerBulkRemove(data,requestOptions)
@@ -360,18 +365,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type WrongQuestionsControllerBulkRemoveMutationResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>>
-    export type WrongQuestionsControllerBulkRemoveMutationBody = BodyType<WrongQuestionsControllerBulkRemoveBody>
+    export type WrongQuestionsControllerBulkRemoveMutationBody = BodyType<BulkRemoveWrongQuestionsDto>
     export type WrongQuestionsControllerBulkRemoveMutationError = ErrorType<null>
 
     /**
  * @summary 批量删除错题记录
  */
 export const useWrongQuestionsControllerBulkRemove = <TError = ErrorType<null>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, TError,{data: BodyType<WrongQuestionsControllerBulkRemoveBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>, TError,{data: BodyType<BulkRemoveWrongQuestionsDto>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof wrongQuestionsControllerBulkRemove>>,
         TError,
-        {data: BodyType<WrongQuestionsControllerBulkRemoveBody>},
+        {data: BodyType<BulkRemoveWrongQuestionsDto>},
         TContext
       > => {
 
@@ -388,7 +393,7 @@ export const wrongQuestionsControllerFindByUser = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto[]>(
       {url: `/wrong-questions/user/${userId}`, method: 'GET', signal
     },
       options);
@@ -400,7 +405,7 @@ export const getWrongQuestionsControllerFindByUserQueryKey = (userId?: string,) 
     }
 
     
-export const getWrongQuestionsControllerFindByUserQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getWrongQuestionsControllerFindByUserQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<null>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -419,10 +424,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type WrongQuestionsControllerFindByUserQueryResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>>
-export type WrongQuestionsControllerFindByUserQueryError = ErrorType<unknown>
+export type WrongQuestionsControllerFindByUserQueryError = ErrorType<null>
 
 
-export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>,
@@ -432,7 +437,7 @@ export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>,
@@ -442,7 +447,7 @@ export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -450,7 +455,7 @@ export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType
  * @summary 获取指定用户的错题记录
  */
 
-export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByUser<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByUser>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -475,7 +480,7 @@ export const wrongQuestionsControllerFindByQuestion = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto[]>(
       {url: `/wrong-questions/question/${questionId}`, method: 'GET', signal
     },
       options);
@@ -487,7 +492,7 @@ export const getWrongQuestionsControllerFindByQuestionQueryKey = (questionId?: s
     }
 
     
-export const getWrongQuestionsControllerFindByQuestionQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getWrongQuestionsControllerFindByQuestionQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -506,10 +511,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type WrongQuestionsControllerFindByQuestionQueryResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>>
-export type WrongQuestionsControllerFindByQuestionQueryError = ErrorType<unknown>
+export type WrongQuestionsControllerFindByQuestionQueryError = ErrorType<null>
 
 
-export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>,
@@ -519,7 +524,7 @@ export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<Return
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>,
@@ -529,7 +534,7 @@ export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<Return
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -537,7 +542,7 @@ export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<Return
  * @summary 获取指定题目的错题记录
  */
 
-export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindByQuestion<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError = ErrorType<null>>(
  questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindByQuestion>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -562,7 +567,7 @@ export const wrongQuestionsControllerFindUnresolved = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto[]>(
       {url: `/wrong-questions/user/${userId}/unresolved`, method: 'GET', signal
     },
       options);
@@ -574,7 +579,7 @@ export const getWrongQuestionsControllerFindUnresolvedQueryKey = (userId?: strin
     }
 
     
-export const getWrongQuestionsControllerFindUnresolvedQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<unknown>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getWrongQuestionsControllerFindUnresolvedQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<null>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -593,10 +598,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type WrongQuestionsControllerFindUnresolvedQueryResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>>
-export type WrongQuestionsControllerFindUnresolvedQueryError = ErrorType<unknown>
+export type WrongQuestionsControllerFindUnresolvedQueryError = ErrorType<null>
 
 
-export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<null>>(
  userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>,
@@ -606,7 +611,7 @@ export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<Return
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>,
@@ -616,7 +621,7 @@ export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<Return
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -624,7 +629,7 @@ export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<Return
  * @summary 获取指定用户的未解决错题
  */
 
-export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerFindUnresolved<TData = Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerFindUnresolved>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -649,7 +654,7 @@ export const wrongQuestionsControllerGetWrongQuestionStats = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionsControllerGetWrongQuestionStats200>(
       {url: `/wrong-questions/stats`, method: 'GET',
         params, signal
     },
@@ -662,7 +667,7 @@ export const getWrongQuestionsControllerGetWrongQuestionStatsQueryKey = (params?
     }
 
     
-export const getWrongQuestionsControllerGetWrongQuestionStatsQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<unknown>>(params?: WrongQuestionsControllerGetWrongQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getWrongQuestionsControllerGetWrongQuestionStatsQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<null>>(params?: WrongQuestionsControllerGetWrongQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -681,10 +686,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type WrongQuestionsControllerGetWrongQuestionStatsQueryResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>>
-export type WrongQuestionsControllerGetWrongQuestionStatsQueryError = ErrorType<unknown>
+export type WrongQuestionsControllerGetWrongQuestionStatsQueryError = ErrorType<null>
 
 
-export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<null>>(
  params: undefined |  WrongQuestionsControllerGetWrongQuestionStatsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>,
@@ -694,7 +699,7 @@ export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<null>>(
  params?: WrongQuestionsControllerGetWrongQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>,
@@ -704,7 +709,7 @@ export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<null>>(
  params?: WrongQuestionsControllerGetWrongQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -712,7 +717,7 @@ export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited
  * @summary 获取错题统计信息
  */
 
-export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionStats<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError = ErrorType<null>>(
  params?: WrongQuestionsControllerGetWrongQuestionStatsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionStats>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -737,7 +742,7 @@ export const wrongQuestionsControllerGetWrongQuestionsByType = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionsControllerGetWrongQuestionsByType200>(
       {url: `/wrong-questions/user/${userId}/stats-by-type`, method: 'GET', signal
     },
       options);
@@ -749,7 +754,7 @@ export const getWrongQuestionsControllerGetWrongQuestionsByTypeQueryKey = (userI
     }
 
     
-export const getWrongQuestionsControllerGetWrongQuestionsByTypeQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<unknown>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getWrongQuestionsControllerGetWrongQuestionsByTypeQueryOptions = <TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<null>>(userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -768,10 +773,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type WrongQuestionsControllerGetWrongQuestionsByTypeQueryResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>>
-export type WrongQuestionsControllerGetWrongQuestionsByTypeQueryError = ErrorType<unknown>
+export type WrongQuestionsControllerGetWrongQuestionsByTypeQueryError = ErrorType<null>
 
 
-export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>,
@@ -781,7 +786,7 @@ export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Await
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>,
@@ -791,7 +796,7 @@ export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Await
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -799,7 +804,7 @@ export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Await
  * @summary 获取指定用户按题型分类的错题统计
  */
 
-export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<unknown>>(
+export function useWrongQuestionsControllerGetWrongQuestionsByType<TData = Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError = ErrorType<null>>(
  userId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof wrongQuestionsControllerGetWrongQuestionsByType>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -824,7 +829,7 @@ export const wrongQuestionsControllerFindOne = (
 ) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/${id}`, method: 'GET', signal
     },
       options);
@@ -911,7 +916,7 @@ export const wrongQuestionsControllerUpdate = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
       data: wrongQuestionsControllerUpdateBody
@@ -921,7 +926,7 @@ export const wrongQuestionsControllerUpdate = (
   
 
 
-export const getWrongQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null>,
+export const getWrongQuestionsControllerUpdateMutationOptions = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<WrongQuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<WrongQuestionsControllerUpdateBody>}, TContext> => {
 
@@ -948,12 +953,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type WrongQuestionsControllerUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof wrongQuestionsControllerUpdate>>>
     export type WrongQuestionsControllerUpdateMutationBody = BodyType<WrongQuestionsControllerUpdateBody>
-    export type WrongQuestionsControllerUpdateMutationError = ErrorType<null>
+    export type WrongQuestionsControllerUpdateMutationError = ErrorType<null | null>
 
     /**
  * @summary 更新错题记录
  */
-export const useWrongQuestionsControllerUpdate = <TError = ErrorType<null>,
+export const useWrongQuestionsControllerUpdate = <TError = ErrorType<null | null>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof wrongQuestionsControllerUpdate>>, TError,{id: string;data: BodyType<WrongQuestionsControllerUpdateBody>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof wrongQuestionsControllerUpdate>>,
@@ -974,7 +979,7 @@ export const wrongQuestionsControllerRemove = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/${id}`, method: 'DELETE'
     },
       options);
@@ -1035,7 +1040,7 @@ export const wrongQuestionsControllerMarkAsResolved = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/${id}/resolve`, method: 'PATCH'
     },
       options);
@@ -1096,7 +1101,7 @@ export const wrongQuestionsControllerMarkAsUnresolved = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/${id}/unresolve`, method: 'PATCH'
     },
       options);
@@ -1158,7 +1163,7 @@ export const wrongQuestionsControllerRemoveByUserAndQuestion = (
  options?: SecondParameter<typeof customInstance>,) => {
       
       
-      return customInstance<null>(
+      return customInstance<WrongQuestionDto>(
       {url: `/wrong-questions/user/${userId}/question/${questionId}`, method: 'DELETE'
     },
       options);

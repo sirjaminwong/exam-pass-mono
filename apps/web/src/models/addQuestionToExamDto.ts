@@ -1,9 +1,18 @@
 
 export interface AddQuestionToExamDto {
-  /** Exam ID */
+  /**
+   * 试卷ID
+   * @pattern ^[cC][^\s-]{8,}$
+   */
   examId: string;
-  /** Question ID */
+  /**
+   * 题目ID
+   * @pattern ^[cC][^\s-]{8,}$
+   */
   questionId: string;
-  /** Order of the question in the exam */
+  /**
+   * 题目在试卷中的顺序
+   * @minimum 1
+   */
   order: number;
 }
