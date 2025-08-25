@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useExamsControllerFindOne } from '../../../services/exams/exams';
-import { useExamQuestionsControllerFindByExam } from '../../../services/exam-questions/exam-questions';
+import { useExamsControllerFindOne } from '@/services/exams/exams';
+import { useExamQuestionsControllerFindByExam } from '@/services/exam-questions/exam-questions';
 import { 
   useExamAttemptsControllerStartExam,
   useExamAttemptsControllerCompleteAttempt
-} from '../../../services/exam-attempts/exam-attempts';
-import { useAnswersControllerSubmitAnswer } from '../../../services/answers/answers';
-import type { UserAnswer, User } from '../../../types/exam';
+} from '@/services/exam-attempts/exam-attempts';
+import { useAnswersControllerSubmitAnswer } from '@/services/answers/answers';
+import type { UserAnswer, User } from '@/types/exam';
 import Timer from './components/Timer';
 import QuestionNavigator from './components/QuestionNavigator';
 

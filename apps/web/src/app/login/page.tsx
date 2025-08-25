@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useUsersControllerFindAll } from '../../services/users/users';
+import { useUsersControllerFindAll } from '@/services/users/users';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({

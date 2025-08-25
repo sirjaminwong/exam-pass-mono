@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { 
   useExamAttemptsControllerFindByUser,
   useExamAttemptsControllerGetUserStats
-} from '../../services/exam-attempts/exam-attempts';
-import { useExamsControllerFindAll } from '../../services/exams/exams';
+} from '@/services/exam-attempts/exam-attempts';
+import { useExamsControllerFindAll } from '@/services/exams/exams';
 
 interface User {
   id: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import type { UserAnswer } from '../../../../types/exam';
+import type { UserAnswer } from '@/types/exam';
 
 interface QuestionNavigatorProps {
   examQuestions: any[]; // 考试题目列表

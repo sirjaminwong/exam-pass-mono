@@ -5,7 +5,7 @@
 export type QuestionsControllerBulkCreateBodyItemType = typeof QuestionsControllerBulkCreateBodyItemType[keyof typeof QuestionsControllerBulkCreateBodyItemType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const QuestionsControllerBulkCreateBodyItemType = {
   SINGLE_CHOICE: 'SINGLE_CHOICE',
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',

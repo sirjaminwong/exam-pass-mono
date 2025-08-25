@@ -5,7 +5,7 @@
 export type QuestionResponseDtoType = typeof QuestionResponseDtoType[keyof typeof QuestionResponseDtoType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const QuestionResponseDtoType = {
   SINGLE_CHOICE: 'SINGLE_CHOICE',
   MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',

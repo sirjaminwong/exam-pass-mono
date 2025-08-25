@@ -8,7 +8,7 @@ import {
   useUpdateUser, 
   useDeleteUser,
   handleApiError 
-} from '../../lib/services';
+} from '@/lib/services';
 
 export default function UsersPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useGetHello } from "../lib/services";
+import { useGetHello } from '@/lib/services';
 
 function HelloComponent() {
   const { data, isLoading, error } = useGetHello();

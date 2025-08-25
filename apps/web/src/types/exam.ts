@@ -1,6 +1,6 @@
-import type { ExamDto } from '../models/examDto';
-import type { QuestionDto } from '../models/questionDto';
-import type { QuestionDtoType } from '../models/questionDtoType';
+import type { ExamDto } from '@/models/examDto';
+import type { QuestionDto } from '@/models/questionDto';
+import type { QuestionDtoType } from '@/models/questionDtoType';
 
 // 考试题目关联接口（基于后端 Prisma 模型）
 export interface ExamQuestion {
