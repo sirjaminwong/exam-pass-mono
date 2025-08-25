@@ -66,16 +66,13 @@ export default function DashboardPage() {
     return 'text-red-600';
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">已完成</span>;
-      case 'in_progress':
-        return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">进行中</span>;
-      case 'abandoned':
-        return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">已放弃</span>;
-      default:
-        return <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">{status}</span>;
+  const getStatusBadge = (isCompleted: boolean, endTime?: string) => {
+    if (isCompleted && endTime) {
+      return <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">已完成</span>;
+    } else if (!isCompleted && !endTime) {
+      return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">进行中</span>;
+    } else {
+      return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">未完成</span>;
     }
   };
 
@@ -238,23 +235,23 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {(userAttempts as any)?.slice(0, 5).map((attempt: any) => (
+                  {userAttempts?.slice(0, 5).map((attempt) => (
                     <div key={attempt.id} className="p-4 border border-gray-200 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-medium text-gray-900">{attempt.exam?.title}</h3>
-                        {getStatusBadge(attempt.status)}
+                        {getStatusBadge(attempt.isCompleted, attempt.endTime)}
                       </div>
                       <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span>考试时间: {formatDate(attempt.startedAt)}</span>
-                        {attempt.score !== null && (
-                          <span className={getScoreColor(attempt.score, attempt.exam?.passingScore || 60)}>
-                            得分: {attempt.score}/{attempt.exam?.totalScore || 100}
+                        <span>考试时间: {formatDate(attempt.startTime)}</span>
+                        {attempt.score !== null && attempt.score !== undefined && (
+                          <span className={getScoreColor(attempt.score, 60)}>
+                            得分: {attempt.score}/100
                           </span>
                         )}
                       </div>
-                      {attempt.completedAt && (
+                      {attempt.endTime && (
                         <p className="text-xs text-gray-500 mt-1">
-                          完成时间: {formatDate(attempt.completedAt)}
+                          完成时间: {formatDate(attempt.endTime)}
                         </p>
                       )}
                     </div>

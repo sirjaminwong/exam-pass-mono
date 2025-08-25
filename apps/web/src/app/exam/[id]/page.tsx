@@ -11,6 +11,8 @@ import {
 } from '../../../services/exam-attempts/exam-attempts';
 import { useAnswersControllerSubmitAnswer } from '../../../services/answers/answers';
 import type { UserAnswer, User } from '../../../types/exam';
+import Timer from './components/Timer';
+import QuestionNavigator from './components/QuestionNavigator';
 
 export default function ExamPage() {
   const params = useParams();
@@ -22,20 +24,14 @@ export default function ExamPage() {
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [examStarted, setExamStarted] = useState(false);
   const [examCompleted, setExamCompleted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [initialTime, setInitialTime] = useState(0);
   const [attemptId, setAttemptId] = useState<string>('');
 
   // 获取考试信息
   const { data: exam, isLoading: examLoading, error: examError } = useExamsControllerFindOne(examId);
-  console.log('exam', exam);
 
   // 获取考试题目
   const { data: examQuestions, isLoading: questionsLoading, error: questionsError } = useExamQuestionsControllerFindByExam(examId);
-
-
-    console.log('examQuestions', examQuestions);
-
-
 
   // API hooks
   const startExamMutation = useExamAttemptsControllerStartExam();
@@ -56,22 +52,7 @@ export default function ExamPage() {
     });
   }, [router]);
 
-  // 计时器
-  useEffect(() => {
-    if (!examStarted || examCompleted || timeRemaining <= 0) return;
 
-    const timer = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 1) {
-          handleCompleteExam();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [examStarted, examCompleted, timeRemaining]);
 
   const handleStartExam = async () => {
     if (!currentUser || !exam) return;
@@ -87,7 +68,7 @@ export default function ExamPage() {
        if (result) {
           setAttemptId((result as any).id);
           setExamStarted(true);
-          setTimeRemaining((exam as any)?.duration * 60 || 3600); // 转换为秒
+          setInitialTime((exam as any)?.duration * 60 || 3600); // 转换为秒
         }
     } catch (error) {
       console.error('开始考试失败:', error);
@@ -145,11 +126,7 @@ export default function ExamPage() {
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
+
 
   if (examLoading) {
     return (
@@ -248,122 +225,151 @@ export default function ExamPage() {
   const currentAnswer = answers.find(a => a.questionId === currentQuestion?.questionId);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 顶部状态栏 */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900">{(exam as any)?.title}</h1>
-            <p className="text-sm text-gray-600">
-              第 {currentQuestionIndex + 1} 题 / 共 {examQuestions?.length || 0} 题
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-lg font-mono font-semibold text-red-600">
-              {formatTime(timeRemaining)}
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* 左侧题目导航器 */}
+      <div className="w-64 flex-shrink-0">
+        <QuestionNavigator
+          examQuestions={examQuestions || []}
+          currentQuestionIndex={currentQuestionIndex}
+          answers={answers}
+          onQuestionSelect={setCurrentQuestionIndex}
+          className="fixed left-0 top-0 bottom-0 w-64"
+        />
+      </div>
+
+      {/* 右侧主要内容区域 */}
+      <div className="flex-1 flex flex-col">
+        {/* 顶部状态栏 */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="px-6 py-4 flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">{(exam as any)?.title}</h1>
+              <p className="text-sm text-gray-600">
+                第 {currentQuestionIndex + 1} 题 / 共 {examQuestions?.length || 0} 题
+              </p>
             </div>
-            <p className="text-sm text-gray-600">剩余时间</p>
+            <div className="w-48">
+              <Timer 
+                initialTime={initialTime}
+                onTimeUp={handleCompleteExam}
+                isActive={examStarted && !examCompleted}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 题目内容 */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {currentQuestion && (
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                {currentQuestion?.question?.content}
-              </h2>
-              
-              <div className="space-y-3">
-                {currentQuestion?.question?.options && Array.isArray(currentQuestion.question.options) ? currentQuestion.question.options.map((option: any, index: number) => {
-                  const optionKey = option.key;
-                  const isSelected = currentAnswer?.selectedOption === optionKey;
+        {/* 题目内容 */}
+        <div className="flex-1 px-6 py-8 overflow-y-auto">
+          {currentQuestion && (
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <div className="mb-6">
+                  {/* 题目标题增强 */}
+                  <div className="flex items-start justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900 leading-relaxed flex-1">
+                      {currentQuestion?.question?.content}
+                    </h2>
+                    <div className="ml-4 flex-shrink-0">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        第 {currentQuestionIndex + 1} 题
+                      </span>
+                    </div>
+                  </div>
                   
-                  return (
-                    <label
-                      key={index}
-                      className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                        isSelected 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name={`question-${currentQuestion?.questionId}`}
-                        value={optionKey}
-                        checked={isSelected}
-                        onChange={() => handleAnswerSelect(currentQuestion?.questionId || '', optionKey)}
-                        className="mr-3 text-blue-600"
-                      />
-                      <span className="font-medium text-gray-700 mr-2">{optionKey}.</span>
-                      <span className="text-gray-900">{option.text}</span>
-                    </label>
-                  );
-                }) : null}
+                  {/* 选项列表优化 */}
+                  <div className="space-y-4">
+                    {currentQuestion?.question?.options && Array.isArray(currentQuestion.question.options) ? currentQuestion.question.options.map((option, index: number) => {
+                      const optionKey = option.key;
+                      const isSelected = currentAnswer?.selectedOption === optionKey;
+                      
+                      return (
+                        <label
+                          key={index}
+                          className={`group flex items-start p-5 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                            isSelected 
+                              ? 'border-blue-500 bg-blue-50 shadow-md transform scale-[1.02]' 
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25 hover:shadow-sm'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`question-${currentQuestion?.questionId}`}
+                            value={optionKey}
+                            checked={isSelected}
+                            onChange={() => handleAnswerSelect(currentQuestion?.questionId || '', optionKey)}
+                            className="mt-1 mr-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold mr-3 ${
+                                isSelected 
+                                  ? 'bg-blue-600 text-white' 
+                                  : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                              }`}>
+                                {optionKey}
+                              </span>
+                              <span className="text-gray-900 text-lg leading-relaxed">{option.text}</span>
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    }) : null}
+                  </div>
+                </div>
+
+                {/* 导航按钮优化 */}
+                <div className="flex justify-between items-center pt-8 border-t border-gray-200">
+                  <button
+                    onClick={handlePrevQuestion}
+                    disabled={currentQuestionIndex === 0}
+                    className="flex items-center px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    上一题
+                  </button>
+                  
+                  <div className="flex space-x-4">
+                    {currentQuestionIndex === (examQuestions?.length || 0) - 1 ? (
+                      <button
+                        onClick={handleCompleteExam}
+                        disabled={completeAttemptMutation.isPending}
+                        className="flex items-center px-8 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                      >
+                        {completeAttemptMutation.isPending ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            提交中...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            提交考试
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleNextQuestion}
+                        className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                      >
+                        下一题
+                        <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* 导航按钮 */}
-            <div className="flex justify-between items-center pt-6 border-t">
-              <button
-                onClick={handlePrevQuestion}
-                disabled={currentQuestionIndex === 0}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                上一题
-              </button>
-              
-              <div className="flex space-x-3">
-                {currentQuestionIndex === (examQuestions?.length || 0) - 1 ? (
-                  <button
-                    onClick={handleCompleteExam}
-                    disabled={completeAttemptMutation.isPending}
-                    className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {completeAttemptMutation.isPending ? '提交中...' : '提交考试'}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleNextQuestion}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    下一题
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 题目导航 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex flex-wrap gap-2">
-            {examQuestions?.map((examQuestion: any, index: number) => {
-              const hasAnswer = answers.some(a => a.questionId === examQuestion?.questionId);
-              const isCurrent = index === currentQuestionIndex;
-              
-              return (
-                <button
-                  key={examQuestion?.id}
-                  onClick={() => setCurrentQuestionIndex(index)}
-                  className={`w-10 h-10 rounded-md text-sm font-medium transition-colors ${
-                    isCurrent
-                      ? 'bg-blue-600 text-white'
-                      : hasAnswer
-                      ? 'bg-green-100 text-green-800 border border-green-300'
-                      : 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              );
-            })}
-          </div>
+          )}
         </div>
       </div>
     </div>
