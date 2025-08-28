@@ -9,6 +9,11 @@ export function setCookie(
     secure?: boolean;
   } = {},
 ): void {
+  // Check if we're in a browser environment
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   let cookieString = `${name}=${encodeURIComponent(value)}`;
 
   if (options.expires) {
@@ -37,6 +42,11 @@ export function setCookie(
 }
 
 export function getCookie(name: string): string | undefined {
+  // Check if we're in a browser environment
+  if (typeof document === 'undefined') {
+    return undefined;
+  }
+
   const cookies = document.cookie.split("; ");
   for (const cookie of cookies) {
     const [cookieName, cookieValue] = cookie.split("=");
@@ -51,6 +61,11 @@ export function removeCookie(
   name: string,
   options: { path?: string; domain?: string } = {},
 ): void {
+  // Check if we're in a browser environment
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   let finalCookieString = `${name}=; expires=${new Date(0).toUTCString()}`;
 
   if (options.path) {

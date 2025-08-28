@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/auth-context';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { useExamsControllerFindOne } from '@/services/exams/exams';
 import { useExamQuestionsControllerFindByExam } from '@/services/exam-questions/exam-questions';
 import { 
@@ -19,7 +22,9 @@ export default function ExamPage() {
   const router = useRouter();
   const examId = params.id as string;
   
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { user: currentUser } = useAuth();
+  const { shouldShowContent } = useAuthGuard();
+  
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
   const [examStarted, setExamStarted] = useState(false);
@@ -38,19 +43,15 @@ export default function ExamPage() {
   const completeAttemptMutation = useExamAttemptsControllerCompleteAttempt();
   const submitAnswerMutation = useAnswersControllerSubmitAnswer();
 
-  // 检查用户登录状态
-  useEffect(() => {
-    const user = localStorage.getItem('currentUser');
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    const userData = JSON.parse(user);
-    setCurrentUser({
-      ...userData,
-      role: userData.role || 'student'
-    });
-  }, [router]);
+  // 如果不应该显示内容（未认证或正在重定向），显示加载状态
+  if (!shouldShowContent) {
+    return <LoadingSpinner />;
+  }
+
+  // 如果认证检查通过但用户数据还未加载，显示加载状态
+  if (!currentUser) {
+    return <LoadingSpinner />;
+  }
 
 
 

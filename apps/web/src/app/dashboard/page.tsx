@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -8,51 +7,40 @@ import {
   useExamAttemptsControllerGetUserStats
 } from '@/services/exam-attempts/exam-attempts';
 import { useExamsControllerFindAll } from '@/services/exams/exams';
+import { useAuth } from '@/contexts/auth-context';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-}
-
-export default function DashboardPage() {
+function DashboardPage() {
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { user: currentUser, logout } = useAuth();
+  const { shouldShowContent } = useAuthGuard();
 
   // 获取用户考试记录
   const { data: userAttempts, isLoading: attemptsLoading } = useExamAttemptsControllerFindByUser(
-    currentUser?.id || ''
+    currentUser?.id || '',
+    {
+      query: {
+        enabled: !!currentUser?.id
+      }
+    }
   );
 
   // 获取用户统计信息
   const { data: userStats, isLoading: statsLoading } = useExamAttemptsControllerGetUserStats(
-    currentUser?.id || ''
+    currentUser?.id || '',
+    {
+      query: {
+        enabled: !!currentUser?.id
+      }
+    }
   );
 
   // 获取所有可用考试
   const { data: availableExams, isLoading: examsLoading } = useExamsControllerFindAll();
 
-  useEffect(() => {
-    // 检查用户登录状态
-    const userData = localStorage.getItem('currentUser');
-    if (!userData) {
-      router.push('/login');
-      return;
-    }
-    
-    try {
-      const user = JSON.parse(userData);
-      setCurrentUser(user);
-    } catch (error) {
-      console.error('解析用户数据失败:', error);
-      router.push('/login');
-    }
-  }, [router]);
-
   const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    router.push('/login');
+    logout();
   };
 
   const formatDate = (dateString: string) => {
@@ -76,15 +64,14 @@ export default function DashboardPage() {
     }
   };
 
+  // 如果不应该显示内容（未认证或正在重定向），显示加载状态
+  if (!shouldShowContent) {
+    return <LoadingSpinner />;
+  }
+
+  // 如果认证检查通过但用户数据还未加载，显示加载状态
   if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -94,7 +81,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">考试系统</h1>
-            <p className="text-sm text-gray-600">欢迎回来，{currentUser.username}</p>
+            <p className="text-sm text-gray-600">欢迎回来，{currentUser.name}</p>
           </div>
           <div className="flex items-center space-x-4">
             <Link
@@ -268,3 +255,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+export default DashboardPage;

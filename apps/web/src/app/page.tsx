@@ -2,16 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useGetHello } from '@/lib/services';
-
-function HelloComponent() {
-  const { data, isLoading, error } = useGetHello();
-  
-  if (isLoading) return <p className="text-sm text-gray-600">连接API中...</p>;
-  if (error) return <p className="text-sm text-red-600">API连接失败</p>;
-  
-  return <p className="text-sm text-green-600">API连接成功 ✓</p>;
-}
 
 export default function Home() {
   return (
@@ -20,7 +10,6 @@ export default function Home() {
         <div className="text-center sm:text-left">
           <h1 className="text-4xl font-bold mb-4">Exam Pass</h1>
           <p className="text-xl text-gray-600 mb-2">考试通过系统</p>
-          <HelloComponent />
         </div>
         
         <div className="bg-gray-50 p-6 rounded-lg max-w-2xl">

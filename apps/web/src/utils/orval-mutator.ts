@@ -1,37 +1,20 @@
 import Axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import { setupHttpInterceptors } from './http-interceptor';
 
 export const AXIOS_INSTANCE = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001',
   timeout: 10000,
 });
 
-// Request interceptor
-AXIOS_INSTANCE.interceptors.request.use(
-  (config) => {
-    // Add auth token if available
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Setup HTTP interceptors using the new interceptor system
+setupHttpInterceptors(AXIOS_INSTANCE);
 
-// Response interceptor
-AXIOS_INSTANCE.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+// Legacy interceptors are replaced by the new HTTP interceptor system
+// The new system handles:
+// - Automatic token attachment from cookies
+// - 401/403 error handling with proper routing
+// - Token refresh mechanism
+// - Request queuing during token refresh
 
 export const customInstance = <T>(
   config: AxiosRequestConfig,
