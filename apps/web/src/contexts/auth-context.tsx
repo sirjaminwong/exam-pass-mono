@@ -29,8 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
   });
 
-  console.log('Auth context: profileData', profileLoading);
-
   // 登出mutation
   const logoutMutation = useAuthControllerLogout({
     mutation: {

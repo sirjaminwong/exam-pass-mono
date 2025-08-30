@@ -1,23 +1,13 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 
 /**
  * 认证守卫 Hook
- * 用于保护需要登录的页面，替代高阶组件的方式
+ * 用于获取认证状态信息，路由保护由 middleware 处理
  * 
- * @param redirectTo - 未认证时重定向的路径，默认为 '/login'
  * @returns 认证状态和加载状态
  */
-export function useAuthGuard(redirectTo: string = '/login') {
+export function useAuthGuard() {
   const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push(redirectTo);
-    }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
 
   return {
     isAuthenticated,
@@ -28,23 +18,13 @@ export function useAuthGuard(redirectTo: string = '/login') {
 }
 
 /**
- * 反向认证守卫 Hook
- * 用于保护不需要登录的页面（如登录页、注册页）
- * 如果用户已登录，则重定向到指定页面
+ * 访客守卫 Hook
+ * 用于获取认证状态信息，路由保护由 middleware 处理
  * 
- * @param redirectTo - 已认证时重定向的路径，默认为 '/dashboard'
  * @returns 认证状态和加载状态
  */
-export function useGuestGuard(redirectTo: string = '/dashboard') {
+export function useGuestGuard() {
   const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    // 只有在加载完成且已认证时才重定向
-    if (!isLoading  && isAuthenticated) {
-      router.push(redirectTo);
-    }
-  }, [isAuthenticated, isLoading, router, redirectTo]);
 
   return {
     isAuthenticated,
