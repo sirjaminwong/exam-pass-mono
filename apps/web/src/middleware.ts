@@ -1,130 +1,198 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { jwtDecode } from 'jwt-decode';
+import type { PathConfig } from '@/types/auth-types';
+import { PathType } from '@/types/auth-types';
+import {
+  validateJwtToken,
+  getTokenRemainingTime
+} from '@/utils/auth-utils';
+import {
+  DEFAULT_PATH_CONFIGS,
+  DEFAULT_PATHS,
+  getPathType,
+  isPublicPath,
+  isProtectedPath,
+  requiresAuthentication,
+  buildLoginRedirectUrl,
+  extractReturnUrl,
+  normalizePath
+} from '@/utils/path-utils';
 
-// 需要认证的路径
-const protectedPaths = [
-  '/dashboard',
-  '/profile',
-  '/settings',
-  '/exams',
-  '/results',
-  '/admin'
+// 扩展默认路径配置
+const MIDDLEWARE_PATH_CONFIGS: PathConfig[] = [
+  ...DEFAULT_PATH_CONFIGS,
+  {
+    paths: [
+      '/exams',
+      '/results'
+    ],
+    type: PathType.PROTECTED
+  },
+  {
+    paths: [
+      '/',
+      '/about',
+      '/contact',
+      '/help'
+    ],
+    type: PathType.PUBLIC
+  },
+  {
+    paths: [
+      '/login',
+      '/register',
+      '/forgot-password',
+      '/reset-password'
+    ],
+    type: PathType.GUEST
+  }
 ];
-
-// 访客页面路径（已登录用户不应访问）
-const guestPaths = [
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password'
-];
-
-// 公开路径（无需认证检查）
-const publicPaths = [
-  '/',
-  '/about',
-  '/contact',
-  '/help'
-];
-
-/**
- * JWT Payload 接口
- */
-interface JwtPayload {
-  iat: number; // 签发时间
-  exp: number; // 过期时间
-  [key: string]: any;
-}
 
 /**
  * 检查用户是否已认证
  * 通过验证 accessToken JWT 的有效性和过期时间来判断
  * @param request - Next.js 请求对象
- * @returns 是否已认证
+ * @returns 认证结果对象
  */
-function isAuthenticated(request: NextRequest): boolean {
+function checkAuthentication(request: NextRequest): {
+  isAuthenticated: boolean;
+  tokenValid: boolean;
+  remainingTime: number;
+  shouldRefresh: boolean;
+} {
   const accessToken = request.cookies.get('accessToken')?.value;
   
   if (!accessToken) {
-    return false;
+    return {
+      isAuthenticated: false,
+      tokenValid: false,
+      remainingTime: 0,
+      shouldRefresh: false
+    };
   }
   
-  try {
-    // 解码 JWT token
-    const decoded = jwtDecode<JwtPayload>(accessToken);
-    
-    // 检查 token 是否过期
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (decoded.exp && decoded.exp < currentTime) {
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    // token 格式无效或解码失败
-    return false;
-  }
+  const validation = validateJwtToken(accessToken);
+  const remainingTime = getTokenRemainingTime(accessToken);
+  
+  return {
+    isAuthenticated: validation.isValid,
+    tokenValid: validation.isValid,
+    remainingTime,
+    shouldRefresh: remainingTime > 0 && remainingTime <= 300 // 5分钟内需要刷新
+  };
 }
 
 /**
- * 检查路径是否匹配指定的路径列表
+ * 检查路径是否应该跳过中间件处理
+ * @param pathname - 路径名
+ * @returns 是否跳过
  */
-function matchesPath(pathname: string, paths: string[]): boolean {
-  return paths.some(path => {
-    // 精确匹配
-    if (pathname === path) return true;
-    // 路径前缀匹配（如 /dashboard/settings 匹配 /dashboard）
-    if (pathname.startsWith(path + '/')) return true;
-    return false;
+function shouldSkipMiddleware(pathname: string): boolean {
+  return (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname.includes('.') ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml'
+  );
+}
+
+/**
+ * 处理未认证用户访问受保护路径
+ * @param request - Next.js 请求对象
+ * @param pathname - 当前路径
+ * @returns 重定向响应
+ */
+function handleUnauthenticatedAccess(request: NextRequest, pathname: string): NextResponse {
+  console.log(`Middleware: Redirecting unauthenticated user from ${pathname} to ${DEFAULT_PATHS.loginPath}`);
+  
+  const loginUrl = buildLoginRedirectUrl(pathname, {
+    searchParams: {
+      reason: 'authentication_required'
+    }
   });
+  
+  return NextResponse.redirect(new URL(loginUrl, request.url));
+}
+
+/**
+ * 处理已认证用户访问访客页面
+ * @param request - Next.js 请求对象
+ * @param pathname - 当前路径
+ * @returns 重定向响应
+ */
+function handleAuthenticatedGuestAccess(request: NextRequest, pathname: string): NextResponse {
+  console.log(`Middleware: Redirecting authenticated user from ${pathname} to ${DEFAULT_PATHS.homePath}`);
+  
+  // 检查是否有重定向参数
+  const redirectTo = extractReturnUrl(request.url, DEFAULT_PATHS.homePath);
+  const normalizedRedirect = normalizePath(redirectTo);
+  
+  // 验证重定向目标是否为受保护路径
+  const targetUrl = requiresAuthentication(normalizedRedirect, MIDDLEWARE_PATH_CONFIGS)
+    ? normalizedRedirect
+    : DEFAULT_PATHS.homePath;
+    
+  return NextResponse.redirect(new URL(targetUrl, request.url));
 }
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const authenticated = isAuthenticated(request);
+  const normalizedPath = normalizePath(pathname);
 
-  // 跳过 API 路由、静态文件和 Next.js 内部文件
-  if (
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/favicon.ico') ||
-    pathname.includes('.')
-  ) {
+  // 跳过不需要处理的路径
+  if (shouldSkipMiddleware(normalizedPath)) {
     return NextResponse.next();
   }
 
-  // 检查是否为受保护路径
-  const isProtectedPath = matchesPath(pathname, protectedPaths);
+  // 检查认证状态
+  const authResult = checkAuthentication(request);
   
-  // 检查是否为访客页面
-  const isGuestPath = matchesPath(pathname, guestPaths);
+  // 获取路径类型
+  const pathResult = getPathType(normalizedPath, MIDDLEWARE_PATH_CONFIGS);
   
-  // 检查是否为公开页面
-  const isPublicPath = matchesPath(pathname, publicPaths);
+  // 记录调试信息
+  console.log(`Middleware: Processing ${normalizedPath}, type: ${pathResult.type}, authenticated: ${authResult.isAuthenticated}`);
 
-  // 未认证用户访问受保护页面 -> 重定向到登录页
-  if (isProtectedPath && !authenticated) {
-    console.log(`Middleware: Redirecting unauthenticated user from ${pathname} to /login`);
-    const loginUrl = new URL('/login', request.url);
-    // 保存原始路径，登录后可以重定向回来
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+  // 处理不同路径类型的访问控制
+  switch (pathResult.type) {
+    case PathType.PROTECTED:
+      // 受保护路径需要认证
+      if (!authResult.isAuthenticated) {
+        return handleUnauthenticatedAccess(request, normalizedPath);
+      }
+      
+      // 如果token即将过期，添加刷新提示头
+      if (authResult.shouldRefresh) {
+        const response = NextResponse.next();
+        response.headers.set('X-Token-Refresh-Needed', 'true');
+        response.headers.set('X-Token-Remaining-Time', authResult.remainingTime.toString());
+        return response;
+      }
+      break;
+      
+    case PathType.GUEST:
+      // 访客页面，已认证用户应重定向
+      if (authResult.isAuthenticated) {
+        return handleAuthenticatedGuestAccess(request, normalizedPath);
+      }
+      break;
+      
+    case PathType.PUBLIC:
+    case PathType.API:
+    case PathType.STATIC:
+    default:
+      // 公开路径、API路径和静态资源直接放行
+      break;
   }
 
-  // 已认证用户访问访客页面 -> 重定向到仪表板
-  if (isGuestPath && authenticated) {
-    console.log(`Middleware: Redirecting authenticated user from ${pathname} to /dashboard`);
-    // 检查是否有重定向参数
-    const redirectTo = request.nextUrl.searchParams.get('redirect');
-    const targetUrl = redirectTo && matchesPath(redirectTo, protectedPaths) 
-      ? redirectTo 
-      : '/dashboard';
-    return NextResponse.redirect(new URL(targetUrl, request.url));
-  }
-
-  // 对于公开页面或其他路径，直接放行
-  return NextResponse.next();
+  // 添加路径信息到响应头，供客户端使用
+  const response = NextResponse.next();
+  response.headers.set('X-Path-Type', pathResult.type || PathType.PUBLIC);
+  response.headers.set('X-Auth-Status', authResult.isAuthenticated ? 'authenticated' : 'unauthenticated');
+  
+  return response;
 }
 
 // 配置 middleware 匹配的路径
