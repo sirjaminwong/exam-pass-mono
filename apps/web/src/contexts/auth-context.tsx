@@ -12,21 +12,18 @@ import type {
   AuthError
 } from '@/types/auth-types';
 import {
-  AuthStatus,
   AuthErrorType
 } from '@/types/auth-types';
 import {
   validateJwtToken,
   getTokenFromStorage,
   createAuthError,
-  getAuthStatusFromValidation
 } from '@/utils/auth-utils';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.UNAUTHENTICATED);
   const [lastError, setLastError] = useState<AuthError | undefined>();
 
   // 获取用户信息的查询
@@ -34,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     query: {
       retry: false,
       staleTime: 5 * 60 * 1000, // 5分钟内不重新获取
-      enabled: authStatus === AuthStatus.AUTHENTICATED, // 只有在认证状态下才获取用户信息
+      enabled: true, // 只有在认证状态下才获取用户信息
     },
   });
 
@@ -51,18 +48,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 清除认证数据
   const clearAuthData = useCallback(() => {
     TokenManager.clearAll();
-    setAuthStatus(AuthStatus.UNAUTHENTICATED);
     setLastError(undefined);
   }, []);
 
   // 设置认证错误
   const setAuthError = useCallback((error: AuthError) => {
     setLastError(error);
-    if (error.type === AuthErrorType.TOKEN_EXPIRED) {
-      setAuthStatus(AuthStatus.TOKEN_EXPIRED);
-    } else {
-      setAuthStatus(AuthStatus.AUTH_FAILED);
-    }
   }, []);
 
   // 清除错误
@@ -75,15 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const accessToken = getTokenFromStorage('accessToken');
     
     if (!accessToken) {
-      setAuthStatus(AuthStatus.UNAUTHENTICATED);
       return false;
     }
 
     const validation = validateJwtToken(accessToken);
-    const status = getAuthStatusFromValidation(validation);
-    
-    setAuthStatus(status);
-    
     if (!validation.isValid) {
       const errorType = validation.isExpired ? AuthErrorType.TOKEN_EXPIRED : AuthErrorType.INVALID_TOKEN;
       setAuthError(createAuthError(errorType, validation.error || 'Token validation failed'));
@@ -106,7 +92,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       TokenManager.setAuthData(tokens);
-      setAuthStatus(AuthStatus.AUTHENTICATED);
       setLastError(undefined);
     } catch (error) {
       setAuthError(createAuthError(
@@ -131,14 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     router.push('/login');
   }, [logoutMutation, clearAuthData, router]);
-
-  // 刷新用户信息
-  const refreshUser = useCallback(() => {
-    if (authStatus === AuthStatus.AUTHENTICATED) {
-      refetchProfile();
-    }
-  }, [authStatus, refetchProfile]);
-
   // 初始化时验证token
   useEffect(() => {
     validateCurrentToken();
@@ -161,18 +138,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [profileError, setAuthError]);
 
   // 计算最终的认证状态
-  const isAuthenticated = authStatus === AuthStatus.AUTHENTICATED && !!user;
-  const isLoading = profileLoading || authStatus === AuthStatus.AUTHENTICATING;
+  const isAuthenticated = !!user;
+  const isLoading = profileLoading;
 
   const value: AuthContextType = {
     user: user || null,
     isLoading,
     isAuthenticated,
-    status: authStatus,
     lastError,
     login,
     logout,
-    refreshUser,
+    refreshUser: refetchProfile,
     clearError,
   };
 

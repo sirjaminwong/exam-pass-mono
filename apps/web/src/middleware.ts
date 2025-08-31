@@ -10,8 +10,6 @@ import {
   DEFAULT_PATH_CONFIGS,
   DEFAULT_PATHS,
   getPathType,
-  isPublicPath,
-  isProtectedPath,
   requiresAuthentication,
   buildLoginRedirectUrl,
   extractReturnUrl,

@@ -160,8 +160,6 @@ export interface AuthContextState {
   isLoading: boolean;
   /** 是否已认证 */
   isAuthenticated: boolean;
-  /** 认证状态 */
-  status: AuthStatus;
   /** 最后一次错误 */
   lastError?: AuthError;
 }

@@ -17,7 +17,6 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [touched, setTouched] = useState<{[key: string]: boolean}>({});
   const [error, setError] = useState('');
-  const router = useRouter();
   const { login } = useAuth();
   const { shouldShowContent } = useGuestGuard();
 
