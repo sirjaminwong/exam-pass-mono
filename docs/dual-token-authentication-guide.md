@@ -1,37 +1,39 @@
-# 双Token认证机制完整指南
+# 双 Token 认证机制完整指南
 
 ## 概述
 
-本文档详细说明了 Exam Pass Mono 项目中实现的双Token认证机制，包括Access Token和Refresh Token的设计原理、实现细节、安全考虑和最佳实践。
+本文档详细说明了 Exam Pass Mono 项目中实现的双 Token 认证机制，包括 Access Token 和 Refresh Token 的设计原理、实现细节、安全考虑和最佳实践。
 
-## 1. 双Token机制原理
+## 1. 双 Token 机制原理
 
-### 1.1 为什么需要两个Token？
+### 1.1 为什么需要两个 Token？
 
 #### 安全性考虑
-- **Access Token短期有效**：减少Token被盗用的风险窗口
-- **Refresh Token长期有效**：避免用户频繁登录
-- **职责分离**：不同Token承担不同的安全职责
-- **撤销控制**：可以独立撤销不同类型的Token
+
+- **Access Token 短期有效**：减少 Token 被盗用的风险窗口
+- **Refresh Token 长期有效**：避免用户频繁登录
+- **职责分离**：不同 Token 承担不同的安全职责
+- **撤销控制**：可以独立撤销不同类型的 Token
 
 #### 用户体验优化
+
 - **无感知刷新**：用户无需重新登录即可延续会话
 - **持久化会话**：支持"记住我"功能
-- **优雅降级**：Token过期时的平滑处理
+- **优雅降级**：Token 过期时的平滑处理
 
-### 1.2 Token配置对比
+### 1.2 Token 配置对比
 
-| 特性 | Access Token | Refresh Token |
-|------|-------------|---------------|
-| **有效期** | 15分钟 | 7天 |
-| **用途** | API访问认证 | 刷新Access Token |
-| **存储位置** | Cookie | Cookie |
+| 特性         | Access Token       | Refresh Token      |
+| ------------ | ------------------ | ------------------ |
+| **有效期**   | 15 分钟            | 7 天               |
+| **用途**     | API 访问认证       | 刷新 Access Token  |
+| **存储位置** | Cookie             | Cookie             |
 | **安全级别** | 高频使用，短期有效 | 低频使用，长期有效 |
-| **撤销策略** | 自动过期 | 主动撤销 |
+| **撤销策略** | 自动过期           | 主动撤销           |
 
 ## 2. 后端实现
 
-### 2.1 Token生成机制
+### 2.1 Token 生成机制
 
 ```typescript
 // apps/api/src/auth/auth.service.ts
@@ -66,7 +68,7 @@ private async generateTokens(user: User): Promise<TokenResponse> {
 }
 ```
 
-### 2.2 Token刷新机制
+### 2.2 Token 刷新机制
 
 ```typescript
 /**
@@ -95,7 +97,7 @@ async refreshToken(refreshTokenDto: RefreshTokenDto): Promise<TokenResponse> {
 }
 ```
 
-### 2.3 JWT策略配置
+### 2.3 JWT 策略配置
 
 ```typescript
 // apps/api/src/auth/strategies/jwt.strategy.ts
@@ -106,7 +108,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET'),
+      secretOrKey: configService.get("JWT_SECRET"),
     });
   }
 
@@ -122,7 +124,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 ## 3. 前端实现
 
-### 3.1 Token管理器
+### 3.1 Token 管理器
 
 ```typescript
 // apps/web/src/utils/token-manager.ts
@@ -135,15 +137,15 @@ export class TokenManager {
   // Token配置
   private static readonly TOKEN_CONFIG = {
     ACCESS_TOKEN: {
-      name: 'accessToken',
+      name: "accessToken",
       maxAge: 15 * 60, // 15分钟
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
     },
     REFRESH_TOKEN: {
-      name: 'refreshToken',
+      name: "refreshToken",
       maxAge: 7 * 24 * 60 * 60, // 7天
-      secure: process.env.NODE_ENV === 'production',
-    }
+      secure: process.env.NODE_ENV === "production",
+    },
   };
 
   /**
@@ -177,7 +179,7 @@ export class TokenManager {
 }
 ```
 
-### 3.2 HTTP拦截器
+### 3.2 HTTP 拦截器
 
 ```typescript
 // apps/web/src/utils/http-interceptor.ts
@@ -220,14 +222,14 @@ class TokenRefreshManager {
 
   private static async performRefresh(): Promise<boolean> {
     const refreshToken = TokenManager.getRefreshToken();
-    
+
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error("No refresh token available");
     }
 
     try {
       const response = await authControllerRefreshToken({
-        refreshToken
+        refreshToken,
       });
 
       TokenManager.setAuthData({
@@ -250,7 +252,9 @@ class TokenRefreshManager {
 // apps/web/src/contexts/auth-context.tsx
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.UNAUTHENTICATED);
+  const [authStatus, setAuthStatus] = useState<AuthStatus>(
+    AuthStatus.UNAUTHENTICATED
+  );
   const [user, setUser] = useState<UserProfileDto | null>(null);
 
   // 登录函数
@@ -258,10 +262,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // 验证Token有效性
       const validation = validateJwtToken(tokens.accessToken);
-      
+
       if (!validation.isValid) {
-        const newStatus = validation.isExpired 
-          ? AuthStatus.TOKEN_EXPIRED 
+        const newStatus = validation.isExpired
+          ? AuthStatus.TOKEN_EXPIRED
           : AuthStatus.AUTH_FAILED;
         setAuthStatus(newStatus);
         return;
@@ -278,14 +282,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 初始化时验证Token
   useEffect(() => {
     const accessToken = TokenManager.getAccessToken();
-    
+
     if (!accessToken) {
       setAuthStatus(AuthStatus.UNAUTHENTICATED);
       return;
     }
 
     const validation = validateJwtToken(accessToken);
-    
+
     if (validation.isValid) {
       setAuthStatus(AuthStatus.AUTHENTICATING);
       // 触发用户信息获取
@@ -296,7 +300,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### 3.4 Middleware保护
+### 3.4 Middleware 保护
 
 ```typescript
 // apps/web/src/middleware.ts
@@ -305,7 +309,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
  * 检查用户是否已认证
  */
 function isAuthenticated(request: NextRequest): boolean {
-  const accessToken = request.cookies.get('accessToken')?.value;
+  const accessToken = request.cookies.get("accessToken")?.value;
 
   if (!accessToken) {
     return false;
@@ -334,21 +338,21 @@ export function middleware(request: NextRequest) {
 
   // 受保护的路径：未认证用户重定向到登录页
   if (matchesPath(pathname, protectedPaths) && !userIsAuthenticated) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('returnUrl', pathname);
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("returnUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // 访客路径：已认证用户重定向到仪表板
   if (matchesPath(pathname, guestPaths) && userIsAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
 }
 ```
 
-## 4. 双Token工作流程
+## 4. 双 Token 工作流程
 
 ### 4.1 初始登录流程
 
@@ -357,7 +361,7 @@ sequenceDiagram
     participant U as 用户
     participant F as 前端
     participant B as 后端
-    
+
     U->>F: 输入用户名密码
     F->>B: POST /auth/login
     B->>B: 验证用户凭据
@@ -369,14 +373,14 @@ sequenceDiagram
     F->>U: 重定向到仪表板
 ```
 
-### 4.2 API访问流程
+### 4.2 API 访问流程
 
 ```mermaid
 sequenceDiagram
     participant F as 前端
     participant I as HTTP拦截器
     participant B as 后端
-    
+
     F->>I: 发起API请求
     I->>I: 检查Access Token
     alt Token有效
@@ -394,14 +398,14 @@ sequenceDiagram
     end
 ```
 
-### 4.3 Token刷新流程
+### 4.3 Token 刷新流程
 
 ```mermaid
 sequenceDiagram
     participant F as 前端
     participant T as Token管理器
     participant B as 后端
-    
+
     F->>T: 检测到Token即将过期
     T->>T: 获取Refresh Token
     T->>B: POST /auth/refresh
@@ -420,46 +424,52 @@ sequenceDiagram
 
 ## 5. 安全考虑
 
-### 5.1 Token安全措施
+### 5.1 Token 安全措施
 
-#### Cookie配置
+#### Cookie 配置
+
 ```typescript
 const cookieOptions = {
-  httpOnly: false,    // 前端需要读取（考虑设置为true增强安全性）
-  secure: true,       // 仅HTTPS传输
-  sameSite: 'strict', // 防止CSRF攻击
-  path: '/',          // 全站可用
+  httpOnly: false, // 前端需要读取（考虑设置为true增强安全性）
+  secure: true, // 仅HTTPS传输
+  sameSite: "strict", // 防止CSRF攻击
+  path: "/", // 全站可用
 };
 ```
 
-#### JWT验证
-- **格式验证**：确保Token格式正确
-- **过期检查**：验证Token未过期
-- **签名验证**：后端验证Token签名
-- **负载验证**：检查Token负载完整性
+#### JWT 验证
+
+- **格式验证**：确保 Token 格式正确
+- **过期检查**：验证 Token 未过期
+- **签名验证**：后端验证 Token 签名
+- **负载验证**：检查 Token 负载完整性
 
 ### 5.2 攻击防护
 
-#### XSS防护
-- 使用HttpOnly Cookie（考虑中）
+#### XSS 防护
+
+- 使用 HttpOnly Cookie（考虑中）
 - 内容安全策略（CSP）
 - 输入验证和输出编码
 
-#### CSRF防护
-- SameSite Cookie属性
-- CSRF Token（可选）
-- Origin验证
+#### CSRF 防护
 
-#### Token泄露防护
-- 短期Access Token
-- 定期轮换Refresh Token
+- SameSite Cookie 属性
+- CSRF Token（可选）
+- Origin 验证
+
+#### Token 泄露防护
+
+- 短期 Access Token
+- 定期轮换 Refresh Token
 - 异常检测和自动撤销
 
 ## 6. 性能优化
 
-### 6.1 Token刷新优化
+### 6.1 Token 刷新优化
 
 #### 预防性刷新
+
 ```typescript
 /**
  * 检查是否应该刷新Token
@@ -467,7 +477,7 @@ const cookieOptions = {
  * @param thresholdMinutes - 提前刷新的时间阈值（分钟）
  */
 export function shouldRefreshToken(
-  token: string, 
+  token: string,
   thresholdMinutes: number = 5
 ): boolean {
   const remainingTime = getTokenRemainingTime(token);
@@ -476,6 +486,7 @@ export function shouldRefreshToken(
 ```
 
 #### 并发控制
+
 - 防止多个并发刷新请求
 - 请求队列管理
 - 失败重试机制
@@ -483,6 +494,7 @@ export function shouldRefreshToken(
 ### 6.2 缓存策略
 
 #### 用户信息缓存
+
 ```typescript
 const { data: profileData } = useAuthControllerGetProfile({
   query: {
@@ -498,23 +510,25 @@ const { data: profileData } = useAuthControllerGetProfile({
 
 ```typescript
 export enum AuthErrorType {
-  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-  TOKEN_INVALID = 'TOKEN_INVALID',
-  REFRESH_FAILED = 'REFRESH_FAILED',
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+  TOKEN_INVALID = "TOKEN_INVALID",
+  REFRESH_FAILED = "REFRESH_FAILED",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 ```
 
 ### 7.2 错误处理策略
 
 #### 自动重试
-- Token过期：自动刷新后重试
+
+- Token 过期：自动刷新后重试
 - 网络错误：指数退避重试
 - 服务器错误：有限次数重试
 
 #### 用户提示
+
 - 友好的错误消息
 - 操作指导建议
 - 恢复操作选项
@@ -523,7 +537,7 @@ export enum AuthErrorType {
 
 ### 8.1 关键指标监控
 
-- **Token刷新频率**：监控刷新请求的频率和成功率
+- **Token 刷新频率**：监控刷新请求的频率和成功率
 - **认证失败率**：跟踪认证失败的原因和频率
 - **会话持续时间**：分析用户会话的平均持续时间
 - **安全事件**：监控异常的认证行为
@@ -551,26 +565,26 @@ const authLogger = {
 
 ```typescript
 // Token管理器测试
-describe('TokenManager', () => {
-  it('should store and retrieve tokens correctly', () => {
+describe("TokenManager", () => {
+  it("should store and retrieve tokens correctly", () => {
     const tokens = {
-      accessToken: 'test-access-token',
-      refreshToken: 'test-refresh-token',
+      accessToken: "test-access-token",
+      refreshToken: "test-refresh-token",
     };
-    
+
     TokenManager.setAuthData(tokens);
-    
+
     expect(TokenManager.getAccessToken()).toBe(tokens.accessToken);
     expect(TokenManager.getRefreshToken()).toBe(tokens.refreshToken);
   });
-  
-  it('should validate auth data correctly', () => {
+
+  it("should validate auth data correctly", () => {
     TokenManager.clearAll();
     expect(TokenManager.validateAuthData()).toBe(false);
-    
+
     TokenManager.setAuthData({
-      accessToken: 'test-token',
-      refreshToken: 'test-refresh',
+      accessToken: "test-token",
+      refreshToken: "test-refresh",
     });
     expect(TokenManager.validateAuthData()).toBe(true);
   });
@@ -581,23 +595,23 @@ describe('TokenManager', () => {
 
 ```typescript
 // 认证流程集成测试
-describe('Authentication Flow', () => {
-  it('should handle complete login flow', async () => {
+describe("Authentication Flow", () => {
+  it("should handle complete login flow", async () => {
     // 模拟登录
     const loginResponse = await authControllerLogin({
-      email: 'test@example.com',
-      password: 'password123',
+      email: "test@example.com",
+      password: "password123",
     });
-    
+
     expect(loginResponse.accessToken).toBeDefined();
     expect(loginResponse.refreshToken).toBeDefined();
-    
+
     // 验证Token存储
     expect(TokenManager.getAccessToken()).toBe(loginResponse.accessToken);
-    
+
     // 测试API调用
     const profileResponse = await authControllerGetProfile();
-    expect(profileResponse.email).toBe('test@example.com');
+    expect(profileResponse.email).toBe("test@example.com");
   });
 });
 ```
@@ -606,22 +620,22 @@ describe('Authentication Flow', () => {
 
 ```typescript
 // E2E认证测试
-describe('Authentication E2E', () => {
-  it('should maintain session across page refreshes', async () => {
+describe("Authentication E2E", () => {
+  it("should maintain session across page refreshes", async () => {
     // 登录
-    await page.goto('/login');
-    await page.fill('[data-testid=email]', 'test@example.com');
-    await page.fill('[data-testid=password]', 'password123');
-    await page.click('[data-testid=login-button]');
-    
+    await page.goto("/login");
+    await page.fill("[data-testid=email]", "test@example.com");
+    await page.fill("[data-testid=password]", "password123");
+    await page.click("[data-testid=login-button]");
+
     // 验证重定向到仪表板
-    expect(page.url()).toContain('/dashboard');
-    
+    expect(page.url()).toContain("/dashboard");
+
     // 刷新页面
     await page.reload();
-    
+
     // 验证仍然在仪表板（未被重定向到登录页）
-    expect(page.url()).toContain('/dashboard');
+    expect(page.url()).toContain("/dashboard");
   });
 });
 ```
@@ -630,61 +644,68 @@ describe('Authentication E2E', () => {
 
 ### 10.1 开发建议
 
-1. **Token生命周期管理**
-   - 合理设置Token过期时间
-   - 实现预防性Token刷新
-   - 处理Token刷新失败场景
+1. **Token 生命周期管理**
+
+   - 合理设置 Token 过期时间
+   - 实现预防性 Token 刷新
+   - 处理 Token 刷新失败场景
 
 2. **安全性考虑**
-   - 使用HTTPS传输
-   - 实现适当的CORS策略
+
+   - 使用 HTTPS 传输
+   - 实现适当的 CORS 策略
    - 定期轮换密钥
 
 3. **用户体验优化**
-   - 无感知的Token刷新
+   - 无感知的 Token 刷新
    - 优雅的错误处理
    - 合理的加载状态
 
 ### 10.2 部署注意事项
 
 1. **环境变量配置**
+
    ```bash
    # JWT密钥（生产环境必须使用强密钥）
    JWT_SECRET=your-super-secret-key
-   
+
    # Token过期时间
    JWT_EXPIRES_IN=15m
    JWT_REFRESH_EXPIRES_IN=7d
    ```
 
-2. **Cookie配置**
-   - 生产环境启用Secure标志
-   - 配置适当的SameSite策略
-   - 考虑使用HttpOnly（需要调整前端实现）
+2. **Cookie 配置**
+
+   - 生产环境启用 Secure 标志
+   - 配置适当的 SameSite 策略
+   - 考虑使用 HttpOnly（需要调整前端实现）
 
 3. **监控和告警**
    - 设置认证失败率告警
-   - 监控Token刷新频率
+   - 监控 Token 刷新频率
    - 跟踪安全相关事件
 
 ## 11. 故障排除
 
 ### 11.1 常见问题
 
-#### Token刷新失败
+#### Token 刷新失败
+
 **症状**：用户频繁被重定向到登录页
-**原因**：Refresh Token过期或无效
-**解决**：检查Token存储和过期时间配置
+**原因**：Refresh Token 过期或无效
+**解决**：检查 Token 存储和过期时间配置
 
 #### 认证状态不一致
-**症状**：页面显示未认证但Cookie中有Token
-**原因**：Token格式错误或解码失败
-**解决**：验证JWT格式和密钥配置
+
+**症状**：页面显示未认证但 Cookie 中有 Token
+**原因**：Token 格式错误或解码失败
+**解决**：验证 JWT 格式和密钥配置
 
 #### 并发刷新问题
-**症状**：多个Token刷新请求导致冲突
+
+**症状**：多个 Token 刷新请求导致冲突
 **原因**：缺少并发控制机制
-**解决**：实现Token刷新队列管理
+**解决**：实现 Token 刷新队列管理
 
 ### 11.2 调试工具
 
@@ -694,17 +715,20 @@ const authDebugger = {
   logTokenInfo: () => {
     const accessToken = TokenManager.getAccessToken();
     const refreshToken = TokenManager.getRefreshToken();
-    
-    console.log('=== Auth Debug Info ===');
-    console.log('Access Token:', accessToken ? 'Present' : 'Missing');
-    console.log('Refresh Token:', refreshToken ? 'Present' : 'Missing');
-    
+
+    console.log("=== Auth Debug Info ===");
+    console.log("Access Token:", accessToken ? "Present" : "Missing");
+    console.log("Refresh Token:", refreshToken ? "Present" : "Missing");
+
     if (accessToken) {
       const validation = validateJwtToken(accessToken);
-      console.log('Token Valid:', validation.isValid);
-      console.log('Token Expired:', validation.isExpired);
+      console.log("Token Valid:", validation.isValid);
+      console.log("Token Expired:", validation.isExpired);
       if (validation.payload) {
-        console.log('Token Expires At:', new Date(validation.payload.exp! * 1000));
+        console.log(
+          "Token Expires At:",
+          new Date(validation.payload.exp! * 1000)
+        );
       }
     }
   },
@@ -713,28 +737,89 @@ const authDebugger = {
 
 ## 12. 总结
 
-双Token认证机制为 Exam Pass Mono 项目提供了：
+双 Token 认证机制为 Exam Pass Mono 项目提供了：
 
 ### 12.1 核心优势
 
-1. **安全性**：短期Access Token + 长期Refresh Token的组合
-2. **用户体验**：无感知的Token刷新和会话延续
+1. **安全性**：短期 Access Token + 长期 Refresh Token 的组合
+2. **用户体验**：无感知的 Token 刷新和会话延续
 3. **性能**：智能的缓存和刷新策略
 4. **可维护性**：清晰的架构和职责分离
 5. **扩展性**：支持未来的安全需求扩展
 
 ### 12.2 关键设计决策
 
-1. **Cookie存储**：支持SSR和更好的安全性
-2. **Middleware保护**：服务端路由保护避免客户端闪烁
+1. **Cookie 存储**：支持 SSR 和更好的安全性
+2. **Middleware 保护**：服务端路由保护避免客户端闪烁
 3. **智能刷新**：预防性刷新和并发控制
 4. **错误处理**：完善的错误分类和恢复机制
 
 ### 12.3 持续改进方向
 
-1. **安全增强**：考虑实现Token轮换和设备绑定
-2. **性能优化**：进一步优化Token验证和刷新逻辑
+1. **安全增强**：考虑实现 Token 轮换和设备绑定
+2. **性能优化**：进一步优化 Token 验证和刷新逻辑
 3. **监控完善**：增加更详细的认证行为分析
 4. **用户体验**：实现更智能的会话管理
 
-这个双Token认证机制为项目提供了坚实的安全基础，同时保持了良好的用户体验和系统性能。通过持续的监控和优化，可以确保认证系统的可靠性和安全性。
+这个双 Token 认证机制为项目提供了坚实的安全基础，同时保持了良好的用户体验和系统性能。通过持续的监控和优化，可以确保认证系统的可靠性和安全性。
+
+双 Token 机制的核心本质可以用一句话概括：
+
+👉 **用短期的 Access Token 做高频访问认证，用长期的 Refresh Token 做低频续期支撑，从而同时兼顾安全性与用户体验。**
+
+---
+
+## 🔑 核心点拆解
+
+### 1. 职责分离
+
+- **Access Token**
+
+  - 作用：携带用户身份信息，用于直接访问受保护的 API
+  - 特点：短期有效（如 15 分钟），即使泄露，风险窗口也有限
+
+- **Refresh Token**
+
+  - 作用：仅用于获取新的 Access Token，不直接访问业务 API
+  - 特点：长期有效（如 7 天/30 天），但使用频率低，可做严格校验和撤销
+
+---
+
+### 2. 安全性提升
+
+- **缩短攻击窗口**：Access Token 过期快，即使被窃取，能用的时间也有限
+- **降低敏感暴露**：Refresh Token 不频繁传输，减少在网络中暴露的机会
+- **可控撤销**：后台可以单独撤销 Refresh Token，实现账号下线/踢人功能
+
+---
+
+### 3. 用户体验优化
+
+- **无感续期**：前端检测到 Access Token 过期 → 静默调用刷新接口 → 自动续期，不打断用户
+- **减少频繁登录**：用户不必每 15 分钟重新登录，长期使用只需 Refresh Token 保活
+- **平滑降级**：如果 Refresh Token 也失效，才强制要求重新登录，体验更合理
+
+---
+
+### 4. 核心流程
+
+1. 用户登录成功，服务端返回一对 Token：**Access + Refresh**
+2. 前端持有 Access Token，带着它调用 API
+3. Access Token 过期 → 前端用 Refresh Token 请求新 Token
+4. 服务端校验 Refresh Token → 返回新的一对 Token
+5. 如果 Refresh Token 也过期 → 用户需要重新登录
+
+---
+
+### 5. 一句话总结
+
+双 Token 的核心是 **“短 Token 做认证，长 Token 做续命”**：
+
+- **Access Token** → 快速、轻便，但短命
+- **Refresh Token** → 持久、安全，但低频
+
+两者配合，让系统既 **安全可控**，又 **体验流畅**。
+
+---
+
+要不要我帮你画一个 **双 Token 流程图（登录 → 请求 → 过期刷新 → 重新登录）**，这样能更直观地展示整个机制？
