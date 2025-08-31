@@ -160,8 +160,8 @@ export interface AuthContextState {
   isLoading: boolean;
   /** 是否已认证 */
   isAuthenticated: boolean;
-  /** 最后一次错误 */
-  lastError?: AuthError;
+  /** 认证状态 */
+  authStatus: AuthStatus;
 }
 
 /**
@@ -174,8 +174,6 @@ export interface AuthContextActions {
   logout: () => void;
   /** 刷新用户信息 */
   refreshUser: () => void;
-  /** 清除错误 */
-  clearError: () => void;
 }
 
 /**

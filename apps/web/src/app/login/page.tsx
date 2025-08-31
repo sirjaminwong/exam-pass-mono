@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthControllerLogin } from '@/services/auth/auth';
 import { useAuth } from '@/contexts/auth-context';
@@ -32,9 +31,6 @@ export default function LoginPage() {
           },
           response.user
         );
-        
-        // 移除这里的重定向，让useEffect处理重定向逻辑
-        // router.push('/dashboard');
       },
       onError: (error: any) => {
         console.error('Login error:', error);

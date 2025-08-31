@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthControllerGetProfile, useAuthControllerLogout } from '@/services/auth/auth';
 import { TokenManager } from '@/utils/token-manager';
@@ -8,32 +8,38 @@ import { setRouterInstance } from '@/utils/http-interceptor';
 import type { UserProfileDto } from '@/models';
 import type {
   AuthContextType,
-  AuthTokens,
-  AuthError
+  AuthTokens
 } from '@/types/auth-types';
 import {
-  AuthErrorType
+  AuthStatus
 } from '@/types/auth-types';
 import {
   validateJwtToken,
   getTokenFromStorage,
-  createAuthError,
 } from '@/utils/auth-utils';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [lastError, setLastError] = useState<AuthError | undefined>();
+  const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.UNAUTHENTICATED);
+  const [user, setUser] = useState<UserProfileDto | null>(null);
 
   // 获取用户信息的查询
-  const { data: user, isLoading: profileLoading, refetch: refetchProfile, error: profileError } = useAuthControllerGetProfile({
+  const { data: profileData, isLoading: profileLoading, refetch: refetchProfile } = useAuthControllerGetProfile({
     query: {
       retry: false,
       staleTime: 5 * 60 * 1000, // 5分钟内不重新获取
-      enabled: true, // 只有在认证状态下才获取用户信息
+      enabled: authStatus === AuthStatus.AUTHENTICATING, // 只有在验证中时才触发请求
     },
   });
+
+  useLayoutEffect(() => {
+    if (profileData) {
+      setUser(profileData);
+      setAuthStatus(AuthStatus.AUTHENTICATED);
+    }
+  }, [profileData]);
 
   // 登出mutation
   const logoutMutation = useAuthControllerLogout({
@@ -48,36 +54,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 清除认证数据
   const clearAuthData = useCallback(() => {
     TokenManager.clearAll();
-    setLastError(undefined);
   }, []);
 
-  // 设置认证错误
-  const setAuthError = useCallback((error: AuthError) => {
-    setLastError(error);
-  }, []);
 
-  // 清除错误
-  const clearError = useCallback(() => {
-    setLastError(undefined);
-  }, []);
-
-  // 验证当前token状态
-  const validateCurrentToken = useCallback(() => {
-    const accessToken = getTokenFromStorage('accessToken');
-    
-    if (!accessToken) {
-      return false;
-    }
-
-    const validation = validateJwtToken(accessToken);
-    if (!validation.isValid) {
-      const errorType = validation.isExpired ? AuthErrorType.TOKEN_EXPIRED : AuthErrorType.INVALID_TOKEN;
-      setAuthError(createAuthError(errorType, validation.error || 'Token validation failed'));
-      return false;
-    }
-
-    return true;
-  }, [setAuthError]);
 
   // 登录函数
   const login = useCallback((tokens: AuthTokens, userData: UserProfileDto) => {
@@ -86,21 +65,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const validation = validateJwtToken(tokens.accessToken);
       
       if (!validation.isValid) {
-        const errorType = validation.isExpired ? AuthErrorType.TOKEN_EXPIRED : AuthErrorType.INVALID_TOKEN;
-        setAuthError(createAuthError(errorType, validation.error || 'Invalid token provided'));
+        const newStatus = validation.isExpired ? AuthStatus.TOKEN_EXPIRED : AuthStatus.AUTH_FAILED;
+        setAuthStatus(newStatus);
         return;
       }
-
+      setUser(userData);
+      setAuthStatus(AuthStatus.AUTHENTICATED);
       TokenManager.setAuthData(tokens);
-      setLastError(undefined);
     } catch (error) {
-      setAuthError(createAuthError(
-        AuthErrorType.UNKNOWN_ERROR,
-        'Failed to process login tokens',
-        error
-      ));
+      setAuthStatus(AuthStatus.AUTH_FAILED);
     }
-  }, [setAuthError]);
+  }, []);
 
   // 登出函数
   const logout = useCallback(() => {
@@ -113,43 +88,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // 如果没有token，直接清除本地数据
       clearAuthData();
     }
-    
+    setUser(null);
+    setAuthStatus(AuthStatus.UNAUTHENTICATED);
     router.push('/login');
   }, [logoutMutation, clearAuthData, router]);
   // 初始化时验证token
   useEffect(() => {
-    validateCurrentToken();
-  }, [validateCurrentToken]);
+    const accessToken = getTokenFromStorage('accessToken');
+    
+    if (!accessToken) {
+      setAuthStatus(AuthStatus.UNAUTHENTICATED);
+      return;
+    }
+
+    const validation = validateJwtToken(accessToken);
+    if (!validation.isValid) {
+      const newStatus = validation.isExpired ? AuthStatus.TOKEN_EXPIRED : AuthStatus.AUTH_FAILED;
+      setAuthStatus(newStatus);
+      return;
+    }
+
+    setAuthStatus(AuthStatus.AUTHENTICATING);
+  }, []);
 
   // 设置路由实例
   useEffect(() => {
     setRouterInstance(router);
   }, [router]);
 
-  // 处理用户信息获取错误
-  useEffect(() => {
-    if (profileError) {
-      setAuthError(createAuthError(
-        AuthErrorType.NETWORK_ERROR,
-        'Failed to fetch user profile',
-        profileError
-      ));
-    }
-  }, [profileError, setAuthError]);
 
   // 计算最终的认证状态
-  const isAuthenticated = !!user;
+  const isAuthenticated = authStatus === AuthStatus.AUTHENTICATED && !!user;
   const isLoading = profileLoading;
 
   const value: AuthContextType = {
     user: user || null,
     isLoading,
     isAuthenticated,
-    lastError,
+    authStatus,
     login,
     logout,
     refreshUser: refetchProfile,
-    clearError,
   };
 
   return (

@@ -71,6 +71,12 @@ function checkAuthentication(request: NextRequest): {
   
   const validation = validateJwtToken(accessToken);
   const remainingTime = getTokenRemainingTime(accessToken);
+
+  console.log('Middleware: Token validation result', {
+    isValid: validation.isValid,
+    remainingTime,
+    shouldRefresh: remainingTime > 0 && remainingTime <= 300 // 5分钟内需要刷新
+  });
   
   return {
     isAuthenticated: validation.isValid,
